@@ -1,3 +1,5 @@
+# Datacook Contributing/Code Style Guide
+
 This style guide extends from the official [Google Javascript style guide](https://google.github.io/styleguide/jsguide.html)
 
 ## Commits
@@ -10,6 +12,9 @@ __Note:__ #num is a pull or issue number.
 For example:
 
 `[Imageprocessor]: Fixes #20 Add crop method`
+
+## Major Changes
+Major changes are made in new branches and a pull request should be opened for review. 
 
 ## File names
 File names must be all lowercase and may include underscores (_) or dashes (-). Filenames’ extension must be .js.
