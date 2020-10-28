@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "resolveJsonModule": true,
+    "composite": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "incremental": true,
+    "module": "commonjs",
+    "target": "es6",
+    "lib": [ "es6" ],
+    "skipLibCheck": true,
+    "sourceMap": true
+  },
+  
+  "exclude": [
+    "node_modules",
+    "test",
+    "dist"
+  ]
+}
