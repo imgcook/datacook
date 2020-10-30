@@ -1,4 +1,3 @@
-export function hello(x: string): string {
-  console.log(`Hello, ${x}`);
-  return x;
-}
+import '@tensorflow/tfjs-backend-cpu';
+
+export * as Generic from './generic';
