@@ -18,6 +18,6 @@ jobs:
         with:
           node-version: 12
       - run: |
-      npm run lint
-      npm run test
-      npm run build
+          npm run lint
+          npm run test
+          npm run build
