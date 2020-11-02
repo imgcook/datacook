@@ -4,10 +4,13 @@
   "description": "Library for data processing in pure JavaScript",
   "main": "dist/index.js",
   "dependencies": {
+    "@tensorflow/tfjs-backend-cpu": "^2.7.0",
+    "@tensorflow/tfjs-backend-wasm": "^2.7.0",
+    "@tensorflow/tfjs-core": "^2.7.0",
     "danfojs": "^0.1.2"
   },
   "scripts": {
-    "test": "nyc mocha -r ts-node/register ./test/*",
+    "test": "nyc mocha -r ts-node/register ./test/**/*.ts",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "build": "npm run clean && tsc -b tsconfig.json",
     "lint": "eslint ./src",
