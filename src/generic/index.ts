@@ -16,7 +16,7 @@ function split(inputs: Tensor[], trainRatio = .75): Tensor[]{
   const trainSize = Math.floor(size * trainRatio);
   const testSize = size - trainSize;
 
-  const results = inputs.map((input) => input.split([trainSize, testSize])).reduce((prev, curr) => {
+  const results = inputs.map((input) => input.split([ trainSize, testSize ])).reduce((prev, curr) => {
     prev.push(...curr);
     return prev;
   }, []);
@@ -25,4 +25,4 @@ function split(inputs: Tensor[], trainRatio = .75): Tensor[]{
 
 export {
   split
-}
+};
