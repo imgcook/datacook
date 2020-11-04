@@ -14,7 +14,7 @@
     "test": "nyc mocha --timeout 10000 -r ts-node/register ./test/**/*.ts",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "build": "npm run clean && tsc -b tsconfig.json",
-    "lint": "eslint ./datacook/src",
+    "lint": "eslint ./src",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "coverage": "nyc report --reporter=text-lcov | coveralls && nyc report --reporter=lcov",
     "patch": "npm version patch",
