@@ -1,3 +1,5 @@
+import * as tf from '@tensorflow/tfjs-core';
+
 interface ImageProp {
   height: number;
   width: number;
@@ -6,7 +8,7 @@ interface ImageProp {
 }
 
 export interface Tensor2ImgArgs extends ImageProp{
-  data: Array<Array<Array<number>>>;
+  data: tf.Tensor3D;
 }
 
 interface Img2TensorArgs extends ImageProp{
@@ -14,7 +16,7 @@ interface Img2TensorArgs extends ImageProp{
   new_channel: number;
 }
 
-export function img2array(opt: Img2TensorArgs): Array<Array<Array<number>>> {
+export function img2array(opt: Img2TensorArgs): tf.Tensor3D {
 
   let img_array: Array<Array<Array<number>>> = [];
 
@@ -32,7 +34,7 @@ export function img2array(opt: Img2TensorArgs): Array<Array<Array<number>>> {
     }
     img_array.push(channel_array);
   }
-  return img_array;
+  return tf.tensor3d(img_array);
 }
 
 export function tensor2Img(opt: Tensor2ImgArgs): Array<number>{
@@ -40,10 +42,11 @@ export function tensor2Img(opt: Tensor2ImgArgs): Array<number>{
   let new_array: Array<number> = new Array(opt.width*
       opt.height*opt.channel);
   
+  let data = opt.data.arraySync()
   let channel_array: Array<Array<number>> = [];
 
   for(let ch=0; ch < opt.channel; ch++){
-    channel_array = opt.data[ch];
+    channel_array = data[ch];
 
     for(let j=0; j < opt.width; j++){
         for(let k=0; k< opt.height; k++){
@@ -55,12 +58,14 @@ export function tensor2Img(opt: Tensor2ImgArgs): Array<number>{
   return new_array;
 }
 
-export function is_img(img: string){
-    
-  let ext: string = img.split(".")[1];
-  let img_ext = ["png", "jpg","JPEG","PNG"];
+export function std(data: tf.Tensor3D) {
+
+  let tensor_data = data
   
-  if(!img_ext.includes(ext)){
-      throw new Error(`extension ${ext} not supported`);
-  }
+  let mean = tensor_data.mean()
+  let sub_mean_pow = tensor_data.sub(mean).pow(2)
+  let mean_data = sub_mean_pow.mean()
+  let std = mean_data.sqrt()
+  
+  return std
 }

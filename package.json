@@ -11,7 +11,7 @@
     "jimp": "^0.16.1"
   },
   "scripts": {
-    "test": "nyc mocha -r ts-node/register ./test/image/*.ts",
+    "test": "nyc mocha --timeout 10000 -r ts-node/register ./test/**/*.ts",
     "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
     "build": "npm run clean && tsc -b tsconfig.json",
     "lint": "eslint ./datacook/src",
