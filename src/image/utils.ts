@@ -7,65 +7,61 @@ interface ImageProp {
 
 }
 
-export interface Tensor2ImgArgs extends ImageProp{
-  data: tf.Tensor3D;
-}
-
-interface Img2TensorArgs extends ImageProp{
+interface Img2TensorArgs extends ImageProp {
   data: Buffer;
-  new_channel: number;
+  newChannel: number;
 }
 
 export function img2array(opt: Img2TensorArgs): tf.Tensor3D {
 
-  let img_array: Array<Array<Array<number>>> = [];
+  let imgArray: Array<Array<Array<number>>> = [];
 
-  for (let ch = 0; ch < opt.new_channel;ch++){
-    let channel_array: Array<Array<number>> = [];
+  for (let ch = 0; ch < opt.newChannel;ch++){
+    let channelArray: Array<Array<number>> = [];
 
     for (let j = 0; j < opt.width; j++){
-      let inner_array: Array<number> = [];
+      let innerArray: Array<number> = [];
 
       for (let k = 0; k < opt.height; k++){
         let index: number = ((opt.width * k) + j) * opt.channel + ch;
-        inner_array.push(opt.data[index]);
+        innerArray.push(opt.data[index]);
       }
-      channel_array.push(inner_array);
+      channelArray.push(innerArray);
     }
-    img_array.push(channel_array);
+    imgArray.push(channelArray);
   }
-  return tf.tensor3d(img_array);
+  return tf.tensor3d(imgArray);
 }
 
-export function tensor2Img(opt: Tensor2ImgArgs): Array<number>{
+export function tensor2Img(tensor: tf.Tensor3D): Array<number> {
 
-  let new_array: Array<number> = new Array(opt.width *
-      opt.height * opt.channel);
+  const [ channel, width, height ] = tensor.shape;
+  let newArray: Array<number> = new Array(width * height * channel);
 
-  let data = opt.data.arraySync();
-  let channel_array: Array<Array<number>> = [];
+  let data = tensor.arraySync();
+  let channelArray: Array<Array<number>> = [];
 
-  for (let ch = 0; ch < opt.channel; ch++){
-    channel_array = data[ch];
+  for (let ch = 0; ch < channel; ch++){
+    channelArray = data[ch];
 
-    for (let j = 0; j < opt.width; j++){
-      for (let k = 0; k < opt.height; k++){
-        let index: number = ((opt.width * k) + j) * opt.channel + ch;
-        new_array[index] = channel_array[j][k];
+    for (let j = 0; j < width; j++){
+      for (let k = 0; k < height; k++){
+        let index: number = ((width * k) + j) * channel + ch;
+        newArray[index] = channelArray[j][k];
       }
     }
   }
-  return new_array;
+  return newArray;
 }
 
-export function std(data: tf.Tensor3D): tf.Tensor {
+export function stdCalc(data: tf.Tensor3D): tf.Tensor {
 
-  let tensor_data = data;
+  let tensorData = data;
 
-  let mean = tensor_data.mean();
-  let sub_mean_pow = tensor_data.sub(mean).pow(2);
-  let mean_data = sub_mean_pow.mean();
-  let std = mean_data.sqrt();
+  let mean = tensorData.mean();
+  let subMeanPow = tensorData.sub(mean).pow(2);
+  let meanData = subMeanPow.mean();
+  let std = meanData.sqrt();
 
   return std;
 }
