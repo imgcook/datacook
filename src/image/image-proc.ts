@@ -1,5 +1,5 @@
 import Jimp from 'jimp';
-import { img2array, tensor2Img, stdCalc } from './utils';
+import { stdCalc } from './utils';
 import * as tf from '@tensorflow/tfjs-core';
 
 /**
@@ -27,29 +27,26 @@ export default class Image {
   /**
    * Convert image Buffer to Tensor
    * @param depth -> number of channel to obtain from image
-   * @return Promise<Array<Array<Array<number>>>> -> A 3dimensional array
+   * @return tf.Tensor3D
    */
   public toTensor(depth = 3): tf.Tensor3D {
-
-    return img2array({
+    return tf.browser.fromPixels({
       data: this.data,
       height: this.height,
-      width: this.width,
-      channel: 4,
-      newChannel: depth
-    });
+      width: this.width
+    }, depth);
 
   }
 
   /**
    * Convert Image Tensor to one dimensional Array to be converted to Buffer.
    * @param tensor Tensor3D of image
-   * @returns imgArray number[]
+   * @returns Promise<Image>
    */
   static async fromTensor(tensor: tf.Tensor3D): Promise<Image> {
-    const imgArray = tensor2Img(tensor);
+    const imgArray = await tf.browser.toPixels(tensor);
     const data: Buffer = Buffer.from(imgArray);
-    const [ width, height ] = tensor.shape.slice(1, 3);
+    const [ width, height ] = tensor.shape.slice(0, 2);
     const img: Jimp = await new Jimp({ data:data, width:width, height:height });
     return new Image(img);
   }
@@ -136,7 +133,7 @@ export default class Image {
   static normalize(data: tf.Tensor3D, mean?: number, std?:number): tf.Tensor3D {
 
     const tfMean = mean ? mean : data.mean().round().arraySync();
-    const tfStd = std ? std : stdCalc(data).round().arraySync();
+    const tfStd = std ? std : stdCalc(data);
     const norm = data.sub(tfMean).div(tfStd);
 
     return norm as tf.Tensor3D;

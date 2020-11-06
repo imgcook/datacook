@@ -3,26 +3,21 @@ import Image from "../../src/image/image-proc";
 import {stdCalc} from "../../src/image/utils";
 import * as fs from 'fs';
 import '@tensorflow/tfjs-backend-cpu';
-import { norm } from "@tensorflow/tfjs-core";
 
 describe("Image-proc", ()=>{
 
   it("should resize image properly", async ()=>{
 
     const img: Image = await Image.read("test/image/artifacts/dog.jpg")
-
     const resizeData = [...img.resize(100,100).data];
     const expectedData = [...fs.readFileSync("test/image/artifacts/resize100.ds")];
-    
     assert.deepEqual(resizeData,expectedData);
   });
   it("should convert image to tensor", async ()=>{
 
     const img: Image = await Image.read("test/image/artifacts/dog.jpg");
-
     const resizeTensor = img.resize(50,50).toTensor();
-    const expectedTensor = new Float32Array([...fs.readFileSync("test/image/artifacts/resize50_tensor.ds")]);
-    
+    const expectedTensor = new Int32Array([...fs.readFileSync("test/image/artifacts/resize50_tensor.ds")]); 
     assert.deepEqual(resizeTensor.dataSync(),expectedTensor);
   });
   it("should convert tensor3D back to image", async ()=>{
@@ -57,7 +52,7 @@ describe("Image-proc", ()=>{
                           .rotate(90)
                           .toTensor()
 
-    const expectedTensor = new Float32Array([...fs.readFileSync("test/image/artifacts/img_chain_tensor.ds")]);
+    const expectedTensor = new Int32Array([...fs.readFileSync("test/image/artifacts/img_chain_tensor.ds")]);
     assert.deepEqual(imgTensor.dataSync(),expectedTensor);
   });
 
@@ -66,8 +61,9 @@ describe("Image-proc", ()=>{
     const img: Image = await Image.read("test/image/artifacts/dog.jpg");
 
     const resizeTensor = img.resize(50,50).toTensor();
+    const img2: Image = await Image.fromTensor(resizeTensor);
     const mean = resizeTensor.mean().round().arraySync() as number;
-    const std = stdCalc(resizeTensor).round().arraySync() as number;
+    const std = stdCalc(resizeTensor);
     
     const normalize = Image.normalize(resizeTensor);
     const unnormalize = Image.unnormalize(normalize,mean,std)
