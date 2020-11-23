@@ -1,4 +1,4 @@
-import { split } from '../../src/generic';
+import { split } from '../../../src/generic';
 import { expect } from 'chai';
 import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-backend-cpu';
