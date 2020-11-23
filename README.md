@@ -12,21 +12,30 @@ cd datacook
 Install dependencies
 
 ```
-yarn
-```
-or if you use npm
-
-```
 npm install
 ```
 
-Run test
-```
-yarn test
-```
-
-or if you use npm
+Run test for both node and browser environment
 
 ```
 npm run test
 ```
+
+To run specific tests:
+
+```
+npm run test:node
+```
+
+or for browser:
+```
+npm run test:browser
+```
+
+To build/bundle the source code to the dist folder, run:
+
+```
+npm run build
+```
+
+
