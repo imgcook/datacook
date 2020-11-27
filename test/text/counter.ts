@@ -59,9 +59,9 @@ describe("Counter", ()=>{
     assert.deepEqual(counter.wordCount,expectedWordCount);
     assert.deepEqual(counter.element, expectedElement);
   });
-  it('should fetch the top 2 coomon word', ()=>{
-    const counter = new Counter({ 'good': 2, 'bad': 2, 'neural': 3 });
-    const expectedElement = [ [ 'neural', 3 ], [ 'good', 2 ] ]
-    assert.deepEqual(counter.element, expectedElement);
+  it('should fetch the top 2 common word', ()=>{
+    const counter = new Counter({ 'good': 1, 'bad': 2, 'neural': 3 });
+    const expectedElement = [ [ 'neural', 3 ], [ 'bad', 2 ] ]
+    assert.deepEqual(counter.mostCommon(2), expectedElement);
   });
 });
