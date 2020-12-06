@@ -11,7 +11,7 @@ export default class Counter {
   public element: Array<Array<string | number>> ;
 
   /**
-   * Initializer COunter class
+   * Initializer Counter class
    * create WordCOunt dictionary and array of element
    * with containing word and their count in order of
    * increasing decreaing value
@@ -21,12 +21,12 @@ export default class Counter {
    *
    * @param textInput
    */
-  constructor (textInput: CounterType){
-    if (Array.isArray(textInput)){
+  constructor (textInput: CounterType) {
+    if (Array.isArray(textInput)) {
       this.wordCountFromArray(textInput);
 
-    } else if (typeof textInput === "string"){
-      let toArray = textInput.split('');
+    } else if (typeof textInput === "string") {
+      const toArray = textInput.split('');
       this.wordCountFromArray(toArray);
 
     } else {
@@ -49,8 +49,8 @@ export default class Counter {
   public update(updateInput: CounterType): void {
     const updateCounter = new Counter(updateInput);
 
-    for (const key in updateCounter.wordCount){
-      if ( key in this.wordCount){
+    for (const key in updateCounter.wordCount) {
+      if ( key in this.wordCount) {
         this.wordCount[key] += updateCounter.wordCount[key];
       } else {
         this.wordCount[key] = updateCounter.wordCount[key];
@@ -64,9 +64,9 @@ export default class Counter {
    * @param textArray string[]
    */
   private wordCountFromArray(textArray: string[]) : void {
-    for (let index = 0; index < textArray.length; index++){
+    for (let index = 0; index < textArray.length; index++) {
       let elem = textArray[index];
-      if (elem in this.wordCount){
+      if (elem in this.wordCount) {
         this.wordCount[elem] += 1;
       } else {
         this.wordCount[elem] = 1;
