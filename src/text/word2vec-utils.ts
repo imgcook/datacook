@@ -48,7 +48,7 @@ export function skipGram(
   return [ wordList, allText ];
 }
 
-interface UniqueWord {
+export interface UniqueWord {
   [word: string] : number;
 }
 
@@ -57,7 +57,7 @@ export function createUniqueWord(textArray: string[]): UniqueWord {
   const wordList = Array.from(wordSet);
   let uniqueWords: UniqueWord = {};
 
-  for (let i = 0; i < wordList.length; i++){
+  for (let i = 0; i < wordList.length; i++) {
     const word = wordList[i];
     uniqueWords[word] = i + 1;
   }
@@ -70,7 +70,7 @@ export function objectLength(dict: UniqueWord): number {
 
 export function createData(
   wordList: string[][], uniqueWords: UniqueWord,
-  nWords: number): Array<Array<number | Float64Array>> {
+  nWords: number): Array<Array<number | number[]>> {
 
   let data = [];
   let label = [];
@@ -82,7 +82,7 @@ export function createData(
 
     let xRow = new Float64Array(nWords);
     xRow[wordIndex] = 1;
-    data.push(xRow);
+    data.push(Array.from(xRow));
     label.push(contextIndex);
   }
 
