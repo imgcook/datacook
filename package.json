@@ -4,6 +4,7 @@
   "description": "Library for data processing in pure JavaScript",
   "main": "dist/index.js",
   "dependencies": {
+    "@tensorflow/tfjs": "^2.7.0",
     "@tensorflow/tfjs-backend-cpu": "^2.7.0",
     "@tensorflow/tfjs-backend-wasm": "^2.7.0",
     "@tensorflow/tfjs-core": "^2.7.0",
