@@ -1,6 +1,7 @@
 import { assert, expect } from "chai"
 import { createData, createUniqueWord, objectLength, skipGram } from '../../src/text/word2vec-utils';
 import { text_list, stopwords, text_lower, text} from './global';
+import '@tensorflow/tfjs-backend-cpu';
 
 describe("Word2Vec Utils", () => {
   
