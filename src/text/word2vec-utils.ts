@@ -1,30 +1,32 @@
 export function clean(text: string, stopwords: string[] | undefined): Array<string> {
-  let textArray = text.split(' ');
-  //filter out empty string
-  textArray = textArray.filter((value) => {
-    return value != '';
-  });
+  const textArray = text.split(' ');
 
-  //filter out stopwords.
-  if (stopwords) {
-    textArray = textArray.filter((value) => {
-      return !stopwords.includes(value);
-    });
-  }
-  //remove punctuation
-  textArray = textArray.map((value) => {
-    return value.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+  const cleanTexts: string[] = [];
+  // TODO
+  // the cleaning of text involves the following steps
+  // 1) filter out all empty string
+  // 2) if stopwords is provided, filter out stopwords
+  // 3) remove all punctuations like dot, comma, question mark e.t.c
+  textArray.forEach((value) => {
+    if (value != '') {
+      if (stopwords) {
+        if (!stopwords.includes(value)) {
+          cleanTexts.push(value.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ''));
+        }
+      } else {
+        cleanTexts.push(value.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ''));
+      }
+    }
   });
-
-  return textArray;
+  return cleanTexts;
 }
 
 export function skipGram(
   window = 5, textArray: Array<string>,
   stopwords: string[] | undefined): Array<Array<string | string[]>> {
 
-  let wordList = [];
-  let allText = [];
+  const wordList = [];
+  const allText = [];
 
   for (const index in textArray) {
     let text = textArray[index];
@@ -55,7 +57,7 @@ export interface UniqueWord {
 export function createUniqueWord(textArray: string[]): UniqueWord {
   const wordSet = new Set(textArray);
   const wordList = Array.from(wordSet);
-  let uniqueWords: UniqueWord = {};
+  const uniqueWords: UniqueWord = {};
 
   for (let i = 0; i < wordList.length; i++) {
     const word = wordList[i];
@@ -72,15 +74,15 @@ export function createData(
   wordList: string[][], uniqueWords: UniqueWord,
   nWords: number): Array<Array<number | number[]>> {
 
-  let data = [];
-  let label = [];
+  const data = [];
+  const label = [];
 
   for (let i = 0; i < wordList.length; i++) {
     const [ x, y ] = wordList[i];
     const wordIndex = uniqueWords[x];
     const contextIndex = uniqueWords[y];
 
-    let xRow = new Float64Array(nWords);
+    const xRow = new Float64Array(nWords);
     xRow[wordIndex] = 1;
     data.push(Array.from(xRow));
     label.push(contextIndex);
