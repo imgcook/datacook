@@ -2,7 +2,6 @@ const tf = require("@tensorflow/tfjs-core");
 
 describe("Generic Split test in browser", () => {
   it("should split data into train & test", async () => {
- 
     const X = tf.range(0, 10).reshape([5, 2]);
 
     const y = tf.range(0, 5);
@@ -15,20 +14,20 @@ describe("Generic Split test in browser", () => {
     const acty_train = tf.range(0, 3).reshape([3]);
     const acty_test = tf.range(3, 5).reshape([2]);
 
-    expect(actX_test.dataSync()).toEqual(X_test.dataSync());
-    expect(actX_train.dataSync()).toEqual(X_train.dataSync());
+    expect(actX_test.dataSync()).to.eql(X_test.dataSync());
+    expect(actX_train.dataSync()).to.eql(X_train.dataSync());
 
-    expect(acty_train.dataSync()).toEqual(y_train.dataSync());
-    expect(acty_test.dataSync()).toEqual(y_test.dataSync());
+    expect(acty_train.dataSync()).to.eql(y_train.dataSync());
+    expect(acty_test.dataSync()).to.eql(y_test.dataSync());
   });
 
-  it("should throws if tensors length equals zero ", () => {
-    expect(() =>  datacook.Generic.split([])).toThrowError("inputs should not have length of zero");
-  });
+  it('should throws if tensors length equals zero ', () => { 
+    expect(() => datacook.Generic.split([])).to.throw('inputs should not have length of zero');
+  }); 
 
-  it("should throws if inputs have different first dimension", () => {
+  it('should throws if inputs have different first dimension', () => { 
     const t1 = tf.ones([10, 28, 28, 3]);
     const t2 = tf.ones([8]);
-    expect(() =>  datacook.Generic.split([t1, t2])).toThrowError("inputs should have the same length");
-  });
+    expect(() => datacook.Generic.split([t1, t2])).to.throw('inputs should have the same length');
+  }); 
 });
