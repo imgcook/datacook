@@ -8,3 +8,4 @@ danfojs/data
 dist/
 tsconfig.tsbuildinfo
 index.html
+yarn-error
