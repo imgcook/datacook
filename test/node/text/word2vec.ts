@@ -1,5 +1,5 @@
 import { assert, expect } from 'chai'
-import Word2Vec from '../../src/text/word2vec';
+import Word2Vec from '../../../src/text/word2vec';
 import { text_list, stopwords} from './global';
 
 describe("Word2Vec", () => {
