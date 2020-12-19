@@ -6,7 +6,11 @@ interface StringIntegerObject {
 export default class CountVectorizer {
   public wordOrder: StringIntegerObject = {};
   public uniqueLength: number;
-
+  /**
+   * Convert text to vector base on their number of count
+   * and the order to which they occur alphabetically.
+   * @param textArray
+   */
   constructor(textArray: string[]) {
 
     const tokenArray: string[] = [];
@@ -21,12 +25,11 @@ export default class CountVectorizer {
     const uniqueWord = Array.from(new Set(tokenArray));
     const sortedUniqueWord: string[] = this.sort(uniqueWord);
 
-    // console.log(sortedUniqueWord);
     // store array element as object element
     // to enable quick search of element
     // when transforming input arrays.
     sortedUniqueWord.forEach((text, index) => {
-      if (text != ''){
+      if (text != '') {
         this.wordOrder[text] = index;
       }
     });
@@ -39,22 +42,25 @@ export default class CountVectorizer {
 
     return textArray.sort(collator.compare);
   }
-
+  /**
+   * Transform input text to vector.
+   * @param textArray
+   * @returns number[][] array of number (vectors)
+   */
   public transform(textArray: string[]): number[][] {
 
     const counterVectorizer: number[][] = textArray.map((value) => {
       const innerArray: number[] = Array.from(new Float64Array(this.uniqueLength));
-      const ar: string[] = [];
+      const cleanTextArray: string[] = [];
       value.split(" ").forEach((text) => {
         if (text != '') {
           const cleanText = text.toLocaleLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
-          ar.push(cleanText);
+          cleanTextArray.push(cleanText);
         }
-
       });
 
-      const wordCounter = new Counter(ar).wordCount;
-      ar.forEach((text) => {
+      const wordCounter = new Counter(cleanTextArray).wordCount;
+      cleanTextArray.forEach((text) => {
         if (text in this.wordOrder) {
           const wordIndex = this.wordOrder[text];
           const value = wordCounter[text];
