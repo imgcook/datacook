@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import Counter from "../../src/text/counter";
+import Counter from "../../../src/text/counter";
 
 describe("Counter", ()=>{
 
