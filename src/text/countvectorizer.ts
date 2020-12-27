@@ -15,7 +15,7 @@ export default class CountVectorizer {
 
     const tokenArray: string[] = [];
     textArray.forEach((value) => {
-      value.split(" ").forEach((text) => {
+      value.split(' ').forEach((text) => {
         if (text != '') {
           tokenArray.push(text.toLocaleLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ''));
         }
@@ -29,7 +29,7 @@ export default class CountVectorizer {
     // to enable quick search of element
     // when transforming input arrays.
     sortedUniqueWord.forEach((text, index) => {
-      if (text != '') {
+      if (text !== '') {
         this.wordOrder[text] = index;
       }
     });
@@ -38,9 +38,9 @@ export default class CountVectorizer {
   }
 
   private sort(textArray: string[]): string[] {
-    const collator = new Intl.Collator(undefined, { numeric:true, sensitivity: 'base' });
-
-    return textArray.sort(collator.compare);
+    return textArray.sort((a: string, b: string) => {
+      return a.charCodeAt(0) - b.charCodeAt(0);
+    });
   }
   /**
    * Transform input text to vector.
@@ -52,8 +52,8 @@ export default class CountVectorizer {
     const counterVectorizer: number[][] = textArray.map((value) => {
       const innerArray: number[] = Array.from(new Float64Array(this.uniqueLength));
       const cleanTextArray: string[] = [];
-      value.split(" ").forEach((text) => {
-        if (text != '') {
+      value.split(' ').forEach((text) => {
+        if (text !== '') {
           const cleanText = text.toLocaleLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
           cleanTextArray.push(cleanText);
         }
