@@ -16,7 +16,7 @@ export default class CountVectorizer {
     const tokenArray: string[] = [];
     textArray.forEach((value) => {
       value.split(' ').forEach((text) => {
-        if (text != '') {
+        if (text !== '') {
           tokenArray.push(text.toLocaleLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ''));
         }
       });
