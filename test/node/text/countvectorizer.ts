@@ -14,11 +14,11 @@ describe('CountVectorizer', function(){
                     over: 5,
                     quick: 6,
                     the: 7
-                  }
+                  };
     const expectedVector = [
                             [2, 0, 0, 0,0, 0, 0, 1],
                             [1, 0, 0, 0,0, 0, 0, 2]
-                           ]
+                           ];
 
     assert.deepEqual(vectorizer.wordOrder, vocab);
     assert.deepEqual(toVector, expectedVector);
