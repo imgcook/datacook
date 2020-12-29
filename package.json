@@ -1,7 +1,7 @@
 {
-  "name": "datacook",
+  "name": "@pipcook/datacook",
   "version": "0.0.1",
-  "description": "Library for data processing in pure JavaScript",
+  "description": "A JavaScript library for feature engineering on datasets",
   "main": "dist/index.js",
   "dependencies": {
     "@tensorflow/tfjs-backend-cpu": "^2.7.0",
@@ -35,7 +35,7 @@
     "data-manipulation",
     "analysis"
   ],
-  "license": "Apache",
+  "license": "Apache 2.0",
   "bugs": {
     "url": "https://github.com/imgcook/datacook/issues"
   },
