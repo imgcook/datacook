@@ -9,5 +9,5 @@ export * as Image from './image/image-proc';
 export const Text = {
   Counter,
   CountVectorizer,
-  Word2Vec,
+  Word2Vec
 };
