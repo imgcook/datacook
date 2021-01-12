@@ -1,7 +1,4 @@
-import { LabelEncoder, OneHotEncoder } from '../../../src/tabular/encoder';
-import * as tf from '@tensorflow/tfjs-core';
-import { assert } from 'chai';
-import 'mocha';
+const tf = require("@tensorflow/tfjs-core");
 
 
 describe("Encodings", function () {
@@ -10,7 +7,7 @@ describe("Encodings", function () {
 
     it("test the label encoding on array", function () {
       let data = ["dog", "cat", "man", "dog", "cat", "man", "man", "cat"];
-      let encode = new LabelEncoder(data);
+      let encode = new datacook.Encoder.LabelEncoder(data);
       let fit_data = [
         0, 1, 2, 0,
         1, 2, 2, 1
@@ -23,7 +20,7 @@ describe("Encodings", function () {
     it("test the label encoding on Tensor", function () {
       let data = ["dog", "cat", "man", "dog", "cat", "man", "man", "cat"];
       let tensor_data = tf.tensor(data);
-      let encode = new LabelEncoder(tensor_data);
+      let encode = new datacook.Encoder.LabelEncoder(tensor_data);
       let fit_data = [
         0, 1, 2, 0,
         1, 2, 2, 1
@@ -39,7 +36,7 @@ describe("Encodings", function () {
 
     it("test onehotencoding on array", function () {
       let data = ["dog", "cat", "man", "dog", "cat", "man", "man", "cat"];
-      let encode = new OneHotEncoder(data);
+      let encode = new datacook.Encoder.OneHotEncoder(data);
       let fit_data = [
         [1, 0, 0],
         [0, 1, 0],
@@ -59,7 +56,7 @@ describe("Encodings", function () {
     it("test onehotencoding on Tensor", function () {
       let data = ["dog", "cat", "man", "dog", "cat", "man", "man", "cat"];
       let tensor_data = tf.tensor(data);
-      let encode = new OneHotEncoder(tensor_data);
+      let encode = new datacook.Encoder.OneHotEncoder(tensor_data);
       let fit_data = [
         [1, 0, 0],
         [0, 1, 0],
