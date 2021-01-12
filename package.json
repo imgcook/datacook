@@ -8,7 +8,6 @@
     "@tensorflow/tfjs-backend-wasm": "^2.7.0",
     "@tensorflow/tfjs-core": "^2.7.0",
     "@tensorflow/tfjs-layers": "^2.8.0",
-    "danfojs-node": "^0.1.10",
     "jimp": "^0.16.1"
   },
   "scripts": {
