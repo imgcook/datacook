@@ -1,5 +1,4 @@
 import { Tensor, Tensor1D } from "@tensorflow/tfjs-core";
-import { Series } from "danfojs-node";
 
 function _zeros(row: number, column: number): Array<any> {
   let zero_array = [];
@@ -15,11 +14,9 @@ function _zeros(row: number, column: number): Array<any> {
 }
 
 
-function getDataByType(data: Tensor1D[] | Array<any> | Series | any) : any{
+function getDataByType(data: Tensor1D[] | Array<any> | any) : Array<any>{
   if (Array.isArray(data)) {
     return data;
-  } else if (data instanceof Series) {
-    return data.values;
   } else if (data instanceof Tensor) {
     return data.arraySync();
   } else {
