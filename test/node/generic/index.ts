@@ -1,8 +1,9 @@
-import { split } from '../../../src/generic';
+import { split, npy } from '../../../src/generic';
 import { expect } from 'chai';
 import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-backend-cpu';
 import 'mocha';
+import * as fs from 'fs';
 
 describe('Generic Split test',
   () => { 
@@ -45,3 +46,25 @@ describe('Generic Split test',
     expect(() => split([t1, t2])).to.throw('inputs should have the same length');
   }); 
 });
+
+describe('Generic Parse test', () => { 
+  it('should read npy', () => {
+    // ones npy 100*100
+    const test = fs.readFileSync('test/node/generic/artifacts/test.npy').buffer;
+    const data = npy.parse(test);
+    
+    expect(data.shape).to.eql([100, 100]);
+    expect(data.dtype).to.eql('float32');
+    expect(data.data).to.eql(new Float32Array(100*100).fill(1));
+  });
+
+  it('should read npy to tfjs tensor', () => {
+    const test = fs.readFileSync('test/node/generic/artifacts/test.npy').buffer;
+    const tensor = npy.parse2Tensor(test);
+
+    expect(tensor.shape).to.eql([100, 100]);
+    expect(tensor.dtype).to.eql('float32');
+    expect(tensor.dataSync()).to.eql(new Float32Array(100*100).fill(1));
+  });
+});
+
