@@ -4,42 +4,42 @@ import { assert } from 'chai';
 import 'mocha';
 
 
-describe("Encodings", function () {
+describe('Encodings', function () {
 
-  describe("LabelEncoder", function () {
+  describe('LabelEncoder', function () {
 
-    it("test the label encoding on array", function () {
-      let data = ["dog", "cat", "man", "dog", "cat", "man", "man", "cat"];
-      let encode = new LabelEncoder(data);
+    it('test the label encoding on array', async function () {
+      let data = ['dog', 'cat', 'man', 'dog', 'cat', 'man', 'man', 'cat'];
+      let encode = new LabelEncoder();
       let fit_data = [
         0, 1, 2, 0,
         1, 2, 2, 1
       ];
-      assert.deepEqual(encode.fit(), fit_data);
-      assert.deepEqual(encode.transform(["dog", "man"]), [0, 2]);
+      assert.deepEqual(await encode.fit(data), fit_data);
+      assert.deepEqual(await encode.transform(['dog', 'man']), [0, 2]);
     });
 
 
-    it("test the label encoding on Tensor", function () {
-      let data = ["dog", "cat", "man", "dog", "cat", "man", "man", "cat"];
+    it('test the label encoding on Tensor', async function () {
+      let data = ['dog', 'cat', 'man', 'dog', 'cat', 'man', 'man', 'cat'];
       let tensor_data = tf.tensor(data);
-      let encode = new LabelEncoder(tensor_data);
+      let encode = new LabelEncoder();
       let fit_data = [
         0, 1, 2, 0,
         1, 2, 2, 1
       ];
-      assert.deepEqual(encode.fit(), fit_data);
-      assert.deepEqual(encode.transform(tf.tensor(["dog", "man"])), [0, 2]);
+      assert.deepEqual(await encode.fit(tensor_data), fit_data);
+      assert.deepEqual(await encode.transform(tf.tensor(['dog', 'man'])), [0, 2]);
     });
 
   });
 
 
-  describe("OneHotEncoder", function () {
+  describe('OneHotEncoder', function () {
 
-    it("test onehotencoding on array", function () {
-      let data = ["dog", "cat", "man", "dog", "cat", "man", "man", "cat"];
-      let encode = new OneHotEncoder(data);
+    it('test one-hot encoding on array', async function () {
+      let data = ['dog', 'cat', 'man', 'dog', 'cat', 'man', 'man', 'cat'];
+      let encode = new OneHotEncoder();
       let fit_data = [
         [1, 0, 0],
         [0, 1, 0],
@@ -52,14 +52,14 @@ describe("Encodings", function () {
       ];
       let transform_data = [[0, 0, 1], [0, 1, 0]];
 
-      assert.deepEqual(encode.fit(), fit_data);
-      assert.deepEqual(encode.transform(["man", "cat"]), transform_data);
+      assert.deepEqual(await encode.fit(data), fit_data);
+      assert.deepEqual(await encode.transform(['man', 'cat']), transform_data);
     });
 
-    it("test onehotencoding on Tensor", function () {
-      let data = ["dog", "cat", "man", "dog", "cat", "man", "man", "cat"];
+    it('test onehotencoding on Tensor', async function () {
+      let data = ['dog', 'cat', 'man', 'dog', 'cat', 'man', 'man', 'cat'];
       let tensor_data = tf.tensor(data);
-      let encode = new OneHotEncoder(tensor_data);
+      let encode = new OneHotEncoder();
       let fit_data = [
         [1, 0, 0],
         [0, 1, 0],
@@ -72,8 +72,8 @@ describe("Encodings", function () {
       ];
       let transform_data = [[0, 0, 1], [0, 1, 0]];
 
-      assert.deepEqual(encode.fit(), fit_data);
-      assert.deepEqual(encode.transform(tf.tensor(["man", "cat"])), transform_data);
+      assert.deepEqual(await encode.fit(tensor_data), fit_data);
+      assert.deepEqual(await encode.transform(tf.tensor(['man', 'cat'])), transform_data);
     });
   });
 });
