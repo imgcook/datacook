@@ -1,4 +1,4 @@
-import { TextDecoder } from "util";
+import { TextDecoder } from 'util';
 import { Tensor, tensor } from '@tensorflow/tfjs-core';
 
 type DataType = 'uint8' | 'uint16' | 'int8' | 'int16' | 'uint32' | 'int32' | 'int64' | 'uint64' | 'float32' | 'float64';
@@ -21,58 +21,58 @@ interface DTypes {
 }
 
 const dtypes: Record<RawDataType, DTypes> = {
-  "<u1": {
-    name: "uint8",
+  '<u1': {
+    name: 'uint8',
     size: 8,
     arrayConstructor: Uint8Array
   },
-  "|u1": {
-    name: "uint8",
+  '|u1': {
+    name: 'uint8',
     size: 8,
     arrayConstructor: Uint8Array
   },
-  "<u2": {
-    name: "uint16",
+  '<u2': {
+    name: 'uint16',
     size: 16,
     arrayConstructor: Uint16Array
   },
-  "|i1": {
-    name: "int8",
+  '|i1': {
+    name: 'int8',
     size: 8,
     arrayConstructor: Int8Array
   },
-  "<i2": {
-    name: "int16",
+  '<i2': {
+    name: 'int16',
     size: 16,
     arrayConstructor: Int16Array
   },
-  "<u4": {
-    name: "uint32",
+  '<u4': {
+    name: 'uint32',
     size: 32,
     arrayConstructor: Int32Array
   },
-  "<i4": {
-    name: "int32",
+  '<i4': {
+    name: 'int32',
     size: 32,
     arrayConstructor: Int32Array
   },
-  "<u8": {
-    name: "uint64",
+  '<u8': {
+    name: 'uint64',
     size: 64,
     arrayConstructor: BigUint64Array
   },
-  "<i8": {
-    name: "int64",
+  '<i8': {
+    name: 'int64',
     size: 64,
     arrayConstructor: BigInt64Array
   },
-  "<f4": {
-    name: "float32",
+  '<f4': {
+    name: 'float32',
     size: 32,
     arrayConstructor: Float32Array
   },
-  "<f8": {
-    name: "float64",
+  '<f8': {
+    name: 'float64',
     size: 64,
     arrayConstructor: Float64Array
   }
@@ -88,27 +88,27 @@ export function parse(arrayBuffer: ArrayBuffer): numpy {
   const magic = String.fromCharCode.apply(null, new Uint8Array(arrayBuffer.slice(1, 6)));
 
   if (magic != MAGIC) {
-    throw new Error("input is not a npy file");
+    throw new Error('input is not a npy file');
   }
 
   const headerLength = new DataView(arrayBuffer.slice(8, 10)).getUint8(0);
   const dataOffset = 10 + headerLength;
 
-  let headerContent: string = new TextDecoder("utf-8").decode(
+  let headerContent: string = new TextDecoder('utf-8').decode(
     new Uint8Array(arrayBuffer.slice(10, headerLength + 10))
   );
   const header = JSON.parse(
     headerContent
       .replace(/'/g, '"')
-      .replace("False", "false")
-      .replace("(", "[")
-      .replace(/,*\),*/g, "]")
+      .replace('False', 'false')
+      .replace('(', '[')
+      .replace(/,*\),*/g, ']')
   );
 
   const shape = header.shape;
   const descr: RawDataType = header.descr;
   const dtype = dtypes[descr];
-  const data = new dtype["arrayConstructor"](
+  const data = new dtype['arrayConstructor'](
     arrayBuffer,
     dataOffset
   );
