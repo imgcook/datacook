@@ -23,6 +23,8 @@ function split(inputs: Tensor[], trainRatio = .75): Tensor[]{
   return results;
 }
 
+export * as npy from './npy';
+
 export {
   split
 };
