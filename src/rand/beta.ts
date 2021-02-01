@@ -1,8 +1,8 @@
 export declare class Beta {
   /**
    * New a Beta Distribution Generator
-   * @param a 
-   * @param b 
+   * @param a
+   * @param b
    */
   constructor(a?: number, b?:number);
 
