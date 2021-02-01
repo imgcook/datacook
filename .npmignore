@@ -1,0 +1,13 @@
+node_modules
+.vscode/
+coverage
+.nyc_output
+danfojs/data
+.DS_Store
+.idea/
+tsconfig.tsbuildinfo
+index.html
+yarn-error
+yarn.lock
+*.log
+test/
