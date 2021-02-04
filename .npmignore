@@ -5,10 +5,9 @@ coverage
 danfojs/data
 .DS_Store
 .idea/
-dist/
 tsconfig.tsbuildinfo
 index.html
 yarn-error
 yarn.lock
 *.log
-*.tgz
+test/
