@@ -9,7 +9,6 @@ function _zeros(row: number, column: number): Array<any> {
   return zero_array;
 }
 
-
 async function getDataByType(data: Tensor1D[] | Array<any> | any) : Promise<any>{
   if (Array.isArray(data)) {
     return data;
@@ -20,7 +19,18 @@ async function getDataByType(data: Tensor1D[] | Array<any> | any) : Promise<any>
   }
 }
 
+function sizeFromShape(shape: number[]): number {
+  if (shape.length === 0) {
+    // Scalar.
+    return 1;
+  }
+  let size = shape[0];
+  for (let i = 1; i < shape.length; i++) {
+    size *= shape[i];
+  }
+  return size;
+}
 
 export {
-  _zeros, getDataByType
+  _zeros, getDataByType, sizeFromShape
 };

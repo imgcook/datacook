@@ -8,6 +8,7 @@ import { LabelEncoder, OneHotEncoder } from './tabular/encoder';
 
 export * as Generic from './generic';
 export * as Image from './image/image-proc';
+export * as Rand from './rand';
 
 export const Text = {
   Counter,
