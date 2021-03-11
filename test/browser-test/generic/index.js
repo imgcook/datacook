@@ -1,3 +1,5 @@
+
+require('@tensorflow/tfjs-backend-cpu');
 const tf = require("@tensorflow/tfjs-core");
 
 describe("Generic Split test in browser", () => {
