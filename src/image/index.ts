@@ -85,11 +85,11 @@ export class Image {
    */
   public save(name:string): Promise<boolean> {
     return new Promise((resolve, reject) => {
-      this.img.write(name, (err, value) => {
+      this.img.write(name, (err) => {
         if (err) reject(err);
         resolve(true);
       });
-    })
+    });
   }
 
   /**
