@@ -1,5 +1,5 @@
 import { assert, expect } from "chai"
-import Image from "../../../src/image/image-proc";
+import {Image} from "../../../src/image";
 import {stdCalc} from "../../../src/image/utils";
 import * as fs from 'fs';
 import '@tensorflow/tfjs-backend-cpu';
