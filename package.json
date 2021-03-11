@@ -11,10 +11,10 @@
     "jimp": "^0.16.1"
   },
   "scripts": {
-    "test": "npm run test:node && npm run test:browser",
+    "test": "npm run test:node",
     "test:node": "nyc mocha --timeout 10000 -r ts-node/register ./test/node/**/*.ts",
-    "test:browser": "npm run build:browser && karma start --single-run --browsers ChromeHeadless karma.conf.js",
-    "build": "npm run clean && npm run build:node && npm run build:browser && npm run build:wasm",
+    "test:browser": "karma start --single-run --browsers ChromeHeadless karma.conf.js",
+    "build": "npm run clean && npm run build:node && npm run build:wasm",
     "build:node": "tsc -b tsconfig.json",
     "build:browser": "npm run build:node && webpack --mode production",
     "build:wasm": "make",
