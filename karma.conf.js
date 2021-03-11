@@ -9,7 +9,7 @@ module.exports = function (config) {
     frameworks: [ "mocha", "chai", "browserify" ],
 
     // list of files / patterns to load in the browser
-    files: [ "dist/browser/bundle.js", "test/browser-test/**/*.js" ],
+    files: [ "dist/index.bundle.js", "test/browser-test/**/*.js" ],
 
     // list of files / patterns to exclude
     exclude: [],
