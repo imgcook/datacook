@@ -6,12 +6,12 @@ const createConfig = (target) => {
     devtool: "source-map",
     context: path.resolve(__dirname),
     entry: {
-      index: `./dist/index.js`
+      index: './dist/index.js'
     },
     target: target,
     output: {
       path: path.resolve(__dirname, "dist"),
-      filename: `index.bundle.js`,
+      filename: 'index.bundle.js',
       library: "datacook"
     },
     module: {
