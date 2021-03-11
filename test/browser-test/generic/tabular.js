@@ -1,3 +1,4 @@
+require('@tensorflow/tfjs-backend-cpu');
 const tf = require('@tensorflow/tfjs-core');
 
 

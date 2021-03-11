@@ -72,5 +72,7 @@ EMSCRIPTEN_BINDINGS(my_class_example) {
     .function("generate", &beta_distribution::generate)
     .function("setParam", &beta_distribution::param)
     .function("setSeed", &beta_distribution::seed)
+    .property("a", &beta_distribution::a)
+    .property("b", &beta_distribution::a)
     ;
 }

@@ -1,5 +1,5 @@
 import { assert, expect } from "chai"
-import Image from "../../../src/image/image-proc";
+import {Image} from "../../../src/image";
 import {stdCalc} from "../../../src/image/utils";
 import * as fs from 'fs';
 import '@tensorflow/tfjs-backend-cpu';
@@ -36,7 +36,7 @@ describe("Image-proc", ()=>{
 
     const img: Image = await Image.read("test/node/image/artifacts/dog.jpg"); 
     const resizeImg = img.resize(50,50);
-    const isSave = resizeImg.save("test/node/image/artifacts/img_resize.jpg")
+    const isSave = await resizeImg.save("test/node/image/artifacts/img_resize.jpg")
 
     fs.unlinkSync("test/node/image/artifacts/img_resize.jpg");
     expect(isSave).to.be.true;
