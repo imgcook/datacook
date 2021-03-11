@@ -1,1 +1,6 @@
-export { Beta } from './beta';
+import BetaModule from "./beta"
+
+import './beta'
+export {
+  BetaModule
+};

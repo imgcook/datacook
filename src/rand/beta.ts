@@ -1,4 +1,5 @@
-export declare class Beta {
+declare function BetaModule(): Promise<Beta>;
+declare class Beta {
   /**
    * New a Beta Distribution Generator
    * @param a
@@ -18,3 +19,5 @@ export declare class Beta {
    */
   setParam(a: number, b: number): void;
 }
+
+export default BetaModule;

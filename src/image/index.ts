@@ -6,7 +6,7 @@ import * as tf from '@tensorflow/tfjs-core';
  * Image class contains utility to handle image manipulation
  * @contructor (data: Jimp)
  */
-export default class Image {
+export class Image {
   private img: Jimp; //img accessible to all methods in the class
 
   constructor (data: Jimp) {
@@ -18,7 +18,6 @@ export default class Image {
    * @param name image file name
    */
   static async read(name: string): Promise<Image> {
-
     const jimpObj = await Jimp.read(name);
 
     return new Image(jimpObj);
@@ -69,6 +68,10 @@ export default class Image {
 
   get height(): number {
     return this.img.bitmap.height;
+  }
+
+  get channel(): number {
+    return this.img.hasAlpha() ? 4 : 3;
   }
 
   get data(): Buffer {

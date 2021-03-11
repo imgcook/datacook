@@ -10,8 +10,8 @@ const createConfig = (target) => {
     },
     target: target,
     output: {
-      path: path.resolve(__dirname, "dist/browser"),
-      filename: `bundle.js`,
+      path: path.resolve(__dirname, "dist"),
+      filename: `index.bundle.js`,
       library: "datacook"
     },
     module: {
