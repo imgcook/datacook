@@ -3,7 +3,7 @@ import { DataAccessor, Dataset, DatasetMeta, Sample } from "./types";
 interface DatasetData<T extends Sample> {
   trainData: Array<T>,
   testData: Array<T>,
-  validData: Array<T>
+  validData?: Array<T>
 }
 
 export class DataAccessorImpl<T extends Sample> implements DataAccessor<T> {
@@ -20,7 +20,7 @@ export class DataAccessorImpl<T extends Sample> implements DataAccessor<T> {
   }
   async nextBatch(batchSize: number) {
     const ret = [];
-    while (batchSize) {
+    while (batchSize--) {
       const value = await this.next();
       if (!value) break;
       ret.push(value);

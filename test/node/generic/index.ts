@@ -1,4 +1,4 @@
-import { split, npy } from '../../../src/generic';
+import { split, npy, shuffle } from '../../../src/generic';
 import { expect } from 'chai';
 import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-backend-cpu';
@@ -68,3 +68,11 @@ describe('Generic Parse test', () => {
   });
 });
 
+
+describe('Random shuffle', () => {
+  const arr = new Array(10).fill(1).map((_, idx) => idx);
+  shuffle(arr, 'test');
+  const expectedArr = [5, 9, 0, 4, 1, 6, 2, 7, 3, 8];
+
+  expect(arr).eql(expectedArr);
+})

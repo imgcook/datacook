@@ -5,10 +5,10 @@ import { Buffer } from 'buffer/';
 import { DataAccessorImpl } from './utils';
 
 const URLs = {
-  trainLabel: 'http://pipcook.oss-cn-hangzhou.aliyuncs.com/dataset/mnist/train-labels-idx1-ubyte.gz',
-  trainData: 'http://pipcook.oss-cn-hangzhou.aliyuncs.com/dataset/mnist/train-images-idx3-ubyte.gz',
-  testData: 'http://pipcook.oss-cn-hangzhou.aliyuncs.com/dataset/mnist/t10k-labels-idx1-ubyte.gz',
-  testLabel: 'http://pipcook.oss-cn-hangzhou.aliyuncs.com/dataset/mnist/t10k-images-idx3-ubyte.gz'
+  trainLabel: 'http://pipcook.oss-cn-hangzhou.aliyuncs.com/dataset/mnist/train-labels-idx1-ubyte',
+  trainData: 'http://pipcook.oss-cn-hangzhou.aliyuncs.com/dataset/mnist/train-images-idx3-ubyte',
+  testData: 'http://pipcook.oss-cn-hangzhou.aliyuncs.com/dataset/mnist/t10k-images-idx3-ubyte',
+  testLabel: 'http://pipcook.oss-cn-hangzhou.aliyuncs.com/dataset/mnist/t10k-labels-idx1-ubyte'
 };
 
 const DATA_MAGIC = 2051;
@@ -45,7 +45,7 @@ class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
       z: 1
     };
 
-    const labelMap = new Array(10).map((_, idx) => idx)
+    const labelMap = new Array(10).fill(0).map((_, idx) => idx)
       .reduce((prev, curr) => {
         prev[curr] = curr.toString();
         return prev;
@@ -85,7 +85,7 @@ class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
     }
 
     const rowNum = rawDataBuffer.readInt32BE(8);
-    const columnNum = rawLabelBuffer.readInt32BE(12);
+    const columnNum = rawDataBuffer.readInt32BE(12);
     this.height = rowNum;
     this.width = columnNum;
     const totalPixels = rowNum * columnNum;
