@@ -4,8 +4,9 @@ import 'seedrandom';
 
 function shuffle(inputs: Array<any>, seed?: string): void {
   if (!seed) seed = Math.random().toString();
-  // @ts-ignore
-  const rng = new Math.seedrandom(seed);
+
+  // convert Math to any to avoid ts error
+  const rng = new (Math as any).seedrandom(seed);
   for (let i = inputs.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
     [ inputs[i], inputs[j] ] = [ inputs[j], inputs[i] ];
