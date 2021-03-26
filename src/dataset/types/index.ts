@@ -76,7 +76,7 @@ export interface TableDatasetMeta extends DatasetMeta {
 
 export interface DataAccessor<T> {
   next: () => Promise<T | null>;
-  nextBatch: (batchSize: number) => Promise<Array<T> | null>;
+  nextBatch: (batchSize: number) => Promise<Array<T>>;
   seek: (pos: number) => Promise<void>;
 }
 
@@ -90,6 +90,6 @@ export interface Dataset<T = DefaultType, D = DatasetMeta> {
   test: DataAccessor<T>;
   // train dataset accessor
   train: DataAccessor<T>;
-  // evaluate dataset accessor, qoptional
-  evaluate?: DataAccessor<T>;
+  // validation dataset accessor, qoptional
+  valid?: DataAccessor<T>;
 }
