@@ -1,4 +1,16 @@
 import { Tensor } from '@tensorflow/tfjs-core';
+import 'seedrandom';
+
+function seed(seed: string): void {
+  (Math as any).seedrandom(seed);
+}
+
+function shuffle(inputs: Array<any>): void {
+  for (let i = inputs.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [ inputs[i], inputs[j] ] = [ inputs[j], inputs[i] ];
+  }
+}
 
 function split(inputs: Tensor[], trainRatio = .75): Tensor[]{
   if (inputs.length === 0) {
@@ -23,8 +35,34 @@ function split(inputs: Tensor[], trainRatio = .75): Tensor[]{
   return results;
 }
 
+function range(start: number, end: number, step = 1): Array<number> {
+
+  if ((step > 0 && start > end) || (step < 0 && start < end)) return [];
+
+  const length = Math.floor(Math.abs(end - start) / Math.abs(step));
+  const arr = new Array(length);
+
+  let x = start;
+  let idx = 0;
+
+  /**
+   * continue adding elements
+   * if step > 0 and x < end or step < 0  and x > end
+   */
+  while ((step > 0 && x < end) || (step < 0 && x > end)) {
+    arr[idx] = x;
+    idx += 1;
+    x += step;
+  }
+
+  return arr;
+}
+
 export * as npy from './npy';
 
 export {
-  split
+  split,
+  shuffle,
+  seed,
+  range
 };

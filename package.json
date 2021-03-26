@@ -8,11 +8,14 @@
     "@tensorflow/tfjs-backend-wasm": "^2.7.0",
     "@tensorflow/tfjs-core": "^2.7.0",
     "@tensorflow/tfjs-layers": "^2.8.0",
-    "jimp": "^0.16.1"
+    "buffer": "^6.0.3",
+    "cross-fetch": "^3.1.2",
+    "jimp": "^0.16.1",
+    "seedrandom": "^3.0.5"
   },
   "scripts": {
     "test": "npm run test:node",
-    "test:node": "nyc mocha --timeout 10000 -r ts-node/register ./test/node/**/*.ts",
+    "test:node": "nyc mocha --timeout 60000 -r ts-node/register ./test/node/**/*.ts",
     "test:browser": "karma start --single-run --browsers ChromeHeadless karma.conf.js",
     "build": "npm run clean && npm run build:node && npm run build:wasm",
     "build:node": "tsc -b tsconfig.json",
