@@ -27,7 +27,7 @@ export class DataAccessorImpl<T extends Sample> implements DataAccessor<T> {
     }
     return ret;
   }
-  async seek(offset: number) {
+  async seek(offset: number): Promise<void> {
     this.cursor = offset;
   }
 
