@@ -3,6 +3,20 @@ import { DatasetMeta, DatasetSize, DatasetType, makeDataset, Sample } from '../.
 import MNIST from '../../../src/dataset/mnist';
 import 'mocha';
 
+const expectThrowsAsync = async (method: any, errorMessage?: string) => {
+  let error = null
+  try {
+    await method()
+  }
+  catch (err) {
+    error = err
+  }
+  expect(error).to.be.an('Error')
+  if (errorMessage) {
+    expect(error.message).to.equal(errorMessage)
+  }
+}
+
 class TestDatasetMeta implements DatasetMeta {
   type: DatasetType = DatasetType.Image;
   size: DatasetSize = {
@@ -96,4 +110,23 @@ describe('Dataset', () => {
     expect(await dataset.train.nextBatch(-1)).to.eql(trainSamples);
   });
 
+  it('should throw an error', async () => {
+    const sample: Sample<number> = {
+      data: 1,
+      label: 1
+    }
+    const trainSamples: Array<Sample> = [sample, sample, sample];
+    const testSamples: Array<Sample> = [sample, sample, sample];
+  
+    const meta = new TestDatasetMeta();
+  
+    const dataset = makeDataset({
+      trainData: trainSamples,
+      testData: testSamples,
+    }, meta);
+  
+
+    const expectedError = new RangeError(`Batch size should be larger than -1 but -2 is present`);
+    await expectThrowsAsync(() => dataset.train.nextBatch(-2));
+  })
 })
