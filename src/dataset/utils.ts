@@ -15,7 +15,7 @@ export class DataAccessorImpl<T extends Sample> implements DataAccessor<T> {
     this.cursor = 0;
   }
 
-  async next() {
+  async next(): Promise<T | null> {
     return this.data[this.cursor++];
   }
   async nextBatch(batchSize: number) {
