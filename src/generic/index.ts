@@ -35,8 +35,7 @@ function split(inputs: Tensor[], trainRatio = .75): Tensor[]{
   return results;
 }
 
-function range(start: number, end: number, step?: number): Array<number> {
-  if (!step) step = 1;
+function range(start: number, end: number, step = 1): Array<number> {
 
   if ((step > 0 && start > end) || (step < 0 && start < end)) return [];
 
