@@ -3,6 +3,7 @@ import { DataAccessor, Dataset, DatasetSize, DatasetType, ImageDatasetMeta, Imag
 import fetch from 'cross-fetch';
 import { Buffer } from 'buffer/';
 import { DataAccessorImpl } from './utils';
+import { range } from '../generic';
 
 const URLs = {
   trainLabel: 'http://pipcook.oss-cn-hangzhou.aliyuncs.com/dataset/mnist/train-labels-idx1-ubyte',
@@ -45,11 +46,10 @@ class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
       z: 1
     };
 
-    const labelMap = new Array(10).fill(0).map((_, idx) => idx)
-      .reduce((prev, curr) => {
-        prev[curr] = curr.toString();
-        return prev;
-      }, {} as Record<number, string>);
+    const labelMap = range(0, 10).reduce((prev, curr) => {
+      prev[curr] = curr.toString();
+      return prev;
+    }, {} as Record<number, string>);
 
     const meta: ImageDatasetMeta = {
       type: DatasetType.Image,

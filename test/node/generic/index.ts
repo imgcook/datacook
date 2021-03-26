@@ -1,4 +1,4 @@
-import { split, npy, shuffle, seed } from '../../../src/generic';
+import { split, npy, shuffle, seed, range } from '../../../src/generic';
 import { expect } from 'chai';
 import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-backend-cpu';
@@ -70,46 +70,100 @@ describe('Generic Parse test', () => {
 
 
 describe('Random shuffle', () => {
-  const arr = new Array(10).fill(1).map((_, idx) => idx);
-  seed('test');
-  shuffle(arr);
-  const expectedArr = [5, 9, 0, 4, 1, 6, 2, 7, 3, 8];
-
-  expect(arr).eql(expectedArr);
-})
+  it('should shuffle randomly', () => {
+    const arr = new Array(10).fill(1).map((_, idx) => idx);
+    seed('test');
+    shuffle(arr);
+    const expectedArr = [5, 9, 0, 4, 1, 6, 2, 7, 3, 8];
+  
+    expect(arr).eql(expectedArr);
+  });
+});
 
 describe('Seeding random', () => {
-  seed('test');
-  const arr = new Array(10).fill(1).map((_) => Math.random());
-  const expectedArr = [
-    0.8722025543160253,
-    0.4023928518604753,
-    0.9647289658507073,
-    0.30479896375101545,
-    0.3521069009157321,
-    0.2734533903544762,
-    0.4635571187776387,
-    0.10034856760950056,
-    0.7247513588372084,
-    0.4236748288641446
-  ];
+  it('should random with seed', () => {
+    seed('test');
+    const arr = new Array(10).fill(1).map((_) => Math.random());
+    const expectedArr = [
+      0.8722025543160253,
+      0.4023928518604753,
+      0.9647289658507073,
+      0.30479896375101545,
+      0.3521069009157321,
+      0.2734533903544762,
+      0.4635571187776387,
+      0.10034856760950056,
+      0.7247513588372084,
+      0.4236748288641446
+    ];
+  
+    seed('test1');
+    const arr1 = new Array(10).fill(1).map((_) => Math.random());
+    const expectedArr1 = [
+      0.4140663576925043,
+      0.3835913058226645,
+      0.32223050456935015,
+      0.5744860625750371,
+      0.720112122139951,
+      0.6619058590665984,
+      0.9665898051176159,
+      0.4101568136478809,
+      0.8431809602909894,
+      0.8021843641109205
+    ];
+  
+    expect(arr).eql(expectedArr);
+    expect(arr1).eql(expectedArr1);
+  });
+});
 
-  seed('test1');
-  const arr1 = new Array(10).fill(1).map((_) => Math.random());
-  const expectedArr1 = [
-    0.4140663576925043,
-    0.3835913058226645,
-    0.32223050456935015,
-    0.5744860625750371,
-    0.720112122139951,
-    0.6619058590665984,
-    0.9665898051176159,
-    0.4101568136478809,
-    0.8431809602909894,
-    0.8021843641109205
-  ];
+describe('Range', () => {
+  it('should generate range', () => {
+    const arr = range(0, 10);
 
-  expect(arr).eql(expectedArr);
-  expect(arr1).eql(expectedArr1);
+    const expectedArr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  
+    expect(arr).eql(expectedArr);
+  });
+
+  it('should generate reversee range', () => {
+    const arr = range(9, -1, -1);
+
+    const expectedArr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+  
+    expect(arr).eql(expectedArr.reverse());
+  });
+
+  it('should generate empty', () => {
+    const arr = range(9, -1);
+
+    const expectedArr: Array<number> = [];
+  
+    expect(arr).eql(expectedArr.reverse());
+  });
+
+  it('should generate by step 2', () => {
+    const arr = range(0, 10, 2);
+
+    const expectedArr = [0, 2, 4, 6, 8];
+  
+    expect(arr).eql(expectedArr);
+  });
+
+  it('should generate by step -2', () => {
+    const arr = range(10, 0, -2);
+
+    const expectedArr = [2, 4, 6, 8, 10];
+  
+    expect(arr).eql(expectedArr.reverse());
+  });
+
+  it('should generate for step 3', () => {
+    const arr = range(0, 10, 3);
+
+    const expectedArr = [0, 3, 6, 9];
+  
+    expect(arr).eql(expectedArr);
+  });
 })
 
