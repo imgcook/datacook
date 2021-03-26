@@ -1,4 +1,4 @@
-import { split, npy, shuffle } from '../../../src/generic';
+import { split, npy, shuffle, seed } from '../../../src/generic';
 import { expect } from 'chai';
 import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-backend-cpu';
@@ -71,8 +71,45 @@ describe('Generic Parse test', () => {
 
 describe('Random shuffle', () => {
   const arr = new Array(10).fill(1).map((_, idx) => idx);
-  shuffle(arr, 'test');
+  seed('test');
+  shuffle(arr);
   const expectedArr = [5, 9, 0, 4, 1, 6, 2, 7, 3, 8];
 
   expect(arr).eql(expectedArr);
 })
+
+describe('Seeding random', () => {
+  seed('test');
+  const arr = new Array(10).fill(1).map((_) => Math.random());
+  const expectedArr = [
+    0.8722025543160253,
+    0.4023928518604753,
+    0.9647289658507073,
+    0.30479896375101545,
+    0.3521069009157321,
+    0.2734533903544762,
+    0.4635571187776387,
+    0.10034856760950056,
+    0.7247513588372084,
+    0.4236748288641446
+  ];
+
+  seed('test1');
+  const arr1 = new Array(10).fill(1).map((_) => Math.random());
+  const expectedArr1 = [
+    0.4140663576925043,
+    0.3835913058226645,
+    0.32223050456935015,
+    0.5744860625750371,
+    0.720112122139951,
+    0.6619058590665984,
+    0.9665898051176159,
+    0.4101568136478809,
+    0.8431809602909894,
+    0.8021843641109205
+  ];
+
+  expect(arr).eql(expectedArr);
+  expect(arr1).eql(expectedArr1);
+})
+

@@ -1,14 +1,13 @@
 import { Tensor } from '@tensorflow/tfjs-core';
 import 'seedrandom';
 
+function seed(seed: string): void {
+  (Math as any).seedrandom(seed);
+}
 
-function shuffle(inputs: Array<any>, seed?: string): void {
-  if (!seed) seed = Math.random().toString();
-
-  // convert Math to any to avoid ts error
-  const rng = new (Math as any).seedrandom(seed);
+function shuffle(inputs: Array<any>): void {
   for (let i = inputs.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
+    const j = Math.floor(Math.random() * (i + 1));
     [ inputs[i], inputs[j] ] = [ inputs[j], inputs[i] ];
   }
 }
@@ -40,5 +39,6 @@ export * as npy from './npy';
 
 export {
   split,
-  shuffle
+  shuffle,
+  seed
 };

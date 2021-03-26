@@ -14,7 +14,7 @@ const URLs = {
 const DATA_MAGIC = 2051;
 const LABEL_MAGIC = 2049;
 
-type mnistSample = Sample<Array<number>>;
+type mnistSample = Sample<Uint8ClampedArray>;
 
 class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
   private dataMap: Record<string, ArrayBuffer>;
@@ -72,16 +72,16 @@ class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
     const rawLabelBuffer = Buffer.from(rawLabel);
     const dataMagic = rawDataBuffer.readInt32BE(0);
     if (dataMagic !== DATA_MAGIC) {
-      throw new Error();
+      throw new TypeError('Data header mismatch; aborting');
     }
     const labelMagic = rawLabelBuffer.readInt32BE(0);
     if (labelMagic !== LABEL_MAGIC) {
-      throw new Error();
+      throw new TypeError('Label header mismatch; aborting');
     }
 
     const samples = rawDataBuffer.readInt32BE(4);
     if (samples !== rawLabelBuffer.readInt32BE(4)) {
-      throw new Error();
+      throw new TypeError('sample size mismatch; aborting');
     }
 
     const rowNum = rawDataBuffer.readInt32BE(8);
@@ -94,7 +94,7 @@ class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
 
     for (let i = 0; i < samples; i++) {
       const label = rawLabelBuffer[i + 8];
-      const pixels: Array<number> = new Array(totalPixels);
+      const pixels: Uint8ClampedArray = new Uint8ClampedArray(totalPixels);
       for (let y = 0; y < columnNum; y++) {
         for (let x = 0; x < rowNum; x++) {
           pixels[x + y * columnNum] = rawDataBuffer[16 + i * totalPixels + (x + y * columnNum)];
