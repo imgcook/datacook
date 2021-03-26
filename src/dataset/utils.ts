@@ -36,6 +36,10 @@ export class DataAccessorImpl<T extends Sample> implements DataAccessor<T> {
       return ret;
     }
 
+    if (batchSize < -1) {
+      throw new RangeError(`Batch size should be larger than -1 but ${batchSize} is present`);
+    }
+
     // default behaviour
     while (batchSize--) {
       const value = await this.next();

@@ -1,4 +1,4 @@
-import { assert, expect } from 'chai';
+import { expect } from 'chai';
 import { DatasetMeta, DatasetSize, DatasetType, makeDataset, Sample } from '../../../src/dataset';
 import MNIST from '../../../src/dataset/mnist';
 import 'mocha';
@@ -95,4 +95,5 @@ describe('Dataset', () => {
   
     expect(await dataset.train.nextBatch(-1)).to.eql(trainSamples);
   });
+
 })
