@@ -18,7 +18,7 @@ export class DataAccessorImpl<T extends Sample> implements DataAccessor<T> {
     this.dataIndexes = range(0, data.length);
   }
 
-  shuffle() {
+  shuffle(): void {
     if (this.data.length === 0) this.dataIndexes = [];
     else shuffle(this.dataIndexes);
   }
@@ -80,7 +80,7 @@ class DatasetImpl<T extends Sample, D extends DatasetMeta> implements Dataset<T,
     return this.meta;
   }
 
-  shuffle() {
+  shuffle(): void {
     this.train.shuffle();
     this.test.shuffle();
     this.valid?.shuffle();

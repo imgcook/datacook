@@ -34,7 +34,7 @@ class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
     this.train = new DataAccessorImpl(this.trainSamples);
   }
 
-  shuffle(seed?: string) {
+  shuffle(seed?: string): void {
     this.test.shuffle(seed);
     this.train.shuffle(seed);
   }
