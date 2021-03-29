@@ -1,4 +1,5 @@
 import { DataAccessor, Dataset, DatasetMeta, Sample } from "./types";
+import { range, shuffle } from "../generic";
 
 interface DatasetData<T extends Sample> {
   trainData: Array<T>,
@@ -8,15 +9,22 @@ interface DatasetData<T extends Sample> {
 
 export class DataAccessorImpl<T extends Sample> implements DataAccessor<T> {
   private data: Array<T>;
+  private dataIndexes: Array<number>;
   private cursor: number;
 
   constructor(data: Array<T>) {
     this.data = data;
     this.cursor = 0;
+    this.dataIndexes = range(0, data.length);
+  }
+
+  shuffle(): void {
+    if (this.data.length === 0) this.dataIndexes = [];
+    else shuffle(this.dataIndexes);
   }
 
   async next(): Promise<T | null> {
-    return this.data[this.cursor++];
+    return this.data[this.dataIndexes[this.cursor++]];
   }
   async nextBatch(batchSize: number): Promise<Array<T>> {
     const ret: Array<T> = [];
@@ -66,11 +74,16 @@ class DatasetImpl<T extends Sample, D extends DatasetMeta> implements Dataset<T,
     this.train = new DataAccessorImpl(datasetData.trainData);
     this.test = new DataAccessorImpl(datasetData.testData);
     this.valid = datasetData.validData ? new DataAccessorImpl(datasetData.validData) : null;
-
   }
 
   async getDatasetMeta() {
     return this.meta;
+  }
+
+  shuffle(): void {
+    this.train.shuffle();
+    this.test.shuffle();
+    this.valid?.shuffle();
   }
 
 }

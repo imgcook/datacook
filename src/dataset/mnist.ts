@@ -34,6 +34,11 @@ class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
     this.train = new DataAccessorImpl(this.trainSamples);
   }
 
+  shuffle(seed?: string): void {
+    this.test.shuffle(seed);
+    this.train.shuffle(seed);
+  }
+
   async getDatasetMeta() {
     const datasetSize: DatasetSize = {
       test: this.trainSamples.length,
