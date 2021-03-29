@@ -78,6 +78,7 @@ export interface DataAccessor<T> {
   next: () => Promise<T | null>;
   nextBatch: (batchSize: number) => Promise<Array<T>>;
   seek: (pos: number) => Promise<void>;
+  shuffle: (seed?: string) => void;
 }
 
 /**
@@ -92,4 +93,6 @@ export interface Dataset<T extends Sample, D extends DatasetMeta> {
   train: DataAccessor<T>;
   // validation dataset accessor, qoptional
   valid?: DataAccessor<T>;
+  // suhffle interface
+  shuffle: (seed?: string) => void;
 }

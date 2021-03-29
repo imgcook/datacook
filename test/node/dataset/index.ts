@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { DatasetMeta, DatasetSize, DatasetType, makeDataset, Sample } from '../../../src/dataset';
+import {  makeDataset, types } from '../../../src/dataset';
 import MNIST from '../../../src/dataset/mnist';
 import 'mocha';
 
@@ -17,9 +17,9 @@ const expectThrowsAsync = async (method: any, errorMessage?: string) => {
   }
 }
 
-class TestDatasetMeta implements DatasetMeta {
-  type: DatasetType = DatasetType.Image;
-  size: DatasetSize = {
+class TestDatasetMeta implements types.DatasetMeta {
+  type: types.DatasetType = types.DatasetType.Image;
+  size: types.DatasetSize = {
     train: 3,
     test: 3
   };
@@ -28,12 +28,12 @@ class TestDatasetMeta implements DatasetMeta {
 
 describe('Dataset', () => {
   it('should make a dataset', async () => {
-    const sample: Sample<number> = {
+    const sample: types.Sample<number> = {
       data: 1,
       label: 1
     }
-    const trainSamples: Array<Sample> = [sample, sample, sample];
-    const testSamples: Array<Sample> = [sample, sample, sample];
+    const trainSamples: Array<types.Sample> = [sample, sample, sample];
+    const testSamples: Array<types.Sample> = [sample, sample, sample];
   
     const meta = new TestDatasetMeta();
   
@@ -47,6 +47,32 @@ describe('Dataset', () => {
     expect(await dataset.test.next()).to.eql(sample);
     expect(await dataset.train.nextBatch(3)).to.eql([sample, sample]);
     expect(await dataset.test.nextBatch(1)).to.eql([sample]);
+  });
+
+  it('should iter a dataset after shuffle', async () => {
+    const sampleMaker = (num: number) => {
+      return {
+        data: num,
+        label: num
+      }
+    }
+    const trainSamples: Array<types.Sample> = [sampleMaker(0), sampleMaker(1), sampleMaker(2)];
+    const testSamples: Array<types.Sample> = [sampleMaker(3), sampleMaker(4), sampleMaker(5)];
+  
+    const meta = new TestDatasetMeta();
+  
+    const dataset = makeDataset({
+      trainData: trainSamples,
+      testData: testSamples,
+    }, meta);
+
+    dataset.shuffle('test');
+    const trainData = (await dataset.train.nextBatch(3)).map(it => it.data);
+    const testData = (await dataset.test.nextBatch(3)).map(it => it.data);
+  
+    expect(await dataset.getDatasetMeta()).to.eql(meta);
+    expect(trainData).to.eql([2, 1, 0])
+    expect(testData).to.eql([5, 4, 3])
   });
 
   it('should make a mnist dataset', async () => {
@@ -67,7 +93,7 @@ describe('Dataset', () => {
     }
 
     expect(meta).to.eql({
-      type: DatasetType.Image,
+      type: types.DatasetType.Image,
       size: { test: 60000, train: 10000 },
       dimension: { x: 28, y: 28, z: 1 },
       labelMap
@@ -75,12 +101,12 @@ describe('Dataset', () => {
   });
 
   it('should read a zero batch', async () => {
-    const sample: Sample<number> = {
+    const sample: types.Sample<number> = {
       data: 1,
       label: 1
     }
-    const trainSamples: Array<Sample> = [sample, sample, sample];
-    const testSamples: Array<Sample> = [sample, sample, sample];
+    const trainSamples: Array<types.Sample> = [sample, sample, sample];
+    const testSamples: Array<types.Sample> = [sample, sample, sample];
   
     const meta = new TestDatasetMeta();
   
@@ -93,12 +119,12 @@ describe('Dataset', () => {
   });
 
   it('should read a whole batch', async () => {
-    const sample: Sample<number> = {
+    const sample: types.Sample<number> = {
       data: 1,
       label: 1
     }
-    const trainSamples: Array<Sample> = [sample, sample, sample];
-    const testSamples: Array<Sample> = [sample, sample, sample];
+    const trainSamples: Array<types.Sample> = [sample, sample, sample];
+    const testSamples: Array<types.Sample> = [sample, sample, sample];
   
     const meta = new TestDatasetMeta();
   
@@ -111,12 +137,12 @@ describe('Dataset', () => {
   });
 
   it('should throw an error', async () => {
-    const sample: Sample<number> = {
+    const sample: types.Sample<number> = {
       data: 1,
       label: 1
     }
-    const trainSamples: Array<Sample> = [sample, sample, sample];
-    const testSamples: Array<Sample> = [sample, sample, sample];
+    const trainSamples: Array<types.Sample> = [sample, sample, sample];
+    const testSamples: Array<types.Sample> = [sample, sample, sample];
   
     const meta = new TestDatasetMeta();
   
