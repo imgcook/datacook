@@ -1,6 +1,5 @@
 import { DataAccessor, Dataset, DatasetMeta, Sample } from "./types";
-import seedrandom from 'seedrandom';
-import { range } from "../generic";
+import { range, shuffle } from "../generic";
 
 interface DatasetData<T extends Sample> {
   trainData: Array<T>,
@@ -19,17 +18,9 @@ export class DataAccessorImpl<T extends Sample> implements DataAccessor<T> {
     this.dataIndexes = range(0, data.length);
   }
 
-  shuffle(seed?: string) {
-    const rng = seedrandom(seed || Math.random().toString());
+  shuffle() {
     if (this.data.length === 0) this.dataIndexes = [];
-    else {
-      for (let i = 0; i < this.dataIndexes.length; i++) {
-        let tempIndex = Math.floor( rng() * (this.dataIndexes.length - i) ) + i;
-        if (tempIndex !== i) {
-          [ this.dataIndexes[i], this.dataIndexes[tempIndex] ] = [ this.dataIndexes[tempIndex], this.dataIndexes[i] ];
-        }
-      }
-    }
+    else shuffle(this.dataIndexes);
   }
 
   async next(): Promise<T | null> {
@@ -89,10 +80,10 @@ class DatasetImpl<T extends Sample, D extends DatasetMeta> implements Dataset<T,
     return this.meta;
   }
 
-  shuffle(seed?: string) {
-    this.train.shuffle(seed);
-    this.test.shuffle(seed);
-    this.valid?.shuffle(seed);
+  shuffle() {
+    this.train.shuffle();
+    this.test.shuffle();
+    this.valid?.shuffle();
   }
 
 }

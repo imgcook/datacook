@@ -1,7 +1,8 @@
 import { expect } from 'chai';
-import {  makeDataset, types } from '../../../src/dataset';
+import { makeDataset, types } from '../../../src/dataset';
 import MNIST from '../../../src/dataset/mnist';
 import 'mocha';
+import { seed } from '../../../src/generic';
 
 const expectThrowsAsync = async (method: any, errorMessage?: string) => {
   let error = null
@@ -66,13 +67,15 @@ describe('Dataset', () => {
       testData: testSamples,
     }, meta);
 
-    dataset.shuffle('test');
+    seed('test');
+    dataset.shuffle();
+
     const trainData = (await dataset.train.nextBatch(3)).map(it => it.data);
     const testData = (await dataset.test.nextBatch(3)).map(it => it.data);
   
     expect(await dataset.getDatasetMeta()).to.eql(meta);
-    expect(trainData).to.eql([2, 1, 0])
-    expect(testData).to.eql([5, 4, 3])
+    expect(trainData).to.eql([1, 0, 2])
+    expect(testData).to.eql([4, 3, 5])
   });
 
   it('should make a mnist dataset', async () => {
