@@ -83,7 +83,7 @@ export interface DataAccessor<T> {
 /**
  * data source api
  */
-export interface Dataset<T = DefaultType, D = DatasetMeta> {
+export interface Dataset<T extends Sample, D extends DatasetMeta> {
   // fetch data source metadata
   getDatasetMeta: () => Promise<D>;
   // test dataset accessor
