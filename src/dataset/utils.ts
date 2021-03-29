@@ -59,13 +59,14 @@ class DatasetImpl<T extends Sample, D extends DatasetMeta> implements Dataset<T,
 
   public train: DataAccessor<T>;
   public test: DataAccessor<T>;
-  public valid: DataAccessor<T>;
+  public valid?: DataAccessor<T>;
 
   constructor(datasetData: DatasetData<T>, datasetMeta: D) {
     this.meta = datasetMeta;
     this.train = new DataAccessorImpl(datasetData.trainData);
     this.test = new DataAccessorImpl(datasetData.testData);
-    this.valid = new DataAccessorImpl(datasetData.validData);
+    this.valid = datasetData.validData ? new DataAccessorImpl(datasetData.validData) : null;
+
   }
 
   async getDatasetMeta() {

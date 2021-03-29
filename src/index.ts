@@ -3,7 +3,7 @@ import CountVectorizer from './text/countvectorizer';
 import Word2Vec from './text/word2vec';
 import { LabelEncoder, OneHotEncoder } from './tabular/encoder';
 
-
+export * as Dataset from './dataset';
 export * as Generic from './generic';
 export { Image } from './image';
 export * as Rand from './rand';
