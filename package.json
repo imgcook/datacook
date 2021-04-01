@@ -26,7 +26,8 @@
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "coverage": "nyc report --reporter=text-lcov | coveralls && nyc report --reporter=lcov",
     "patch": "npm version patch",
-    "publish": "npm pack && npm publish"
+    "publish": "npm pack && npm publish",
+    "doc": "typedoc src/index.ts --name \"Datacook API\" --out ./doc --tsconfig ./tsconfig.ts --highlightTheme github-light"
   },
   "repository": {
     "type": "git",
@@ -69,6 +70,7 @@
     "source-map-loader": "^1.0.0",
     "transform-loader": "^0.2.4",
     "ts-node": "^9.0.0",
+    "typedoc": "^0.20.34",
     "typescript": "^4.0.5",
     "webpack": "4.44.2",
     "webpack-cli": "3.3.12"
