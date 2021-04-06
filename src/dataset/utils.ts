@@ -104,42 +104,42 @@ function makeTransformDataAccessor<IN extends Sample, OUT extends Sample>(access
     next: async () => next(await accessor.next()),
     nextBatch: async (batchSize: number) => {
       const samples: Array<OUT> = [];
-      while(batchSize--) {
-          const s = await this.next();
-          if (s) {
-            samples.push(s);
-          } else {
-            break;
-          }
+      while (batchSize--) {
+        const s = await this.next();
+        if (s) {
+          samples.push(s);
+        } else {
+          break;
         }
-        return samples;
       }
+      return samples;
     }
+  };
   return transformedData;
 }
 
 export function transformDataset<IN_META extends DatasetMeta, IN_SAMPLE extends Sample, OUT_SAMPLE extends Sample = IN_SAMPLE, OUT_META extends DatasetMeta = IN_META>
-    (transformOption: TransformOption<IN_META, IN_SAMPLE, OUT_SAMPLE, OUT_META>, dataset: Dataset<IN_SAMPLE, IN_META>): Dataset<OUT_SAMPLE, OUT_META> {
-  const { metadata, next } = transformOption;  
-  
+(transformOption: TransformOption<IN_META, IN_SAMPLE, OUT_SAMPLE, OUT_META>, dataset: Dataset<IN_SAMPLE, IN_META>): Dataset<OUT_SAMPLE, OUT_META> {
+  const { metadata, next } = transformOption;
+
   const internalDataset: Dataset<OUT_SAMPLE, OUT_META> = {
     shuffle: (seed?: string) => dataset.shuffle(seed),
     getDatasetMeta: async () => metadata(await dataset.getDatasetMeta()),
     train: makeTransformDataAccessor<IN_SAMPLE, OUT_SAMPLE>(dataset.train, next),
     test: makeTransformDataAccessor<IN_SAMPLE, OUT_SAMPLE>(dataset.test, next)
-  }
+  };
 
   return internalDataset;
 }
 
 export function transformNextInDataset<IN_META extends DatasetMeta, IN_SAMPLE extends Sample, OUT_SAMPLE extends Sample = IN_SAMPLE>
-    (next: (sample: IN_SAMPLE) => Promise<OUT_SAMPLE>, dataset: Dataset<IN_SAMPLE, IN_META>) {  
+(next: (sample: IN_SAMPLE) => Promise<OUT_SAMPLE>, dataset: Dataset<IN_SAMPLE, IN_META>) {
   const internalDataset: Dataset<OUT_SAMPLE, IN_META> = {
     shuffle: (seed?: string) => dataset.shuffle(seed),
     getDatasetMeta: () => dataset.getDatasetMeta(),
     train: makeTransformDataAccessor<IN_SAMPLE, OUT_SAMPLE>(dataset.train, next),
     test: makeTransformDataAccessor<IN_SAMPLE, OUT_SAMPLE>(dataset.test, next)
-  }
+  };
 
   return internalDataset;
 }
