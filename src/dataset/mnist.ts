@@ -15,7 +15,15 @@ const URLs = {
 const DATA_MAGIC = 2051;
 const LABEL_MAGIC = 2049;
 
-type mnistSample = Sample<Uint8ClampedArray, number>;
+interface mnistSample extends Sample<Uint8ClampedArray> {
+  label: number
+}
+
+interface mnistDatasetMeta extends ImageDatasetMeta {
+  labelMap: Record<number, string>
+}
+
+// type mnistSample = Sample<Uint8ClampedArray, number>;
 
 class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
   private dataMap: Record<string, ArrayBuffer>;
@@ -56,7 +64,7 @@ class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
       return prev;
     }, {} as Record<number, string>);
 
-    const meta: ImageDatasetMeta = {
+    const meta: mnistDatasetMeta = {
       type: DatasetType.Image,
       size: datasetSize,
       dimension: imageDims,

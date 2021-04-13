@@ -31,7 +31,6 @@ describe('Dataset', () => {
   it('should make a dataset', async () => {
     const sample: Types.Sample<number> = {
       data: 1,
-      label: 1
     }
     const trainSamples: Array<Types.Sample> = [sample, sample, sample];
     const testSamples: Array<Types.Sample> = [sample, sample, sample];
@@ -54,7 +53,6 @@ describe('Dataset', () => {
     const sampleMaker = (num: number) => {
       return {
         data: num,
-        label: num
       }
     }
     const trainSamples: Array<Types.Sample> = [sampleMaker(0), sampleMaker(1), sampleMaker(2)];
@@ -105,8 +103,7 @@ describe('Dataset', () => {
 
   it('should read a zero batch', async () => {
     const sample: Types.Sample<number> = {
-      data: 1,
-      label: 1
+      data: 1
     }
     const trainSamples: Array<Types.Sample> = [sample, sample, sample];
     const testSamples: Array<Types.Sample> = [sample, sample, sample];
@@ -123,8 +120,7 @@ describe('Dataset', () => {
 
   it('should read a whole batch', async () => {
     const sample: Types.Sample<number> = {
-      data: 1,
-      label: 1
+      data: 1
     }
     const trainSamples: Array<Types.Sample> = [sample, sample, sample];
     const testSamples: Array<Types.Sample> = [sample, sample, sample];
@@ -141,8 +137,7 @@ describe('Dataset', () => {
 
   it('should throw an error', async () => {
     const sample: Types.Sample<number> = {
-      data: 1,
-      label: 1
+      data: 1
     }
     const trainSamples: Array<Types.Sample> = [sample, sample, sample];
     const testSamples: Array<Types.Sample> = [sample, sample, sample];

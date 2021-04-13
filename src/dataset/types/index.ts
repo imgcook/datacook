@@ -1,8 +1,7 @@
 export type DefaultType = any;
 
 // sample
-export interface Sample<T = DefaultType, L = DefaultType> {
-  label: L;
+export interface Sample<T = DefaultType> {
   data: T;
 }
 
@@ -56,7 +55,6 @@ export interface ImageDimension {
 export interface DatasetMeta {
   type: DatasetType;
   size: DatasetSize;
-  labelMap: Record<number, string>;
 }
 
 /**
