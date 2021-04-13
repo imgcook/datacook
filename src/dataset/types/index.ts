@@ -1,8 +1,8 @@
 export type DefaultType = any;
 
 // sample
-export interface Sample<T = DefaultType> {
-  label: number;
+export interface Sample<T = DefaultType, L = DefaultType> {
+  label: L;
   data: T;
 }
 
@@ -36,7 +36,7 @@ export type TableSchema = Array<TableColumn>;
  *   Table: data from db, csv
  *   Image: image data
  */
-export enum DatasetType { Table, Image }
+export enum DatasetType { Table, Image, Sound, General }
 
 /**
  * size of data source

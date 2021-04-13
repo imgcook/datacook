@@ -101,11 +101,15 @@ function makeTransformDataAccessor<IN extends Sample, OUT extends Sample>(access
   const transformedData: DataAccessor<OUT> = {
     seek: (pos: number) => accessor.seek(pos),
     shuffle: (seed?: string) => accessor.shuffle(seed),
-    next: async () => next(await accessor.next()),
+    next: async () => {
+      const sample = await accessor.next();
+      if (sample) return next(sample);
+      else return null;
+    },
     nextBatch: async (batchSize: number) => {
       const samples: Array<OUT> = [];
       while (batchSize--) {
-        const s = await this.next();
+        const s = await transformedData.next();
         if (s) {
           samples.push(s);
         } else {
@@ -132,7 +136,7 @@ export function transformDataset<IN_META extends DatasetMeta, IN_SAMPLE extends 
   return internalDataset;
 }
 
-export function transformNextInDataset<IN_META extends DatasetMeta, IN_SAMPLE extends Sample, OUT_SAMPLE extends Sample = IN_SAMPLE>
+export function transformSampleInDataset<IN_SAMPLE extends Sample, OUT_SAMPLE extends Sample = IN_SAMPLE, IN_META extends DatasetMeta = any>
 (next: (sample: IN_SAMPLE) => Promise<OUT_SAMPLE>, dataset: Dataset<IN_SAMPLE, IN_META>) {
   const internalDataset: Dataset<OUT_SAMPLE, IN_META> = {
     shuffle: (seed?: string) => dataset.shuffle(seed),
