@@ -1,5 +1,5 @@
 
-import { DataAccessor, Dataset, DatasetSize, DatasetType, ImageDatasetMeta, ImageDimension, Sample } from './types';
+import { DataAccessor, Dataset, DatasetMeta, DatasetSize, DatasetType, ImageDatasetMeta, ImageDimension, Sample } from './types';
 import fetch from 'cross-fetch';
 import { Buffer } from 'buffer/';
 import { DataAccessorImpl } from './utils';
@@ -15,16 +15,7 @@ const URLs = {
 const DATA_MAGIC = 2051;
 const LABEL_MAGIC = 2049;
 
-interface mnistSample extends Sample<Uint8ClampedArray> {
-  label: number
-}
-
-interface mnistDatasetMeta extends ImageDatasetMeta {
-  labelMap: Record<number, string>
-}
-
-// type mnistSample = Sample<Uint8ClampedArray, number>;
-
+type mnistSample = Sample<Uint8ClampedArray, number>;
 class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
   private dataMap: Record<string, ArrayBuffer>;
   private trainSamples: Array<mnistSample>;
@@ -64,7 +55,7 @@ class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
       return prev;
     }, {} as Record<number, string>);
 
-    const meta: mnistDatasetMeta = {
+    const meta: ImageDatasetMeta = {
       type: DatasetType.Image,
       size: datasetSize,
       dimension: imageDims,
