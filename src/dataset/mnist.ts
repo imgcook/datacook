@@ -1,5 +1,5 @@
 
-import { DataAccessor, Dataset, DatasetMeta, DatasetSize, DatasetType, ImageDatasetMeta, ImageDimension, Sample } from './types';
+import { DataAccessor, Dataset, DatasetSize, DatasetType, ImageDatasetMeta, ImageDimension, Sample } from './types';
 import fetch from 'cross-fetch';
 import { Buffer } from 'buffer/';
 import { DataAccessorImpl } from './utils';
