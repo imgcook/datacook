@@ -91,3 +91,59 @@ class DatasetImpl<T extends Sample, D extends DatasetMeta> implements Dataset<T,
 export function makeDataset<T extends Sample, D extends DatasetMeta> (datasetData: DatasetData<T>, datasetMeta: D): Dataset<T, D> {
   return new DatasetImpl(datasetData, datasetMeta);
 }
+
+export interface TransformOption<IN_META extends DatasetMeta, IN_SAMPLE extends Sample, OUT_SAMPLE extends Sample = IN_SAMPLE, OUT_META extends DatasetMeta = IN_META> {
+  next: (sample: IN_SAMPLE) => Promise<OUT_SAMPLE>,
+  metadata: (meta: IN_META) => Promise<OUT_META>
+}
+
+function makeTransformDataAccessor<IN extends Sample, OUT extends Sample>(accessor: DataAccessor<IN>, next: (sample: IN) => Promise<OUT>): DataAccessor<OUT> {
+  const transformedData: DataAccessor<OUT> = {
+    seek: (pos: number) => accessor.seek(pos),
+    shuffle: (seed?: string) => accessor.shuffle(seed),
+    next: async () => {
+      const sample = await accessor.next();
+      if (sample) return next(sample);
+      else return null;
+    },
+    nextBatch: async (batchSize: number) => {
+      const samples: Array<OUT> = [];
+      while (batchSize--) {
+        const s = await transformedData.next();
+        if (s) {
+          samples.push(s);
+        } else {
+          break;
+        }
+      }
+      return samples;
+    }
+  };
+  return transformedData;
+}
+
+export function transformDataset<IN_META extends DatasetMeta, IN_SAMPLE extends Sample, OUT_SAMPLE extends Sample = IN_SAMPLE, OUT_META extends DatasetMeta = IN_META>
+(transformOption: TransformOption<IN_META, IN_SAMPLE, OUT_SAMPLE, OUT_META>, dataset: Dataset<IN_SAMPLE, IN_META>): Dataset<OUT_SAMPLE, OUT_META> {
+  const { metadata, next } = transformOption;
+
+  const internalDataset: Dataset<OUT_SAMPLE, OUT_META> = {
+    shuffle: (seed?: string) => dataset.shuffle(seed),
+    getDatasetMeta: async () => metadata(await dataset.getDatasetMeta()),
+    train: makeTransformDataAccessor<IN_SAMPLE, OUT_SAMPLE>(dataset.train, next),
+    test: makeTransformDataAccessor<IN_SAMPLE, OUT_SAMPLE>(dataset.test, next)
+  };
+
+  return internalDataset;
+}
+
+export function transformSampleInDataset<IN_SAMPLE extends Sample, OUT_SAMPLE extends Sample = IN_SAMPLE, IN_META extends DatasetMeta = any>
+(next: (sample: IN_SAMPLE) => Promise<OUT_SAMPLE>, dataset: Dataset<IN_SAMPLE, IN_META>) {
+  const internalDataset: Dataset<OUT_SAMPLE, IN_META> = {
+    shuffle: (seed?: string) => dataset.shuffle(seed),
+    getDatasetMeta: () => dataset.getDatasetMeta(),
+    train: makeTransformDataAccessor<IN_SAMPLE, OUT_SAMPLE>(dataset.train, next),
+    test: makeTransformDataAccessor<IN_SAMPLE, OUT_SAMPLE>(dataset.test, next)
+  };
+
+  return internalDataset;
+}
