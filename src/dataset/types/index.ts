@@ -6,7 +6,6 @@ export interface BaseSample<T = DefaultType> {
 }
 
 export interface Sample<T = DefaultType, L = DefaultType> extends BaseSample<T> {
-  data: T;
   label: L;
 }
 
@@ -65,7 +64,7 @@ export interface BaseDatasetMeta {
 export interface DatasetMeta {
   type: DatasetType;
   size: DatasetSize;
-  labelMap: Record<string, any>;
+  labelMap: Record<number, any>;
 }
 
 /**
