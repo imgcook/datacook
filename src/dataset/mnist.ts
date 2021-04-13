@@ -16,7 +16,6 @@ const DATA_MAGIC = 2051;
 const LABEL_MAGIC = 2049;
 
 type mnistSample = Sample<Uint8ClampedArray, number>;
-
 class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
   private dataMap: Record<string, ArrayBuffer>;
   private trainSamples: Array<mnistSample>;
