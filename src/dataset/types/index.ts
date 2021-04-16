@@ -56,9 +56,12 @@ export interface ImageDimension {
   z: number
 }
 
-export interface DatasetMeta {
+export interface BaseDatasetMeta {
   type: DatasetType;
   size: DatasetSize;
+}
+
+export interface DatasetMeta extends BaseDatasetMeta {
   labelMap: Record<number, any>;
 }
 
