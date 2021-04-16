@@ -56,11 +56,6 @@ export interface ImageDimension {
   z: number
 }
 
-export interface BaseDatasetMeta {
-  type: DatasetType;
-  size: DatasetSize;
-}
-
 export interface DatasetMeta {
   type: DatasetType;
   size: DatasetSize;
