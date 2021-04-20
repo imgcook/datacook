@@ -61,9 +61,7 @@ export interface BaseDatasetMeta {
   size: DatasetSize;
 }
 
-export interface DatasetMeta {
-  type: DatasetType;
-  size: DatasetSize;
+export interface DatasetMeta extends BaseDatasetMeta {
   labelMap: Record<number, any>;
 }
 
