@@ -1,7 +1,7 @@
 import { DataAccessor, Dataset, DatasetMeta, Sample } from "./types";
 import { range, shuffle } from "../generic";
 
-interface DatasetData<T extends Sample> {
+export interface DatasetData<T extends Sample> {
   trainData: Array<T>,
   testData: Array<T>,
   validData?: Array<T>

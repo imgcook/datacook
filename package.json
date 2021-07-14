@@ -10,6 +10,7 @@
     "@tensorflow/tfjs-layers": "^2.8.0",
     "buffer": "^6.0.3",
     "cross-fetch": "^3.1.2",
+    "fs-extra": "^10.0.0",
     "jimp": "^0.16.1",
     "seedrandom": "^3.0.5"
   },
@@ -46,6 +47,7 @@
   "homepage": "https://github.com/imgcook/datacook#README",
   "devDependencies": {
     "@types/chai": "^4.2.14",
+    "@types/fs-extra": "^9.0.12",
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.14.20",
     "@typescript-eslint/eslint-plugin": "^4.6.0",
