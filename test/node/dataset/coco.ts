@@ -113,10 +113,12 @@ const sample1: Types.Sample<Coco.Image, Coco.Label> = {
   data: annotationObj.images[0],
   label: [ annotationObj.annotations[0], annotationObj.annotations[1] ]
 };
+
 const sample2: Types.Sample<Coco.Image, Coco.Label> = {
   data: annotationObj.images[1],
   label: [ annotationObj.annotations[2], annotationObj.annotations[3] ]
 };
+
 const sample3: Types.Sample<Coco.Image, Coco.Label> = {
   data: annotationObj.images[2],
   label: [ annotationObj.annotations[4] ]
@@ -139,7 +141,7 @@ describe('Coco Dataset', () => {
       info: undefined,
       licenses: undefined
     };
-    
+
     expect(await dataset.getDatasetMeta()).to.eql(metadata);
     expect(await dataset.train.next()).to.eql(sample1);
     expect(await dataset.test.next()).to.eql(sample1);
@@ -164,7 +166,7 @@ describe('Coco Dataset', () => {
       info: undefined,
       licenses: undefined
     };
-    
+
     expect(await dataset.getDatasetMeta()).to.eql(metadata);
     expect(await dataset.train.next()).to.eql(sample1);
     expect(await dataset.test.next()).to.eql(sample1);
