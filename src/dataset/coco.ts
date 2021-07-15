@@ -1,133 +1,75 @@
-import { Dataset, Sample, DatasetType } from './types';
+import { Dataset, Sample, DatasetType, Coco } from './types';
 import { DatasetData, makeDataset } from './utils';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { train } from '@tensorflow/tfjs-core';
-
-export type Image = {
-  id: number;
-  width: number;
-  height: number;
-  file_name: string;
-  license?: number;
-  flickr_url?: string;
-  coco_url?: string;
-  url?: string;
-  date_captured?: string;
-};
-
-export type Bbox = Array<[x:number, y:number, width: number, height: number]>;
-
-export type Annotation = {
-  id: number;
-  image_id: number;
-  category_id: number;
-  segmentation?: Array<any>;
-  area: number;
-  bbox: Bbox;
-  iscrowd: 0 | 1;
-};
-
-export type Category = {
-  supercategory: string;
-	id: number;
-	name: string;
-};
-
-export type CocoMeta = {
-  info: any;
-  licenses: Array<any>;
-  images: Array<Image>;
-  annotations: Array<Annotation>;
-  categories: Array<Category>;
-};
-
-export type CocoOptions = {
-  trainDir: string;
-  trainAnnotationFile?: string;
-  testDir: string;
-  testAnnotationFile?: string;
-  validDir?: string;
-  validAnnotationFile?: string;
-};
+import * as assert from 'assert';
 
 async function checkCocoMeta(metaObj: Record<string, any>) {
-  
+  assert.ok(Array.isArray(metaObj.images), 'images should be array');
+  assert.ok(Array.isArray(metaObj.annotations), 'annotations should be array');
+  metaObj.images.forEach(image => {
+    assert.ok(typeof image.id === 'number', 'invalid id field found in image data');
+    assert.ok(typeof image.width === 'number', 'invalid width field found in image data');
+    assert.ok(typeof image.height === 'number', 'invalid height field found in image data');
+    assert.ok(
+      typeof image.url === 'string'
+      || typeof image.coco_url === 'string'
+      || typeof image.flickr_url === 'string',
+      'invalid url/flickr_url/coco_url field found in image data'
+    );
+  });
 }
 
-export type Label = Array<{bbox: Bbox, categoryId: number}>;
-
-function cocoMetaToDatasetData(cocoMeta: CocoMeta): Array<Sample<string, Label>> {
-  const annotationMap: Record<number, Record<number, Bbox>> = {};
+function cocoMetaToDatasetData(cocoMeta: Coco.Meta): Array<Sample<Coco.Image, Coco.Label>> {
+  const annotationMap: Record<number, Array<Coco.Annotation>> = {};
   for (const ann of cocoMeta.annotations) {
     if (!annotationMap[ann.image_id]) {
-      annotationMap[ann.image_id] = {};
+      annotationMap[ann.image_id] = [];
     }
-    if (!annotationMap[ann.image_id][ann.category_id]) {
-      annotationMap[ann.image_id][ann.category_id] = [];
-    }
-    annotationMap[ann.image_id][ann.category_id].concat(ann.bbox);
+    annotationMap[ann.image_id].push(ann);
   };
-  return cocoMeta.images.map((img: Image) => {
-    const sample: Sample<string, Label> = {
-      data: img.coco_url || img.flickr_url || img.url,
-      label: []
-    };
-    const categories = annotationMap[img.id];
-    if (!categories) {
-      throw new TypeError(`no annotation found for image: ${img.file_name || img.coco_url || img.flickr_url || img.url}`);
-    }
-    for (const categoryId in categories) {
-      sample.label.push({
-        categoryId: Number(categoryId),
-        bbox: categories[categoryId]
-      });
-    }
-    return sample;
-  });
+  return cocoMeta.images.map((img: Coco.Image) => ({ data: img, label: annotationMap[img.id]}));
 }
 
+async function process(
+  dir: string,
+  annotationFile?: string
+): Promise<{
+  meta: Coco.Meta,
+  datasetData: Array<Sample<Coco.Image, Coco.Label>>
+}> {
+  const trainAnnFile = annotationFile ? annotationFile : path.join(dir, 'annotation.json');
+  const meta = await fs.readJson(trainAnnFile);
+  await checkCocoMeta(meta);
+  return { meta, datasetData: cocoMetaToDatasetData(meta) };
+}
 
-
-export const makeDatasetFromCocoFormat = async (options: CocoOptions): Promise<Dataset<Sample<string, Label>, any>> => {
-  const trainAnnFile = options.trainAnnotationFile ?
-    options.trainAnnotationFile : path.join(options.trainDir, 'annotation.json');
-  const trainMeta = await fs.readJson(trainAnnFile);
-  await checkCocoMeta(trainMeta);
-  const testAnnFile = options.testAnnotationFile ?
-    options.testAnnotationFile : path.join(options.testDir, 'annotation.json');
-  const testMeta = await fs.readJson(testAnnFile);
-  await checkCocoMeta(testMeta);
-
-  const trainData = cocoMetaToDatasetData(trainMeta);
-  const testData = cocoMetaToDatasetData(testMeta);
-  let validData = undefined;
+export const makeDatasetFromCocoFormat = async (options: Coco.Options): Promise<Dataset<Sample<Coco.Image, Coco.Label>, Coco.DatasetMeta>> => {
+  const { meta: trainMeta, datasetData: trainDatasetData } = await process(options.trainDir, options.trainAnnotationFile);
+  const { datasetData: testDatasetData } = await process(options.testDir, options.testAnnotationFile);
+  let validDatasetData = undefined;
   if (options.validDir) {
-    const validAnnFile = options.validAnnotationFile ?
-      options.validAnnotationFile : path.join(options.validDir, 'annotation.json');
-    const validMeta = await fs.readJson(validAnnFile);
-    await checkCocoMeta(validMeta);
-    validData = cocoMetaToDatasetData(trainMeta);
+    validDatasetData = (await process(options.validDir, options.validAnnotationFile)).datasetData;
   }
-  const data: DatasetData<Sample<string, Label>> = {
-    trainData,
-    testData,
-    validData
+  const data: DatasetData<Sample<Coco.Image, Coco.Label>> = {
+    trainData: trainDatasetData,
+    testData: testDatasetData,
+    validData: validDatasetData
   };
-  const labelMap: Record<number, Category> = {};
-  (trainMeta as CocoMeta).categories.forEach((category) => {
+  const labelMap: Record<number, Coco.Category> = {};
+  (trainMeta as Coco.Meta).categories.forEach((category) => {
     labelMap[category.id] = category;
   });
-  const datasetMeta = {
+  const datasetMeta: Coco.DatasetMeta = {
     type: DatasetType.Image,
     size: {
-      train: trainData.length,
-      test: testData.length,
-      valid: validData?.length
+      train: trainDatasetData.length,
+      test: testDatasetData.length,
+      valid: validDatasetData?.length
     },
-    labelMap
+    labelMap,
+    info: trainMeta.info,
+    licenses: trainMeta.licenses
   };
-  makeDataset(data, datasetMeta);
-
-  return null;
+  return makeDataset(data, datasetMeta);
 };

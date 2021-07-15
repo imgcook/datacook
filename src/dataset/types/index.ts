@@ -102,3 +102,5 @@ export interface Dataset<T extends Sample, D extends DatasetMeta> {
   // suhffle interface
   shuffle: (seed?: string) => void;
 }
+
+export * as Coco from './coco';
