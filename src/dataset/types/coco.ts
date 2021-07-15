@@ -21,16 +21,14 @@ export type Info = {
   date_created: string;
 };
 
-export type BboxEntity = [x:number, y:number, width: number, height: number];
-
-export type Bbox = Array<BboxEntity>;
+export type Bbox = [number, number, number, number];
 
 export type Annotation = {
   id: number;
   image_id: number;
   category_id: number;
   segmentation?: Array<any>;
-  area: number;
+  area?: number;
   bbox: Bbox;
   iscrowd: 0 | 1;
 };
@@ -42,8 +40,8 @@ export type Category = {
 };
 
 export type Meta = {
-  info: Info;
-  licenses: Array<License>;
+  info?: Info;
+  licenses?: Array<License>;
   images: Array<Image>;
   annotations: Array<Annotation>;
   categories: Array<Category>;
@@ -56,12 +54,9 @@ export type License = {
 };
 
 export type Options = {
-  trainDir: string;
-  trainAnnotationFile?: string;
-  testDir: string;
-  testAnnotationFile?: string;
-  validDir?: string;
-  validAnnotationFile?: string;
+  trainAnnotationObj: Meta;
+  testAnnotationObj: Meta;
+  validAnnotationObj?: Meta;
 };
 
 export type Label = Array<Annotation>;

@@ -1,7 +1,5 @@
 import { Dataset, Sample, DatasetType, Coco } from './types';
 import { DatasetData, makeDataset } from './utils';
-import * as fs from 'fs-extra';
-import * as path from 'path';
 import * as assert from 'assert';
 
 async function checkCocoMeta(metaObj: Record<string, any>) {
@@ -32,24 +30,21 @@ function cocoMetaToDatasetData(cocoMeta: Coco.Meta): Array<Sample<Coco.Image, Co
 }
 
 async function process(
-  dir: string,
-  annotationFile?: string
+  annotationObj: Coco.Meta
 ): Promise<{
   meta: Coco.Meta,
   datasetData: Array<Sample<Coco.Image, Coco.Label>>
 }> {
-  const trainAnnFile = annotationFile ? annotationFile : path.join(dir, 'annotation.json');
-  const meta = await fs.readJson(trainAnnFile);
-  await checkCocoMeta(meta);
-  return { meta, datasetData: cocoMetaToDatasetData(meta) };
+  await checkCocoMeta(annotationObj);
+  return { meta: annotationObj, datasetData: cocoMetaToDatasetData(annotationObj) };
 }
 
 export const makeDatasetFromCocoFormat = async (options: Coco.Options): Promise<Dataset<Sample<Coco.Image, Coco.Label>, Coco.DatasetMeta>> => {
-  const { meta: trainMeta, datasetData: trainDatasetData } = await process(options.trainDir, options.trainAnnotationFile);
-  const { datasetData: testDatasetData } = await process(options.testDir, options.testAnnotationFile);
+  const { meta: trainMeta, datasetData: trainDatasetData } = await process(options.trainAnnotationObj);
+  const { datasetData: testDatasetData } = await process(options.testAnnotationObj);
   let validDatasetData = undefined;
-  if (options.validDir) {
-    validDatasetData = (await process(options.validDir, options.validAnnotationFile)).datasetData;
+  if (options.validAnnotationObj) {
+    validDatasetData = (await process(options.validAnnotationObj)).datasetData;
   }
   const data: DatasetData<Sample<Coco.Image, Coco.Label>> = {
     trainData: trainDatasetData,
@@ -65,7 +60,7 @@ export const makeDatasetFromCocoFormat = async (options: Coco.Options): Promise<
     size: {
       train: trainDatasetData.length,
       test: testDatasetData.length,
-      valid: validDatasetData?.length
+      valid: Array.isArray(validDatasetData) ? validDatasetData.length : 0
     },
     labelMap,
     info: trainMeta.info,
