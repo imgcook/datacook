@@ -5,7 +5,7 @@ import * as assert from 'assert';
 async function checkCocoMeta(metaObj: Record<string, any>) {
   assert.ok(Array.isArray(metaObj.images), 'images should be array');
   assert.ok(Array.isArray(metaObj.annotations), 'annotations should be array');
-  metaObj.images.forEach(image => {
+  metaObj.images.forEach((image) => {
     assert.ok(typeof image.id === 'number', 'invalid id field found in image data');
     assert.ok(typeof image.width === 'number', 'invalid width field found in image data');
     assert.ok(typeof image.height === 'number', 'invalid height field found in image data');
@@ -25,8 +25,8 @@ function cocoMetaToDatasetData(cocoMeta: Coco.Meta): Array<Sample<Coco.Image, Co
       annotationMap[ann.image_id] = [];
     }
     annotationMap[ann.image_id].push(ann);
-  };
-  return cocoMeta.images.map((img: Coco.Image) => ({ data: img, label: annotationMap[img.id]}));
+  }
+  return cocoMeta.images.map((img: Coco.Image) => ({ data: img, label: annotationMap[img.id] }));
 }
 
 async function process(
