@@ -21,7 +21,7 @@ export type Info = {
   date_created: string;
 };
 
-export type Bbox = [number, number, number, number];
+export type Bbox = [ x: number, y: number, width: number, height: number ];
 
 export type Annotation = {
   id: number;
