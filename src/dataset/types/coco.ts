@@ -35,8 +35,8 @@ export type Annotation = {
 
 export type Category = {
   supercategory: string;
-	id: number;
-	name: string;
+  id: number;
+  name: string;
 };
 
 export type Meta = {
