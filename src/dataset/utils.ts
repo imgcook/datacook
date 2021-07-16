@@ -1,7 +1,7 @@
 import { DataAccessor, Dataset, DatasetMeta, Sample } from "./types";
 import { range, shuffle } from "../generic";
 
-interface DatasetData<T extends Sample> {
+export interface DatasetData<T extends Sample> {
   trainData: Array<T>,
   testData: Array<T>,
   validData?: Array<T>
@@ -137,7 +137,7 @@ export function transformDataset<IN_META extends DatasetMeta, IN_SAMPLE extends 
 }
 
 export function transformSampleInDataset<IN_SAMPLE extends Sample, OUT_SAMPLE extends Sample = IN_SAMPLE, IN_META extends DatasetMeta = any>
-(next: (sample: IN_SAMPLE) => Promise<OUT_SAMPLE>, dataset: Dataset<IN_SAMPLE, IN_META>) {
+(next: (sample: IN_SAMPLE) => Promise<OUT_SAMPLE>, dataset: Dataset<IN_SAMPLE, IN_META>): Dataset<OUT_SAMPLE, IN_META> {
   const internalDataset: Dataset<OUT_SAMPLE, IN_META> = {
     shuffle: (seed?: string) => dataset.shuffle(seed),
     getDatasetMeta: () => dataset.getDatasetMeta(),

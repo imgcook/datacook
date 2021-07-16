@@ -38,7 +38,7 @@ class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
     this.train.shuffle(seed);
   }
 
-  async getDatasetMeta() {
+  async getDatasetMeta(): Promise<ImageDatasetMeta> {
     const datasetSize: DatasetSize = {
       test: this.trainSamples.length,
       train: this.testSamples.length
@@ -113,7 +113,7 @@ class MNIST implements Dataset<mnistSample, ImageDatasetMeta> {
     return ret;
   }
 
-  static async getMNIST() {
+  static async getMNIST(): Promise<MNIST> {
     console.log('start downloading dataset');
     const fetchData = await Promise.all(Object.values(URLs).map((url) => fetch(url)));
     const abData = await Promise.all(fetchData.map((it) => it.arrayBuffer()));
