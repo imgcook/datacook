@@ -1,4 +1,4 @@
-import { Tensor } from '@tensorflow/tfjs-core';
+import { Tensor, split as splitOp } from '@tensorflow/tfjs-core';
 import 'seedrandom';
 
 function seed(seed: string): void {
@@ -28,7 +28,7 @@ function split(inputs: Tensor[], trainRatio = .75): Tensor[]{
   const trainSize = Math.floor(size * trainRatio);
   const testSize = size - trainSize;
 
-  const results = inputs.map((input) => input.split([ trainSize, testSize ])).reduce((prev, curr) => {
+  const results = inputs.map((input) => splitOp(input, [ trainSize, testSize ])).reduce((prev, curr) => {
     prev.push(...curr);
     return prev;
   }, []);

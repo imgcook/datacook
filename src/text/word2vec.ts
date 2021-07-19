@@ -1,6 +1,6 @@
 import * as tf from '@tensorflow/tfjs-layers';
 import { createData, createUniqueWord, objectLength, skipGram, UniqueWord } from './word2vec-utils';
-import { tensor } from '@tensorflow/tfjs-core';
+import { tensor, sub, pow, mean, sqrt } from '@tensorflow/tfjs-core';
 
 export default class Word2Vec {
   public weight: number[][] | undefined = undefined;
@@ -70,7 +70,7 @@ export default class Word2Vec {
     const indexB = this.uniqueWords[wordB];
     const weightA = tensor(this.weight[indexA]);
     const weightB = tensor(this.weight[indexB]);
-    const sim = weightA.sub(weightB).pow(2).mean().sqrt();
+    const sim = sqrt(mean(pow(sub(weightA, weightB), 2)));
     return sim.arraySync() as number;
 
   }
@@ -99,7 +99,7 @@ export default class Word2Vec {
     const wordWeight = tensor(this.weight[index]);
     weight.splice(index - 1, 1);
 
-    const rslt = tensor(weight).sub(wordWeight).pow(2).mean(1).sqrt();
+    const rslt = sqrt(mean(pow(sub(tensor(weight), wordWeight), 2), 1));
     const simArray = rslt.arraySync() as number[];
 
     let similarities = Object.keys(this.uniqueWords);
