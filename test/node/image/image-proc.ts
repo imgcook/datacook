@@ -2,6 +2,7 @@ import { assert, expect } from "chai"
 import {Image} from "../../../src/image";
 import {stdCalc} from "../../../src/image/utils";
 import * as fs from 'fs';
+import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-backend-cpu';
 
 describe("Image-proc", ()=>{
@@ -62,7 +63,7 @@ describe("Image-proc", ()=>{
 
     const resizeTensor = img.resize(50,50).toTensor();
     const img2: Image = await Image.fromTensor(resizeTensor);
-    const mean = resizeTensor.mean().round().arraySync() as number;
+    const mean = tf.round(tf.mean(resizeTensor)).arraySync() as number;
     const std = stdCalc(resizeTensor);
     
     const normalize = Image.normalize(resizeTensor);

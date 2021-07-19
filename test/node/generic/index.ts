@@ -17,17 +17,17 @@ describe('Generic Split test',
        *   [8, 9]
        * ]
        */
-      const X = tf.range(0, 10).reshape([5, 2]);
+      const X = tf.reshape(tf.range(0, 10), [5, 2]);
       
       const y = tf.range(0, 5);
 
       const [X_train, X_test, y_train, y_test] = split([X, y]); 
       
-      const actX_test = tf.range(6, 10).reshape([2, 2]);
-      const actX_train = tf.range(0, 6).reshape([3, 2]);
+      const actX_test = tf.reshape(tf.range(6, 10), [2, 2]);
+      const actX_train = tf.reshape(tf.range(0, 6), [3, 2]);
       
-      const acty_train = tf.range(0, 3).reshape([3]);
-      const acty_test = tf.range(3, 5).reshape([2]);
+      const acty_train = tf.reshape(tf.range(0, 3), [3]);
+      const acty_test = tf.reshape(tf.range(3, 5), [2]);
 
       expect(actX_test.dataSync()).to.eql(X_test.dataSync());
       expect(actX_train.dataSync()).to.eql(X_train.dataSync());
