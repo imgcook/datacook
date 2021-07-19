@@ -134,11 +134,9 @@ export class Image {
    * @return Tensor3D
    */
   static normalize(data: tf.Tensor3D, mean?: number, std?:number): tf.Tensor3D {
-
-    const tfMean = mean ? mean : data.mean().round().arraySync();
+    const tfMean = mean ? mean : tf.round(tf.mean(data)).arraySync();
     const tfStd = std ? std : stdCalc(data);
-    const norm = data.sub(tfMean).div(tfStd);
-
+    const norm = tf.div(tf.sub(data, tfMean), tfStd);
     return norm as tf.Tensor3D;
   }
 
@@ -150,7 +148,7 @@ export class Image {
    * @returns Tensor
    */
   static unnormalize(data: tf.Tensor3D, mean: number, std:number): tf.Tensor3D {
-    const unnorm = tf.cast(data.mul(std).add(mean), "int32");
+    const unnorm = tf.cast(tf.add(tf.mul(data, std), mean), 'int32');
     return unnorm as tf.Tensor3D;
   }
 
