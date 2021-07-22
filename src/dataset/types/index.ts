@@ -106,3 +106,4 @@ export interface Dataset<T extends Sample, D extends DatasetMeta> {
 export * as ObjectDetection from './object-detection';
 
 export * as Coco from './coco';
+export * as PascolVoc from './pascol-voc';
