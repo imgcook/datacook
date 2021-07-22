@@ -1,5 +1,5 @@
-import { Dataset, Sample, DatasetType, Coco } from './types';
-import { DatasetData, makeDataset } from './utils';
+import { Dataset, Sample, DatasetType, Coco } from '../types';
+import { DatasetData, makeDataset } from '../utils';
 
 async function checkCocoMeta(metaObj: Record<string, any>) {
   if (!Array.isArray(metaObj.images)) {
