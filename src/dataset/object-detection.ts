@@ -19,8 +19,8 @@ export const makeObjectDetectionDatasetFromCoco = async (options: Coco.Options):
     },
     metadata: async (meta: Coco.DatasetMeta): Promise<ObjectDetection.DatasetMeta> => {
       const labelMap: Record<number, string> = {};
-      for (const labelName in meta.labelMap) {
-        labelMap[labelName] = meta.labelMap[labelName].name;
+      for (const labelId in meta.labelMap) {
+        labelMap[labelId] = meta.labelMap[labelId].name;
       }
       return {
         type: meta.type,
