@@ -1,5 +1,5 @@
 
-import { BaseDatasetMeta } from './index';
+import { BaseDatasetMeta } from './';
 
 export interface Source {
   database: string;

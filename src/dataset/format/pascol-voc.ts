@@ -1,5 +1,5 @@
-import { Dataset, Sample, DatasetType, PascolVoc } from './types';
-import { makeDataset } from './utils';
+import { Dataset, Sample, DatasetType, PascolVoc } from '../types';
+import { makeDataset } from '../utils';
 
 function attachId(labelMap: Array<string>, annotationList: Array<PascolVoc.Annotation>): Array<Sample<PascolVoc.ExtAnnotation, Array<PascolVoc.ExtPascolVocObject>>> {
   return annotationList.map((annotation: PascolVoc.Annotation) => {
