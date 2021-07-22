@@ -103,4 +103,6 @@ export interface Dataset<T extends Sample, D extends DatasetMeta> {
   shuffle: (seed?: string) => void;
 }
 
+export * as ObjectDetection from './object-detection';
+
 export * as Coco from './coco';
