@@ -58,7 +58,7 @@ export interface ImageDimension {
 
 export interface BaseDatasetMeta {
   type: DatasetType;
-  size: DatasetSize;
+  size?: DatasetSize;
 }
 
 export interface DatasetMeta extends BaseDatasetMeta {
