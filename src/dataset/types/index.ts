@@ -62,7 +62,7 @@ export interface BaseDatasetMeta {
 }
 
 export interface DatasetMeta extends BaseDatasetMeta {
-  labelMap: Record<number, any>;
+  labelMap?: Record<number, any>;
 }
 
 /**
