@@ -1,8 +1,8 @@
-import { Dataset, Sample, DatasetType, PascolVoc } from '../types';
+import { Dataset, DatasetType, PascalVoc } from '../types';
 import { makeDataset } from '../utils';
 
-function attachId(labelMap: Array<string>, annotationList: Array<PascolVoc.Annotation>): Array<Sample<PascolVoc.ExtAnnotation, Array<PascolVoc.ExtPascolVocObject>>> {
-  return annotationList.map((annotation: PascolVoc.Annotation) => {
+function attachId(labelMap: Array<string>, annotationList: Array<PascalVoc.Annotation>): Array<PascalVoc.Sample> {
+  return annotationList.map((annotation: PascalVoc.Annotation) => {
     const extObjs = annotation.object?.map((obj) => {
       const index = labelMap.indexOf(obj.name);
       if (index >= 0) {
@@ -24,9 +24,9 @@ function attachId(labelMap: Array<string>, annotationList: Array<PascolVoc.Annot
   });
 }
 
-export const makeDatasetFromPascolVocFormat = async (options: PascolVoc.Options): Promise<Dataset<Sample<PascolVoc.ExtAnnotation, Array<PascolVoc.ExtPascolVocObject>>, PascolVoc.DatasetMeta>> => {
+export const makeDatasetFromPascalVocFormat = async (options: PascalVoc.Options): Promise<Dataset<PascalVoc.Sample, PascalVoc.DatasetMeta>> => {
   const labelNames: Array<string> = [];
-  const trainData = options.trainAnnotationList.map((annotation: PascolVoc.Annotation) => {
+  const trainData = options.trainAnnotationList.map((annotation: PascalVoc.Annotation) => {
     const extObjs = annotation.object?.map((obj) => {
       const index = labelNames.indexOf(obj.name);
       if (index >= 0) {
@@ -51,9 +51,9 @@ export const makeDatasetFromPascolVocFormat = async (options: PascolVoc.Options)
     };
   });
   const testData = attachId(labelNames, options.testAnnotationList);
-  const validData = attachId(labelNames, options.validAnnotationList);
+  const validData = Array.isArray(options.validAnnotationList) ? attachId(labelNames, options.validAnnotationList) : undefined;
 
-  const datasetMeta: PascolVoc.DatasetMeta = {
+  const datasetMeta: PascalVoc.DatasetMeta = {
     type: DatasetType.Image,
     size: {
       train: trainData.length,

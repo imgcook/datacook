@@ -1,5 +1,5 @@
 
-import { BaseDatasetMeta } from './';
+import { BaseDatasetMeta, Sample as BaseSample } from '.';
 
 export interface Source {
   database: string;
@@ -26,7 +26,7 @@ export interface Bndbox {
   ymax: number;
 }
 
-export interface PascolVocObject {
+export interface PascalVocObject {
   name: string;
   pose: string;
   truncated: 0 | 1;
@@ -34,7 +34,7 @@ export interface PascolVocObject {
   bndbox: Bndbox;
 }
 
-export interface ExtPascolVocObject extends PascolVocObject{
+export interface ExtPascalVocObject extends PascalVocObject{
   id: number;
 }
 
@@ -45,7 +45,7 @@ export interface Annotation {
   owner: Owner;
   size: Size;
   segmented: number;
-  object: Array<PascolVocObject>;
+  object: Array<PascalVocObject>;
 }
 
 export interface ExtAnnotation {
@@ -55,15 +55,17 @@ export interface ExtAnnotation {
   owner: Owner;
   size: Size;
   segmented: number;
-  object: Array<ExtPascolVocObject>;
+  object: Array<ExtPascalVocObject>;
 }
 
 export interface Options {
   trainAnnotationList: Array<Annotation>;
   testAnnotationList: Array<Annotation>;
-  validAnnotationList: Array<Annotation>;
+  validAnnotationList?: Array<Annotation>;
 }
 
 export interface DatasetMeta extends BaseDatasetMeta {
   labelMap: Array<string>;
 }
+export type Label = Array<ExtPascalVocObject>;
+export type Sample = BaseSample<ExtAnnotation, Label>;
