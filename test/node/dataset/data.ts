@@ -109,6 +109,7 @@ export const pascalVocAnnotation: Array<PascalVoc.Annotation> = [
   {
     folder: 'images',
     filename: '0001.jpg',
+    path: 'images/0001.jpg',
     source: {
       database: 'database',
       annotation: 'source.annotation',
@@ -157,6 +158,7 @@ export const pascalVocAnnotation: Array<PascalVoc.Annotation> = [
   {
     folder: 'images',
     filename: '0002.jpg',
+    path: 'images/0002.jpg',
     source: {
       database: 'database',
       annotation: 'source.annotation',
@@ -205,6 +207,7 @@ export const pascalVocAnnotation: Array<PascalVoc.Annotation> = [
   {
     folder: 'images',
     filename: '0003.jpg',
+    path: 'images/0003.jpg',
     source: {
       database: 'database',
       annotation: 'source.annotation',

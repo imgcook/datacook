@@ -62,7 +62,7 @@ describe('Objec detection dataset', () => {
 
   it('should make a dataset from pascol', async () => {
     const sample1: Types.ObjectDetection.Sample = {
-      data: path.join(pascalVocAnnotation[0].folder, pascalVocAnnotation[0].filename),
+      data: pascalVocAnnotation[0].path,
       label: [ {
         id: 0,
         bbox: [
@@ -84,7 +84,7 @@ describe('Objec detection dataset', () => {
     };
     
     const sample2: Types.ObjectDetection.Sample = {
-      data: path.join(pascalVocAnnotation[1].folder, pascalVocAnnotation[1].filename),
+      data: pascalVocAnnotation[1].path,
       label: [ {
         id: 0,
         bbox: [
@@ -106,7 +106,7 @@ describe('Objec detection dataset', () => {
     };
     
     const sample3: Types.ObjectDetection.Sample = {
-      data: path.join(pascalVocAnnotation[2].folder, pascalVocAnnotation[2].filename),
+      data: pascalVocAnnotation[2].path,
       label: [
         {
           id: 2,

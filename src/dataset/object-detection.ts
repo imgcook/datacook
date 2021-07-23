@@ -54,7 +54,7 @@ export const makeObjectDetectionDatasetFromPascalVoc = async (options: PascalVoc
           };
         });
         return {
-          data: `${sample.data.folder ? sample.data.folder + '/' : ''}${sample.data.filename}`,
+          data: sample.data.path,
           label: newLabels
         };
       },

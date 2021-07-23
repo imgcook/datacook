@@ -41,6 +41,7 @@ export interface ExtPascalVocObject extends PascalVocObject{
 export interface Annotation {
   folder: string;
   filename: string;
+  path: string;
   source: Source;
   owner: Owner;
   size: Size;
@@ -51,6 +52,7 @@ export interface Annotation {
 export interface ExtAnnotation {
   folder: string;
   filename: string;
+  path: string;
   source: Source;
   owner: Owner;
   size: Size;
