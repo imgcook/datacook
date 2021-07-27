@@ -58,11 +58,11 @@ export interface ImageDimension {
 
 export interface BaseDatasetMeta {
   type: DatasetType;
-  size: DatasetSize;
+  size?: DatasetSize;
 }
 
 export interface DatasetMeta extends BaseDatasetMeta {
-  labelMap: Record<number, any>;
+  labelMap?: Record<number, any>;
 }
 
 /**
