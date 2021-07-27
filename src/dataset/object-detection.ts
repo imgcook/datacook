@@ -14,7 +14,7 @@ export const makeObjectDetectionDatasetFromCoco = async (options: Coco.Options):
         };
       });
       return {
-        data: sample.data.url || sample.data.coco_url || sample.data.flickr_url,
+        data: { uri: sample.data.url || sample.data.coco_url || sample.data.flickr_url },
         label: newLabels
       };
     },

@@ -1,4 +1,4 @@
-import { Sample as BaseSample, Dataset as BaseDataset, DatasetMeta as BaseDatasetMeta } from './';
+import { Sample as BaseSample, Dataset as BaseDataset, DatasetMeta as BaseDatasetMeta, ObjectDetection } from './';
 
 export type Bbox = [
   x: number,
@@ -9,7 +9,12 @@ export type Bbox = [
 
 export type Label = Array<{ id: number; bbox: Bbox; }>;
 
-export type Sample = BaseSample<string, Label>;
+export interface ObjectDetectionData {
+  uri?: string;
+  buffer?: ArrayBuffer;
+}
+
+export type Sample = BaseSample<ObjectDetectionData, Label>;
 
 export interface DatasetMeta extends BaseDatasetMeta {
   labelMap: Record<number, string>;
