@@ -9,7 +9,7 @@ import * as path from 'path';
 describe('Objec detection dataset', () => {
   it('should make a dataset from coco', async () => {
     const sample1: Types.ObjectDetection.Sample = {
-      data: cocoAnnotation.images[0].url,
+      data: { uri: cocoAnnotation.images[0].url },
       label: [{
         id: cocoAnnotation.annotations[0].id,
         bbox: cocoAnnotation.annotations[0].bbox
@@ -20,7 +20,7 @@ describe('Objec detection dataset', () => {
     };
     
     const sample2: Types.ObjectDetection.Sample = {
-      data: cocoAnnotation.images[1].url,
+      data: { uri: cocoAnnotation.images[1].url },
       label: [{
         id: cocoAnnotation.annotations[2].id,
         bbox: cocoAnnotation.annotations[2].bbox
@@ -31,7 +31,7 @@ describe('Objec detection dataset', () => {
     };
     
     const sample3: Types.ObjectDetection.Sample = {
-      data: cocoAnnotation.images[2].url,
+      data: { uri: cocoAnnotation.images[2].url },
       label: [{
         id: cocoAnnotation.annotations[4].id,
         bbox: cocoAnnotation.annotations[4].bbox
@@ -62,7 +62,7 @@ describe('Objec detection dataset', () => {
 
   it('should make a dataset from pascol', async () => {
     const sample1: Types.ObjectDetection.Sample = {
-      data: pascalVocAnnotation[0].path,
+      data: { uri: pascalVocAnnotation[0].path },
       label: [ {
         id: 0,
         bbox: [
@@ -84,7 +84,7 @@ describe('Objec detection dataset', () => {
     };
     
     const sample2: Types.ObjectDetection.Sample = {
-      data: pascalVocAnnotation[1].path,
+      data: { uri: pascalVocAnnotation[1].path },
       label: [ {
         id: 0,
         bbox: [
@@ -106,7 +106,7 @@ describe('Objec detection dataset', () => {
     };
     
     const sample3: Types.ObjectDetection.Sample = {
-      data: pascalVocAnnotation[2].path,
+      data: { uri: pascalVocAnnotation[2].path },
       label: [
         {
           id: 2,
