@@ -1,4 +1,4 @@
-import { Sample as BaseSample, Dataset as BaseDataset, DatasetMeta as BaseDatasetMeta, ObjectDetection } from './';
+import { Sample as BaseSample, Dataset as BaseDataset, DatasetMeta as BaseDatasetMeta } from './';
 
 export type Bbox = [
   x: number,

@@ -54,7 +54,7 @@ export const makeObjectDetectionDatasetFromPascalVoc = async (options: PascalVoc
           };
         });
         return {
-          data: sample.data.path,
+          data: { uri: sample.data.path },
           label: newLabels
         };
       },
