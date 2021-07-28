@@ -1,4 +1,4 @@
-import { Sample as BaseSample, DatasetMeta as BaseDatasetMeta } from './';
+import { DatasetType, Sample as BaseSample, DatasetMeta as BaseDatasetMeta } from './';
 
 export interface Options {
   trainData: string;
@@ -16,5 +16,6 @@ export type Label = Record<string, ColumnData>;
 export type Sample = BaseSample<Record<string, ColumnData>, Label>;
 
 export interface DatasetMeta extends BaseDatasetMeta {
+  type: DatasetType.Table,
   labelMap: undefined;
 }

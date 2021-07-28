@@ -4,8 +4,6 @@
   "description": "A JavaScript library for feature engineering on datasets",
   "main": "dist/index.js",
   "dependencies": {
-    "@tensorflow/tfjs-backend-cpu": "^3.8.0",
-    "@tensorflow/tfjs-backend-wasm": "^3.8.0",
     "@tensorflow/tfjs-core": "^3.8.0",
     "@tensorflow/tfjs-layers": "^3.8.0",
     "buffer": "^6.0.3",
@@ -45,6 +43,8 @@
   },
   "homepage": "https://github.com/imgcook/datacook#README",
   "devDependencies": {
+    "@tensorflow/tfjs-backend-cpu": "^3.8.0",
+    "@tensorflow/tfjs-backend-wasm": "^3.8.0",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.14.20",

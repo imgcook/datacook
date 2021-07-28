@@ -1,5 +1,5 @@
 
-import { BaseDatasetMeta, Sample as BaseSample } from '.';
+import { DatasetType, BaseDatasetMeta, Sample as BaseSample } from '.';
 
 export interface Source {
   database: string;
@@ -67,6 +67,7 @@ export interface Options {
 }
 
 export interface DatasetMeta extends BaseDatasetMeta {
+  type: DatasetType.Image,
   labelMap: Array<string>;
 }
 export type Label = Array<ExtPascalVocObject>;

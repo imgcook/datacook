@@ -1,4 +1,4 @@
-import { Sample as BaseSample, Dataset as BaseDataset, DatasetMeta as BaseDatasetMeta } from './';
+import { DatasetType, Sample as BaseSample, Dataset as BaseDataset, DatasetMeta as BaseDatasetMeta } from './';
 
 export type Bbox = [
   x: number,
@@ -17,6 +17,7 @@ export interface ObjectDetectionData {
 export type Sample = BaseSample<ObjectDetectionData, Label>;
 
 export interface DatasetMeta extends BaseDatasetMeta {
+  type: DatasetType.Image,
   labelMap: Record<number, string>;
 }
 

@@ -1,6 +1,6 @@
 import { Sample, ObjectDetection, Coco, PascalVoc } from './types';
 import { makeDatasetFromCocoFormat } from './format/coco';
-import { transformDataset } from './';
+import { transformDataset, makeDataset, DatasetData } from './';
 import { makeDatasetFromPascalVocFormat } from './format/pascal-voc';
 
 export const makeObjectDetectionDatasetFromCoco = async (options: Coco.Options): Promise<ObjectDetection.Dataset> => {
@@ -70,4 +70,8 @@ export const makeObjectDetectionDatasetFromPascalVoc = async (options: PascalVoc
         };
       }
     }, dataset);
+};
+
+export const makeObjectDetectionDataset = async (datasetData: DatasetData<ObjectDetection.Sample>, meta: ObjectDetection.DatasetMeta): Promise<ObjectDetection.Dataset> => {
+  return makeDataset<ObjectDetection.Sample, ObjectDetection.DatasetMeta>(datasetData, meta);
 };
