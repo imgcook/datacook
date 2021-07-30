@@ -1,6 +1,5 @@
 import { expect } from 'chai';
-import { makeDataset, Types } from '../../../src/dataset';
-import MNIST from '../../../src/dataset/mnist';
+import { ArrayDatasetImpl, makeTransformDataset, Types } from '../../../src/dataset';
 import 'mocha';
 import { seed } from '../../../src/generic';
 
@@ -18,36 +17,48 @@ const expectThrowsAsync = async (method: any, errorMessage?: string) => {
   }
 }
 
-class TestDatasetMeta implements Types.DatasetMeta {
-  type: Types.DatasetType = Types.DatasetType.Image;
-  size: Types.DatasetSize = {
-    train: 3,
-    test: 3
-  };
-  labelMap: { 1: '1' }
-}
-
 describe('Dataset', () => {
   it('should make a dataset', async () => {
     const sample: Types.Sample<number> = {
       data: 1,
       label: 1
-    }
-    const trainSamples: Array<Types.Sample> = [sample, sample, sample];
-    const testSamples: Array<Types.Sample> = [sample, sample, sample];
-  
-    const meta = new TestDatasetMeta();
-  
-    const dataset = makeDataset({
-      trainData: trainSamples,
-      testData: testSamples,
-    }, meta);
-  
-    expect(await dataset.getDatasetMeta()).to.eql(meta);
-    expect(await dataset.train.next()).to.eql(sample);
-    expect(await dataset.test.next()).to.eql(sample);
-    expect(await dataset.train.nextBatch(3)).to.eql([sample, sample]);
-    expect(await dataset.test.nextBatch(1)).to.eql([sample]);
+    };
+    const trainSamples: Array<Types.Sample> = [ sample, sample, sample ];
+
+    const dataset = new ArrayDatasetImpl(trainSamples);
+
+    expect(await dataset.next()).to.eql(sample);
+    expect(await dataset.nextBatch(3)).to.eql([ sample, sample ]);
+    await dataset.seek(0);
+    expect(await dataset.nextBatch(-1)).to.eql([ sample, sample, sample ]);
+    expect(await dataset.next()).to.eql(undefined);
+    expect(await dataset.nextBatch(1)).to.eql([]);
+  });
+
+  it('should make a transform', async () => {
+    const sample: Types.Sample<number> = {
+      data: 1,
+      label: 1
+    };
+    const transformedSample: Types.Sample<number> = {
+      data: 2,
+      label: 2
+    };
+    const trainSamples: Array<Types.Sample> = [ sample, sample, sample ];
+
+    const dataset = new ArrayDatasetImpl(trainSamples);
+    const transformed = makeTransformDataset(dataset, async (sample: Types.Sample): Promise<Types.Sample> => {
+      return {
+        data: sample.data + 1,
+        label: sample.data + 1
+      };
+    });
+    expect(await transformed.next()).to.eql(transformedSample);
+    expect(await transformed.nextBatch(3)).to.eql([ transformedSample, transformedSample ]);
+    await transformed.seek(0);
+    expect(await transformed.nextBatch(-1)).to.eql([ transformedSample, transformedSample, transformedSample ]);
+    expect(await transformed.next()).to.eql(undefined);
+    expect(await transformed.nextBatch(1)).to.eql([]);
   });
 
   it('should iter a dataset after shuffle', async () => {
@@ -56,51 +67,17 @@ describe('Dataset', () => {
         data: num,
         label: num
       }
-    }
+    };
     const trainSamples: Array<Types.Sample> = [sampleMaker(0), sampleMaker(1), sampleMaker(2)];
-    const testSamples: Array<Types.Sample> = [sampleMaker(3), sampleMaker(4), sampleMaker(5)];
   
-    const meta = new TestDatasetMeta();
-  
-    const dataset = makeDataset({
-      trainData: trainSamples,
-      testData: testSamples,
-    }, meta);
+    const dataset = new ArrayDatasetImpl(trainSamples);
 
     seed('test');
     dataset.shuffle();
 
-    const trainData = (await dataset.train.nextBatch(3)).map(it => it.data);
-    const testData = (await dataset.test.nextBatch(3)).map(it => it.data);
-  
-    expect(await dataset.getDatasetMeta()).to.eql(meta);
-    expect(trainData).to.eql([1, 0, 2])
-    expect(testData).to.eql([4, 3, 5])
-  });
+    const trainData = (await dataset.nextBatch(3)).map(it => it.data);
 
-  it('should make a mnist dataset', async () => {
-    const mnist = await MNIST.getMNIST();
-    const meta = await mnist.getDatasetMeta();  
-
-    const labelMap = {
-      '0': '0',
-      '1': '1',
-      '2': '2',
-      '3': '3',
-      '4': '4',
-      '5': '5',
-      '6': '6',
-      '7': '7',
-      '8': '8',
-      '9': '9'
-    }
-
-    expect(meta).to.eql({
-      type: Types.DatasetType.Image,
-      size: { test: 60000, train: 10000 },
-      dimension: { x: 28, y: 28, z: 1 },
-      labelMap
-    });
+    expect(trainData).to.eql([1, 0, 2]);
   });
 
   it('should read a zero batch', async () => {
@@ -109,53 +86,21 @@ describe('Dataset', () => {
       label: 1
     }
     const trainSamples: Array<Types.Sample> = [sample, sample, sample];
-    const testSamples: Array<Types.Sample> = [sample, sample, sample];
+    const dataset = new ArrayDatasetImpl(trainSamples);
   
-    const meta = new TestDatasetMeta();
-  
-    const dataset = makeDataset({
-      trainData: trainSamples,
-      testData: testSamples,
-    }, meta);
-  
-    expect(await dataset.train.nextBatch(0)).to.eql([]);
-  });
-
-  it('should read a whole batch', async () => {
-    const sample: Types.Sample<number> = {
-      data: 1,
-      label: 1
-    }
-    const trainSamples: Array<Types.Sample> = [sample, sample, sample];
-    const testSamples: Array<Types.Sample> = [sample, sample, sample];
-  
-    const meta = new TestDatasetMeta();
-  
-    const dataset = makeDataset({
-      trainData: trainSamples,
-      testData: testSamples,
-    }, meta);
-  
-    expect(await dataset.train.nextBatch(-1)).to.eql(trainSamples);
+    expect(await dataset.nextBatch(0)).to.eql([]);
   });
 
   it('should throw an error', async () => {
     const sample: Types.Sample<number> = {
       data: 1,
       label: 1
-    }
-    const trainSamples: Array<Types.Sample> = [sample, sample, sample];
-    const testSamples: Array<Types.Sample> = [sample, sample, sample];
+    };
+    const trainSamples: Array<Types.Sample> = [ sample, sample, sample ];
   
-    const meta = new TestDatasetMeta();
-  
-    const dataset = makeDataset({
-      trainData: trainSamples,
-      testData: testSamples,
-    }, meta);
-  
+    const dataset = new ArrayDatasetImpl(trainSamples);
 
-    const expectedError = new RangeError(`Batch size should be larger than -1 but -2 is present`);
-    await expectThrowsAsync(() => dataset.train.nextBatch(-2));
-  })
-})
+    await expectThrowsAsync(() => dataset.nextBatch(-2));
+  });
+});
+

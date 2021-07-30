@@ -12,6 +12,9 @@
     "papaparse": "^5.3.1",
     "seedrandom": "^3.0.5"
   },
+  "peerDependencies": {
+    "@pipcook/datacook": "0.0.8"
+  },
   "scripts": {
     "test": "npm run test:node",
     "test:node": "nyc mocha --timeout 60000 -r ts-node/register ./test/node/**/*.ts",

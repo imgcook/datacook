@@ -1,5 +1,5 @@
 
-import { DatasetType, BaseDatasetMeta, Sample as BaseSample } from '.';
+import { Sample as BaseSample } from '.';
 
 export interface Source {
   database: string;
@@ -60,15 +60,5 @@ export interface ExtAnnotation {
   object: Array<ExtPascalVocObject>;
 }
 
-export interface Options {
-  trainAnnotationList: Array<Annotation>;
-  testAnnotationList: Array<Annotation>;
-  validAnnotationList?: Array<Annotation>;
-}
-
-export interface DatasetMeta extends BaseDatasetMeta {
-  type: DatasetType.Image,
-  labelMap: Array<string>;
-}
 export type Label = Array<ExtPascalVocObject>;
 export type Sample = BaseSample<ExtAnnotation, Label>;

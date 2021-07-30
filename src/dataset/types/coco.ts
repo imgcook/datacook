@@ -1,5 +1,3 @@
-import { DatasetSize, DatasetType } from './';
-
 export type Image = {
   id: number;
   width: number;
@@ -53,18 +51,4 @@ export type License = {
   url: string;
 };
 
-export type Options = {
-  trainAnnotationObj: Meta;
-  testAnnotationObj: Meta;
-  validAnnotationObj?: Meta;
-};
-
 export type Label = Array<Annotation>;
-
-export type DatasetMeta = {
-  type: DatasetType.Image,
-  size: DatasetSize,
-  labelMap: Record<number, Category>,
-  info: Info;
-  licenses: Array<License>;
-}
