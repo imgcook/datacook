@@ -56,12 +56,12 @@ export class ArrayDatasetImpl<T extends Sample> implements Dataset<T> {
 
 }
 
-export function makeTransformDataset<IN extends Sample, OUT extends Sample>(accessor: Dataset<IN> | undefined, transform: (sample: IN) => Promise<OUT>): Dataset<OUT> {
+export function makeTransformDataset<IN extends Sample, OUT extends Sample>(dataset: Dataset<IN> | undefined, transform: (sample: IN) => Promise<OUT>): Dataset<OUT> {
   const transformedData: Dataset<OUT> = {
-    seek: (pos: number) => accessor.seek(pos),
-    shuffle: (seed?: string) => accessor.shuffle(seed),
+    seek: (pos: number) => dataset.seek(pos),
+    shuffle: (seed?: string) => dataset.shuffle(seed),
     next: async () => {
-      const sample = await accessor.next();
+      const sample = await dataset.next();
       if (sample) return transform(sample);
       else return undefined;
     },
