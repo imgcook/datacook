@@ -1,13 +1,9 @@
 import { Sample as BaseSample } from './';
+import { Coco } from './';
 
-export type Bbox = [
-  x: number,
-  y: number,
-  width: number,
-  height: number
-];
+export type Bbox = Coco.Bbox;
 
-export type Label = Array<{ id: number; bbox: Bbox; }>;
+export type Label = Array<{ name: string; bbox: Bbox; }>;
 
 export interface ObjectDetectionData {
   uri?: string;
@@ -15,4 +11,3 @@ export interface ObjectDetectionData {
 }
 
 export type Sample = BaseSample<ObjectDetectionData, Label>;
-

@@ -1,3 +1,5 @@
+import { Sample as BaseSample } from './';
+
 export type Image = {
   id: number;
   width: number;
@@ -52,3 +54,5 @@ export type License = {
 };
 
 export type Label = Array<Annotation>;
+
+export type Sample = BaseSample<Image, Label>;
