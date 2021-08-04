@@ -19,7 +19,6 @@ describe('Encodings', function () {
       assert.deepEqual(await encode.transform(['dog', 'man']), [0, 2]);
     });
 
-
     it('test the label encoding on Tensor', async function () {
       let data = ['dog', 'cat', 'man', 'dog', 'cat', 'man', 'man', 'cat'];
       let tensor_data = tf.tensor(data);
