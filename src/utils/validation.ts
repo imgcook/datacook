@@ -1,4 +1,4 @@
-import { Tensor, cast, tensor, DataType } from '@tensorflow/tfjs-core';
+import { Tensor,  cast,  DataType, tensor } from '@tensorflow/tfjs-core';
 
 export function checkArray(array: Tensor | Array<any>, dtype: DataType = 'float32', ensureDimension: number = -1, allowNaN: boolean = true): Tensor{
     if (array instanceof Array){

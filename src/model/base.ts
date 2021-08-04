@@ -20,6 +20,23 @@ export class BaseClassifier {
   public validateData(X: any, y: any){
     const X_tensor = checkArray(X, 'float32', 2);
     const y_tensor = checkArray(y, 'int32', 1);
+    /*let y_tensor;
+    if (y instanceof Array) {
+      if (y.length && y[0] instanceof Number){
+        y_tensor = checkArray(y, 'int32', 1);
+      }else{
+        y_tensor = checkArray(y, 'string', 1);
+      }
+    }
+    else{
+      if (y instanceof Tensor) {
+        if (y.dtype == 'float32' || y.dtype == 'complex64'){
+          y_tensor = checkArray(y, 'int32', 1);
+        }else{
+          y_tensor = checkArray(y, 'string', 1);
+        }
+      }
+    }*/
     const n_X = X_tensor.shape[0];
     const n_y = y_tensor.shape[0];
     if (n_X != n_y) {

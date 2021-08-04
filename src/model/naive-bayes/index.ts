@@ -95,7 +95,7 @@ export class MultinomialNB extends BaseClassifier {
   private getNewBatchOneHot(y: Tensor): Tensor {
     const yData = y.dataSync();
     const yInd = yData.map((d) => { return this.classMap[d] });
-    return tensor(yInd);
+    return cast(tensor(yInd), 'int32');
   }
 
   /**
@@ -160,6 +160,8 @@ export class MultinomialNB extends BaseClassifier {
     const axis_h = 1;
     const classInd = argMax(logLikelihood, axis_h);
     const classVal = gather(this.classes, classInd);
+    this.classes.print();
+    console.log(classVal);
     return classVal;
   }
 
