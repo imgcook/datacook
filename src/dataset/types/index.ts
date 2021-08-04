@@ -56,6 +56,7 @@ export interface Dataset<T> {
 
 export * as ObjectDetection from './object-detection';
 export * as ImageClassification from './image-classification';
+export * as TextClassification from './text-classification';
 
 export * as Coco from './coco';
 export * as PascalVoc from './pascal-voc';

@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { ArrayDatasetImpl, makeTransformDataset, Types } from '../../../src/dataset';
+import { ArrayDatasetImpl, makeTransform, Types } from '../../../src/dataset';
 import 'mocha';
 import { seed } from '../../../src/generic';
 
@@ -47,7 +47,7 @@ describe('Dataset', () => {
     const trainSamples: Array<Types.Sample> = [ sample, sample, sample ];
 
     const dataset = new ArrayDatasetImpl(trainSamples);
-    const transformed = makeTransformDataset(dataset, async (sample: Types.Sample): Promise<Types.Sample> => {
+    const transformed = makeTransform(dataset, async (sample: Types.Sample): Promise<Types.Sample> => {
       return {
         data: sample.data + 1,
         label: sample.data + 1

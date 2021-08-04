@@ -38,7 +38,6 @@ export class Image {
       height: this.height,
       width: this.width
     }, depth);
-
   }
 
   /**
