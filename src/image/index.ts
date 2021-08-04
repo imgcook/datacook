@@ -15,11 +15,15 @@ export class Image {
 
   /**
    * Read image from files and create an Image object for processing
-   * @param name image file name
+   * @param data image file name or image buffer
    */
-  static async read(name: string): Promise<Image> {
-    const jimpObj = await Jimp.read(name);
-
+  static async read(data: string | ArrayBuffer): Promise<Image> {
+    let jimpObj;
+    if (typeof data === 'string') {
+      jimpObj = await Jimp.read(data);
+    } else {
+      jimpObj = await Jimp.read(Buffer.from(data));
+    }
     return new Image(jimpObj);
   }
 
