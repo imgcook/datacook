@@ -1,5 +1,5 @@
 
-import { BaseDatasetMeta, Sample as BaseSample } from '.';
+import { Sample as BaseSample } from '.';
 
 export interface Source {
   database: string;
@@ -34,10 +34,6 @@ export interface PascalVocObject {
   bndbox: Bndbox;
 }
 
-export interface ExtPascalVocObject extends PascalVocObject{
-  id: number;
-}
-
 export interface Annotation {
   folder: string;
   filename: string;
@@ -49,25 +45,5 @@ export interface Annotation {
   object: Array<PascalVocObject>;
 }
 
-export interface ExtAnnotation {
-  folder: string;
-  filename: string;
-  path: string;
-  source: Source;
-  owner: Owner;
-  size: Size;
-  segmented: number;
-  object: Array<ExtPascalVocObject>;
-}
-
-export interface Options {
-  trainAnnotationList: Array<Annotation>;
-  testAnnotationList: Array<Annotation>;
-  validAnnotationList?: Array<Annotation>;
-}
-
-export interface DatasetMeta extends BaseDatasetMeta {
-  labelMap: Array<string>;
-}
-export type Label = Array<ExtPascalVocObject>;
-export type Sample = BaseSample<ExtAnnotation, Label>;
+export type Label = Array<PascalVocObject>;
+export type Sample = BaseSample<Annotation, Label>;

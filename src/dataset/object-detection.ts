@@ -1,73 +1,49 @@
-import { Sample, ObjectDetection, Coco, PascalVoc } from './types';
-import { makeDatasetFromCocoFormat } from './format/coco';
-import { transformDataset } from './';
-import { makeDatasetFromPascalVocFormat } from './format/pascal-voc';
+import { Sample, Dataset, ObjectDetection, Coco, PascalVoc } from './types';
+import { makeDatasetFromCoco, extractCategoriesFromCoco } from './format/coco';
+import { makeDatasetFromPascalVoc } from './format/pascal-voc';
+import { makeTransform } from './';
 
-export const makeObjectDetectionDatasetFromCoco = async (options: Coco.Options): Promise<ObjectDetection.Dataset> => {
-  const dataset = await makeDatasetFromCocoFormat(options);
-  return transformDataset<Coco.DatasetMeta, Sample<Coco.Image, Coco.Label>, ObjectDetection.Sample, ObjectDetection.DatasetMeta>({
-    next: async (sample: Sample<Coco.Image, Coco.Label>): Promise<ObjectDetection.Sample> => {
-      const newLabels = sample.label.map((lable) => {
+export function makeObjectDetectionDatasetFromCoco(meta: Coco.Meta): Dataset<ObjectDetection.Sample> {
+  const dataset = makeDatasetFromCoco(meta);
+  const categories = extractCategoriesFromCoco(meta);
+  const categoryFinder: Record<number, Coco.Category> = {};
+  categories.forEach((item) => {
+    categoryFinder[item.id] = item;
+  });
+  return makeTransform<Coco.Sample, ObjectDetection.Sample>(dataset, async (sample: Sample<Coco.Image, Coco.Label>): Promise<ObjectDetection.Sample> => {
+    const newLabels = sample.label.map((lable) => {
+      return {
+        name: categoryFinder[lable.category_id]?.name,
+        bbox: lable.bbox
+      };
+    });
+    return {
+      data: { uri: sample.data.url || sample.data.coco_url || sample.data.flickr_url },
+      label: newLabels
+    };
+  });
+}
+
+export function makeObjectDetectionDatasetFromPascalVoc(annotations: Array<PascalVoc.Annotation>): Dataset<ObjectDetection.Sample> {
+  const dataset = makeDatasetFromPascalVoc(annotations);
+  return makeTransform<PascalVoc.Sample, ObjectDetection.Sample>(
+    dataset,
+    async (sample: PascalVoc.Sample): Promise<ObjectDetection.Sample> => {
+      const newLabels: ObjectDetection.Label = sample.label.map((label) => {
         return {
-          id: lable.id,
-          bbox: lable.bbox
+          name: label.name,
+          bbox: [
+            label.bndbox.xmin,
+            label.bndbox.ymin,
+            label.bndbox.xmax - label.bndbox.xmin,
+            label.bndbox.ymax - label.bndbox.ymin
+          ]
         };
       });
       return {
-        data: { uri: sample.data.url || sample.data.coco_url || sample.data.flickr_url },
+        data: { uri: sample.data.path },
         label: newLabels
       };
-    },
-    metadata: async (meta: Coco.DatasetMeta): Promise<ObjectDetection.DatasetMeta> => {
-      const labelMap: Record<number, string> = {};
-      for (const labelId in meta.labelMap) {
-        labelMap[labelId] = meta.labelMap[labelId].name;
-      }
-      return {
-        type: meta.type,
-        size: meta.size,
-        labelMap
-      };
     }
-  }, dataset);
-};
-
-export const makeObjectDetectionDatasetFromPascalVoc = async (options: PascalVoc.Options): Promise<ObjectDetection.Dataset> => {
-  const dataset = await makeDatasetFromPascalVocFormat(options);
-  return transformDataset<
-      PascalVoc.DatasetMeta,
-      Sample<PascalVoc.ExtAnnotation, Array<PascalVoc.ExtPascalVocObject>>,
-      ObjectDetection.Sample,
-      ObjectDetection.DatasetMeta
-    >({
-      next: async (sample: Sample<PascalVoc.ExtAnnotation, Array<PascalVoc.ExtPascalVocObject>>)
-        : Promise<ObjectDetection.Sample> => {
-        const newLabels: ObjectDetection.Label = sample.label.map((lable) => {
-          return {
-            id: lable.id,
-            bbox: [
-              lable.bndbox.xmin,
-              lable.bndbox.ymin,
-              lable.bndbox.xmax - lable.bndbox.xmin,
-              lable.bndbox.ymax - lable.bndbox.ymin
-            ]
-          };
-        });
-        return {
-          data: { uri: sample.data.path },
-          label: newLabels
-        };
-      },
-      metadata: async (meta: PascalVoc.DatasetMeta): Promise<ObjectDetection.DatasetMeta> => {
-        const labelMap: Record<number, string> = {};
-        for (const labelId in meta.labelMap) {
-          labelMap[labelId] = meta.labelMap[labelId];
-        }
-        return {
-          type: meta.type,
-          size: meta.size,
-          labelMap
-        };
-      }
-    }, dataset);
-};
+  );
+}
