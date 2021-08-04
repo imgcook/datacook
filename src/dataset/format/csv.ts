@@ -22,10 +22,7 @@ function toSamples(
 export const makeDatasetFromCsv = (
   records: Array<Record<string, any>>,
   labelKeys?: Array<string>
-): Dataset<Csv.Sample> | undefined => {
-  if (!records) {
-    return undefined;
-  }
+): Dataset<Csv.Sample> => {
   const data = toSamples(records, labelKeys);
   return new ArrayDatasetImpl(data);
 };
