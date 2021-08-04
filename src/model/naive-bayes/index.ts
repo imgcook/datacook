@@ -30,19 +30,9 @@ export class MultinomialNB extends BaseClassifier {
   }
 
   private updateClassLogPrior() {
-    this.classCount.print();
     if (this.classCount) {
       const nData = cast(sum(this.classCount),'float32');
       this.priorProb = sub(log(this.classCount), log(nData));
-      log(this.classCount).print();
-      log(nData).print();
-      sub(log(this.classCount), log(nData)).print();
-      nData.print();
-      console.log(nData.dtype);
-      this.classCount.print();
-      div(this.classCount, nData).print();
-      this.priorProb = log(div(this.classCount, nData))
-      this.priorProb.print();
     } 
 
   }
@@ -52,7 +42,6 @@ export class MultinomialNB extends BaseClassifier {
       const axis_h = 1;
       const featureCountFixed = add(this.featureCount, this.alpha);
       const classCountFixed = reshape(sum(featureCountFixed, axis_h),[-1, 1]);
-      
       this.conditionProb = sub(log(featureCountFixed), log(classCountFixed));
     }
   }
@@ -109,7 +98,13 @@ export class MultinomialNB extends BaseClassifier {
     return tensor(yInd);
   }
 
-  public async trainBatch(XData: Array<any> | Tensor, yData: Array<any> | Tensor) {
+  /**
+   * Training multinomial naive bayes model according to X, y. Support training multiple batches of data
+   * @param XData feature array, two dimension numeric array or 2D Tensor of shape (n_samples, n_features)
+   * @param yData label array, one dimension numeric array or 1D Tensor of size n_samples, use different integer values to represent different labels
+   * @returns classifier itself
+   */
+  public async train(XData: Array<any> | Tensor, yData: Array<any> | Tensor) {
     
     const { X, y } = this.validateData(XData, yData);
     const { values, indices } = unique(y);
@@ -132,13 +127,10 @@ export class MultinomialNB extends BaseClassifier {
       yOneHot = oneHot(yInd, nClass);
     }
 
-    yOneHot.print();
     const axis_h = 0;
     // update class count
     const classCount = sum(yOneHot, axis_h);
-    classCount.print();
     this.updateClassCount(classCount);
-    this.classCount.print();
 
     // update feature count
     const featureCounts = []
@@ -146,84 +138,16 @@ export class MultinomialNB extends BaseClassifier {
       const axis_h = 1;
       const axis_v = 0;
       const classMask = squeeze(cast(gather(yOneHot, [i], axis_h), 'bool'));
-      X.print();
-      classMask.print();
       const data_i = await booleanMaskAsync(X, classMask);
       const featureCount = sum(data_i, axis_v);
       featureCounts.push(featureCount);
     }
     const featureCountTensor = stack(featureCounts);
     this.updateFeautrCount(featureCountTensor);
-    this.featureCount.print();
     // update prior prob
-    
     this.updateClassLogPrior();
-  
     // update feature conditional log prob
     this.updateFeatureLogProb();
-    console.log('class prior')
-    this.priorProb.print();
-    console.log('condition prob')
-    this.conditionProb.print();
-  }
-
-  /**
-   * Training multinomial naive bayes model according to X, y.
-   * @param XData feature array, two dimension numeric array or 2D Tensor of shape (n_samples, n_features)
-   * @param yData label array, one dimension numeric array or 1D Tensor of size n_samples, use different integer values to represent different labels
-   * @returns classifier itself
-   */
-  public async train(XData: Array<any> | Tensor, yData: Array<any> | Tensor) {
-    
-    const { X, y } = this.validateData(XData, yData);
-
-    const { values, indices } = unique(y);
-    this.classes = values;
-
-    const nData = y.shape[0];
-    const nFeatures = X.shape[1];
-    const nClass =  values.shape[0];
-    const yInt  = cast(y, 'int32');
-    const yOneHot = oneHot(yInt, nClass);
-    const axis = 0;
-    const classSum = sum(yOneHot, axis);
-    const priorProb = div(classSum, nData);
-    const priorProbLog = log(priorProb);
-
-    this.priorProb = priorProbLog;
-    
-    
-    // compute log conditional probability
-    let conditionProbs = [];
-
-    priorProb.print();
-    
-    for (let i = 0; i < nClass ; i++) {
-      const axis_h = 1;
-      const axis_v = 0;
-      const classMask = squeeze(cast(gather(yOneHot, [i], axis_h), 'bool'));
-      X.print();
-      classMask.print();
-      const data_i = await booleanMaskAsync(X, classMask);
-      const data_i_fix = add(data_i, 1);
-      
-      const sum_data_i = reshape(sum(data_i_fix, axis_h), [-1,1]);
-      //const sum_data_i_fix = add(sum_data_i, nFeatures);
-
-      const probs = divNoNan(data_i_fix, sum_data_i);
-      sum_data_i.print();
-      probs.print();
-      const conditionProb_i = mean(probs, axis_v);
-      conditionProb_i.print();
-      conditionProbs.push(conditionProb_i);
-    }
-
-    const conditionProbsTensor = stack(conditionProbs);
-    conditionProbsTensor.print();
-    const conditionProbsTensorLog = log(conditionProbsTensor);
-    this.conditionProb = conditionProbsTensorLog;
-    conditionProbsTensorLog.print();
-    return this;
   }
 
   /**
@@ -233,10 +157,8 @@ export class MultinomialNB extends BaseClassifier {
    */
   public predict(X: Tensor2D): Tensor {
     const logLikelihood = this.getLogLikelihood(X);
-    logLikelihood .print();
     const axis_h = 1;
     const classInd = argMax(logLikelihood, axis_h);
-    //const classVal = slice(this.values, classInd, [1]);
     const classVal = gather(this.classes, classInd);
     return classVal;
   }
@@ -253,25 +175,44 @@ export class MultinomialNB extends BaseClassifier {
     const logLikelihood = this.getLogLikelihood(X);
     const likeliHood = exp(logLikelihood);
     const sumLikelihood = reshape(sum(likeliHood, axis_h), [-1,1]);
-    likeliHood.print();
-    sumLikelihood.print();
     const proba = div(likeliHood, sumLikelihood);
     return proba;
   }
 
-  public load(model:any) {
-    if (model.name !== 'MultinomialNB') {
-      throw new RangeError(`${model.name} is not a Multinomial Naive Bayes`);
+  /**
+   * Load model parameters from dumped JSON string
+   * @param modelJson: JSON string, contains model parameters
+   * @returns classifier itself
+   */
+  public load(modelJson:string) {
+    try {
+      const modelParams = JSON.parse(modelJson);
+      if (modelParams.name != 'MultinomialNB'){
+        throw new RangeError(`${modelParams.name} is not a Multinomial Naive Bayes`);
+      }
+      this.priorProb = modelParams.priorProb ? tensor(modelParams.priorProb) : this.priorProb;
+      this.classes = modelParams.classes ? cast(tensor(modelParams.classes), 'int32') : this.classes;
+      this.conditionProb = modelParams.conditionProb ? tensor(modelParams.conditionProb): this.conditionProb;
+      this.alpha = modelParams.alpha ? modelParams.alpha : this.alpha;
+      this.classCount = modelParams.classCount ? modelParams.classCount : this.classCount;
+      this.featureCount = modelParams.featureCount ? modelParams.featureCount : this.featureCount;
+
+    } catch (error) {
+      throw error;
     }
-    return new MultinomialNB(model);
   }
 
-  public toJson() {
-    return {
+  public toJson(): string {
+    const modelParams = {
       name: 'MultinomialNB',
       priorProb: this.priorProb.arraySync(),
-      conditionProb: this.conditionProb.arraySync()
+      conditionProb: this.conditionProb.arraySync(),
+      classes: this.classes.arraySync(),
+      alpha: this.alpha,
+      classCount: this.classCount.arraySync(),
+      featureCount: this.featureCount.arraySync(),
     }
+    return JSON.stringify(modelParams);
   }
 
 }
