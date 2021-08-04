@@ -2,7 +2,7 @@ import { Dataset, ImageClassification } from './types';
 import { ArrayDatasetImpl } from './';
 
 export function makeImageClassificationDatasetFromList(imageList: ImageClassification.ImageList): Dataset<ImageClassification.Sample> {
-  const data = imageList.map(img => {
+  const data = imageList.map((img) => {
     return {
       data: {
         uri: img.uri,
