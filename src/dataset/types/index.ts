@@ -58,11 +58,11 @@ export interface ImageDimension {
 
 export interface BaseDatasetMeta {
   type: DatasetType;
-  size: DatasetSize;
+  size?: DatasetSize;
 }
 
 export interface DatasetMeta extends BaseDatasetMeta {
-  labelMap: Record<number, any>;
+  labelMap?: Record<number, any>;
 }
 
 /**
@@ -107,3 +107,4 @@ export * as ObjectDetection from './object-detection';
 
 export * as Coco from './coco';
 export * as PascalVoc from './pascal-voc';
+export * as Csv from './csv';

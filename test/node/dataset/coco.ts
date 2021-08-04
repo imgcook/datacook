@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { makeDataset, Types } from '../../../src/dataset';
+import { Types } from '../../../src/dataset';
 import { makeDatasetFromCocoFormat } from '../../../src/dataset/format/coco';
 import 'mocha';
 import { Coco } from '../../../src/dataset/types';
