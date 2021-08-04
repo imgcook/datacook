@@ -39,7 +39,7 @@ export type TableSchema = Array<TableColumn>;
  *   Table: data from db, csv
  *   Image: image data
  */
-export enum DatasetType { Table, Image, Sound, General }
+export enum DatasetType { Table, Image, Sound, General, Text }
 
 export interface ImageDimension {
   x: number,
