@@ -1,11 +1,7 @@
 
 import { BaseClassifier } from "../base";
-import { Tensor, Tensor1D, zeros, oneHot, unique, tensor1d, add, sub, log, mul, argMax, cast, squeeze, slice, exp, reshape,
-  matMul, transpose, sum, div, divNoNan, booleanMaskAsync, gather, mean, stack, Tensor2D, tensor } 
-  from '@tensorflow/tfjs-core';
-//import '@tensorflow/tfjs-core/dist/public/chained_ops/register_all_chained_ops';
-//import '@tensorflow/tfjs-core/src/public/chained_ops/register_all_chained_ops';
-
+import { Tensor, oneHot, unique, add, sub, log, argMax, cast, squeeze, exp, reshape,
+  matMul, transpose, sum, div, booleanMaskAsync, gather, stack, Tensor2D, tensor } from '@tensorflow/tfjs-core';
 
 type ClassMap = {
   [key: string]: number
@@ -24,7 +20,7 @@ export class MultinomialNB extends BaseClassifier {
   public classCount: Tensor;
   public classMap: ClassMap;
 
-  constructor (alpha: number = 1.0) {
+  constructor (alpha = 1.0) {
     super();
     this.alpha = alpha;
   }
@@ -48,9 +44,9 @@ export class MultinomialNB extends BaseClassifier {
 
   private updateFeautrCount(featureCount: Tensor) {
     featureCount = cast(featureCount, 'float32');
-    if (this.featureCount){
+    if (this.featureCount) {
       this.featureCount = add(this.featureCount, featureCount);
-    }else{
+    } else {
       this.featureCount = featureCount;
     }
   }
@@ -59,7 +55,7 @@ export class MultinomialNB extends BaseClassifier {
     classCount = cast(classCount, 'float32');
     if (this.classCount) {
       this.classCount = add(this.classCount, classCount);
-    }else{
+    } else {
       this.classCount = classCount;
     }
   }
@@ -72,7 +68,7 @@ export class MultinomialNB extends BaseClassifier {
 
   // check if first call to train
   private firstCall(): boolean{
-    if(this.featureCount && this.priorProb && this.conditionProb && this.classCount){
+    if (this.featureCount && this.priorProb && this.conditionProb && this.classCount) {
       return false;
     }
     return true;
@@ -82,8 +78,8 @@ export class MultinomialNB extends BaseClassifier {
   private updateClassMap(){
     if (this.classes){
       const classData = this.classes.dataSync();
-      let classMap: ClassMap = {}
-      for(let i=0; i < classData.length; i++){
+      let classMap: ClassMap = {};
+      for (let i = 0; i < classData.length; i++) {
         const key = classData[i];
         classMap[key] = i;
       }
@@ -94,7 +90,7 @@ export class MultinomialNB extends BaseClassifier {
   // get one-hot vector for new input data
   private getNewBatchOneHot(y: Tensor): Tensor {
     const yData = y.dataSync();
-    const yInd = yData.map((d) => { return this.classMap[d] });
+    const yInd = yData.map((d: number) => { return this.classMap[d]; });
     return cast(tensor(yInd), 'int32');
   }
 
@@ -104,11 +100,10 @@ export class MultinomialNB extends BaseClassifier {
    * @param yData label array, one dimension numeric array or 1D Tensor of size n_samples, use different integer values to represent different labels
    * @returns classifier itself
    */
-  public async train(XData: Array<any> | Tensor, yData: Array<any> | Tensor) {
-    
+  public async train(XData: Array<any> | Tensor, yData: Array<any> | Tensor): Promise<MultinomialNB> {
     const { X, y } = this.validateData(XData, yData);
     const { values, indices } = unique(y);
-    const nClass =  values.shape[0];
+    const nClass = values.shape[0];
     const firstCall = this.firstCall();
     let yOneHot;
 
@@ -116,9 +111,7 @@ export class MultinomialNB extends BaseClassifier {
       this.classes = values;
       this.updateClassMap();
       yOneHot = oneHot(indices, nClass);
-      
-    }
-    else{
+    } else {
       const yInd = this.getNewBatchOneHot(y);
       const nFeatures = X.shape[1];
       if (nFeatures != this.featureCount.shape[1]){
@@ -133,11 +126,11 @@ export class MultinomialNB extends BaseClassifier {
     this.updateClassCount(classCount);
 
     // update feature count
-    const featureCounts = []
+    const featureCounts = [];
     for (let i = 0; i < nClass ; i++) {
       const axis_h = 1;
       const axis_v = 0;
-      const classMask = squeeze(cast(gather(yOneHot, [i], axis_h), 'bool'));
+      const classMask = squeeze(cast(gather(yOneHot, [ i ], axis_h), 'bool'));
       const data_i = await booleanMaskAsync(X, classMask);
       const featureCount = sum(data_i, axis_v);
       featureCounts.push(featureCount);
@@ -148,6 +141,7 @@ export class MultinomialNB extends BaseClassifier {
     this.updateClassLogPrior();
     // update feature conditional log prob
     this.updateFeatureLogProb();
+    return this;
   }
 
   /**
@@ -176,7 +170,7 @@ export class MultinomialNB extends BaseClassifier {
     const axis_h = 1;
     const logLikelihood = this.getLogLikelihood(X);
     const likeliHood = exp(logLikelihood);
-    const sumLikelihood = reshape(sum(likeliHood, axis_h), [-1,1]);
+    const sumLikelihood = reshape(sum(likeliHood, axis_h), [ -1, 1 ]);
     const proba = div(likeliHood, sumLikelihood);
     return proba;
   }
@@ -186,7 +180,8 @@ export class MultinomialNB extends BaseClassifier {
    * @param modelJson: JSON string, contains model parameters
    * @returns classifier itself
    */
-  public load(modelJson:string) {
+  public load(modelJson:string): void {
+    // eslint-disable-next-line no-useless-catch
     try {
       const modelParams = JSON.parse(modelJson);
       if (modelParams.name != 'MultinomialNB'){
@@ -194,7 +189,7 @@ export class MultinomialNB extends BaseClassifier {
       }
       this.priorProb = modelParams.priorProb ? tensor(modelParams.priorProb) : this.priorProb;
       this.classes = modelParams.classes ? cast(tensor(modelParams.classes), 'int32') : this.classes;
-      this.conditionProb = modelParams.conditionProb ? tensor(modelParams.conditionProb): this.conditionProb;
+      this.conditionProb = modelParams.conditionProb ? tensor(modelParams.conditionProb) : this.conditionProb;
       this.alpha = modelParams.alpha ? modelParams.alpha : this.alpha;
       this.classCount = modelParams.classCount ? modelParams.classCount : this.classCount;
       this.featureCount = modelParams.featureCount ? modelParams.featureCount : this.featureCount;
@@ -213,7 +208,7 @@ export class MultinomialNB extends BaseClassifier {
       alpha: this.alpha,
       classCount: this.classCount.arraySync(),
       featureCount: this.featureCount.arraySync(),
-    }
+    };
     return JSON.stringify(modelParams);
   }
 
