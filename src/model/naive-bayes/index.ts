@@ -1,4 +1,3 @@
-
 import { BaseClassifier } from "../base";
 import { Tensor, oneHot, unique, add, sub, log, argMax, cast, squeeze, exp, reshape,
   matMul, transpose, sum, div, booleanMaskAsync, gather, stack, Tensor2D, tensor } from '@tensorflow/tfjs-core';
@@ -206,10 +205,9 @@ export class MultinomialNB extends BaseClassifier {
       classes: this.classes.arraySync(),
       alpha: this.alpha,
       classCount: this.classCount.arraySync(),
-      featureCount: this.featureCount.arraySync(),
+      featureCount: this.featureCount.arraySync()
     };
     return JSON.stringify(modelParams);
   }
-
 }
 
