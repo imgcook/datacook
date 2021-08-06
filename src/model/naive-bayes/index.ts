@@ -4,7 +4,7 @@ import { Tensor, oneHot, unique, add, sub, log, argMax, cast, squeeze, exp, resh
   matMul, transpose, sum, div, booleanMaskAsync, gather, stack, Tensor2D, tensor } from '@tensorflow/tfjs-core';
 
 type ClassMap = {
-  [key: string]: number
+  [ key: string ]: number
 }
 
 /**
@@ -27,17 +27,16 @@ export class MultinomialNB extends BaseClassifier {
 
   private updateClassLogPrior() {
     if (this.classCount) {
-      const nData = cast(sum(this.classCount),'float32');
+      const nData = cast(sum(this.classCount), 'float32');
       this.priorProb = sub(log(this.classCount), log(nData));
-    } 
-
+    }
   }
 
   private updateFeatureLogProb() {
     if (this.featureCount){
       const axis_h = 1;
       const featureCountFixed = add(this.featureCount, this.alpha);
-      const classCountFixed = reshape(sum(featureCountFixed, axis_h),[-1, 1]);
+      const classCountFixed = reshape(sum(featureCountFixed, axis_h), [ -1, 1 ]);
       this.conditionProb = sub(log(featureCountFixed), log(classCountFixed));
     }
   }
@@ -67,7 +66,7 @@ export class MultinomialNB extends BaseClassifier {
   }
 
   // check if first call to train
-  private firstCall(): boolean{
+  private firstCall(): boolean {
     if (this.featureCount && this.priorProb && this.conditionProb && this.classCount) {
       return false;
     }
@@ -75,7 +74,7 @@ export class MultinomialNB extends BaseClassifier {
   }
 
   // get class map
-  private updateClassMap(){
+  private updateClassMap(): void {
     if (this.classes){
       const classData = this.classes.dataSync();
       let classMap: ClassMap = {};
