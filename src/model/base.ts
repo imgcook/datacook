@@ -9,8 +9,7 @@ export class BaseClassifier {
     if (xCount == 0 || yCount == 0) {
       throw new Error('inputs should not have length of zero');
     }
-    // TODO(sugarspectre):
-    // Accuaracy score computation
+    // TODO(sugarspectre): Accuaracy score computation
     const score = tensor([ 0 ]);
     return score;
   }
@@ -31,8 +30,7 @@ export class BaseClassifier {
 
 
 export class BaseEstimater {
-  // TODO(sugarspectre):
-  // Add evaluation functions
+  // TODO(sugarspectre): Add evaluation functions
   public validateData(x: Tensor | RecursiveArray<number>, y: Tensor | RecursiveArray<number>, xDimension = 2, yDimension = 1): { x: Tensor, y: Tensor } {
     const xTensor = checkArray(x, 'float32', xDimension);
     const y_tensor = checkArray(y, 'float32', yDimension);
