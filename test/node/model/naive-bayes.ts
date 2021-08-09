@@ -10,7 +10,7 @@ const cases = tf.tensor2d([
     [1, 0, 0, 1, 0, 0],
     [1, 0, 0, 0, 1, 1]
   ]);
-const labels = [0, 0, 0, 1];
+const labels = [0, 0, 0, 5];
 
 const testCases = tf.tensor2d([
     [2, 0, 0, 0, 0, 0],
@@ -18,7 +18,7 @@ const testCases = tf.tensor2d([
     [1, 0, 0, 3, 0, 0],
     [0, 0, 0, 0, 4, 6]
   ]);
-const testLabels = [0, 0, 0, 1];
+const testLabels = [0, 0, 0, 5];
 
 describe('Naive bayes', () => {
     it('predict train case', async () => {
@@ -58,5 +58,4 @@ describe('Naive bayes', () => {
         const yPred = mnb2.predict(testCases);
         assert.deepEqual(yPred.arraySync(), testLabels);
     });
-
-})
+});
