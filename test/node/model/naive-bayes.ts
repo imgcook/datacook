@@ -33,8 +33,6 @@ describe('Naive bayes', () => {
   });
 
   it('predict class probabilities', async () => {
-    const Xtest = tf.tensor2d([[2, 1, 0, 0, 0, 0],[3, 0, 0, 0, 1, 1],[1,0,0,0,1,1]]);
-    const expection = tf.tensor1d([0]);
     const mnb = new MultinomialNB();
     await mnb.train(cases, labels);
     const probs = mnb.predictProba(cases);
