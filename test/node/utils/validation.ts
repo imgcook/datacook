@@ -5,7 +5,6 @@ import 'mocha';
 import { checkArray } from '../../../src/utils/validation';
 
 describe('Validation', function () {
-
   describe('ArrayChecker', () => {
     
     it('convert array to int32 tensor', () => {
@@ -23,4 +22,4 @@ describe('Validation', function () {
     });
     
   })  
-})
+});
