@@ -1,8 +1,8 @@
-import { BaseClassifier } from "../base";
+import { BaseClassifier } from '../base';
 import { Tensor, oneHot, unique, add, sub, log, argMax, cast, squeeze, exp, reshape,
   matMul, transpose, sum, div, booleanMaskAsync, gather, stack, Tensor2D, tensor } from '@tensorflow/tfjs-core';
 
-type ClassMap = {
+export type ClassMap = {
   [ key: string ]: number
 }
 

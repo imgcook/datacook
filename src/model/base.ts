@@ -22,7 +22,7 @@ export class BaseClassifier {
     const n_y = yTensor.shape[0];
     if (n_X != n_y) {
       throw new RangeError(
-        "the size of the training set and the training labels must be the same."
+        'the size of training set and training labels must be the same.'
       );
     }
     return { 'x': xTensor, 'y': yTensor };
@@ -40,7 +40,7 @@ export class BaseEstimater {
     const n_y = y_tensor.shape[0];
     if (n_X != n_y) {
       throw new RangeError(
-        "the size of the training set and the training labels must be the same."
+        'the size of the training set and the training labels must be the same.'
       );
     }
     return { 'x': xTensor, 'y': y_tensor };
