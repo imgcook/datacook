@@ -3,6 +3,8 @@ import Counter from './counter';
 interface StringIntegerObject {
   [property: string] : number
 }
+type TextInput = string | string[];
+
 export default class CountVectorizer {
   public wordOrder: StringIntegerObject = {};
   public uniqueLength: number;
@@ -11,11 +13,18 @@ export default class CountVectorizer {
    * and the order to which they occur alphabetically.
    * @param textArray
    */
-  constructor(textArray: string[]) {
+  constructor(textArray: TextInput[]) {
 
-    const tokenArray: string[] = [];
-    textArray.forEach((value) => {
-      value.split(' ').forEach((text) => {
+    let tokenArray: string[] = [];
+
+    textArray.forEach((value: TextInput) => {
+      let wordElements: string[] = [];
+      if (Array.isArray(value)) {
+        wordElements = value;
+      } else {
+        wordElements = value.split(' ');
+      }
+      wordElements.forEach((text) => {
         if (text !== '') {
           tokenArray.push(text.toLocaleLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ''));
         }
@@ -47,12 +56,18 @@ export default class CountVectorizer {
    * @param textArray
    * @returns number[][] array of number (vectors)
    */
-  public transform(textArray: string[]): number[][] {
+  public transform(textArray: TextInput[]): number[][] {
 
-    const counterVectorizer: number[][] = textArray.map((value) => {
+    const counterVectorizer: number[][] = textArray.map((value: TextInput) => {
       const innerArray: number[] = Array.from(new Float64Array(this.uniqueLength));
       const cleanTextArray: string[] = [];
-      value.split(' ').forEach((text) => {
+      let wordElements: string[] = [];
+      if (Array.isArray(value)) {
+        wordElements = value;
+      } else {
+        wordElements = value.split(' ');
+      }
+      wordElements.forEach((text) => {
         if (text !== '') {
           const cleanText = text.toLocaleLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
           cleanTextArray.push(cleanText);
