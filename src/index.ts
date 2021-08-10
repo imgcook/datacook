@@ -7,6 +7,7 @@ export * as Dataset from './dataset';
 export * as Generic from './generic';
 export { Image } from './image';
 export * as Rand from './rand';
+export * as Model from './model';
 
 export const Text = {
   Counter,
