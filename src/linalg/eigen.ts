@@ -17,7 +17,7 @@ import { linalg, Tensor, matMul, abs, sub, max, transpose } from '@tensorflow/tf
    @param tol tolerence, default to 1e-4
    @param maxIter max iteration time, default to 200
  */
-export const eigenSolve = (matrix: Tensor, tol = 1e-6, maxIter = 200): [ Tensor, Tensor ] => {
+export const eigenSolve = (matrix: Tensor, tol = 1e-4, maxIter = 200): [ Tensor, Tensor ] => {
   let [ q, r ] = linalg.qr(matrix);
   let x = matrix;
   let xTr = linalg.bandPart(x, 0, 0);
