@@ -1,5 +1,6 @@
-import { linalg, Tensor, matMul, abs, sub, max, transpose, tensor, mul, eye } from '@tensorflow/tfjs-core';
+import { linalg, Tensor, matMul, abs, sub, max, tensor, mul, eye, slice, stack, squeeze, neg } from '@tensorflow/tfjs-core';
 import { linSolveQR } from './linsolve';
+import { tensorNormalize, tensorEqual } from './utils';
 /**
  * Compute the eigenvalues of a matrix using the QR algorithm.
   This is a renormalized version of power iteration that converges to a full
@@ -20,6 +21,7 @@ import { linSolveQR } from './linsolve';
 export const solveEigenValues = (matrix: Tensor, tol = 1e-4, maxIter = 200): Tensor => {
   let [ q, r ] = linalg.qr(matrix);
   let x = matrix;
+  const n = matrix.shape[0];
   let xTr = linalg.bandPart(x, 0, 0);
   //let preQ = q;
   let qn = q;
@@ -36,13 +38,13 @@ export const solveEigenValues = (matrix: Tensor, tol = 1e-4, maxIter = 200): Ten
     }
     //console.log(maxDis);
   }
-  const d = linalg.bandPart(matMul(r, q), 0, 0);
-
-  return d;
-};
-
-export const solveEigenVectors = (maxtrix: Tensor, eigenValues: Tensor, tol = 1e-4, maxIter = 200): Tensor => {
-  // const eigenVectors = 
+  x = matMul(r, q);
+  const eigenValues = [];
+  for (let i = 0; i < n; i++) {
+    eigenValues.push(slice(x, [ i, i ], [ 1, 1 ]));
+  }
+  const eigenValuesTensor = squeeze(stack(eigenValues));
+  return eigenValuesTensor;
 };
 
 /**
@@ -58,23 +60,63 @@ export const solveEigenVectors = (maxtrix: Tensor, eigenValues: Tensor, tol = 1e
     ...
   This algorithm will converge to the eigenvector associated with the eigenvalue
   closest to lambda.
- * @param matrix 
- * @param eigenValue 
- * @param tol 
- * @param maxIter 
+ * @param matrix matrix
+ * @param eigenValue eigen value
+ * @param tol tolerance, default to 1e-4
+ * @param maxIter max iteration time, default to 200
  */
-export const eigenBackSolve = (matrix: Tensor, eigenValue: number, tol= 1e-4, maxIter = 200) => {
-    const n = matrix.shape[0];
-    let current = tensor(new Array(n).fill(1));
-    let previous;
-    // Preturb the eigenvalue a litle to prevent our right hand side matrix
-    // from becoming singular.
-    const lambda = eigenValue + 0.00001;
-    const mi = sub(matrix, mul(eye(n), lambda));
-    for (let i = 0; i < maxIter; i++) {
-      previous = current;
-      current = linSolveQR(mi, previous);
+export const eigenBackSolve = (matrix: Tensor, eigenValue: number, tol = 1e-4, maxIter = 200): Tensor => {
+  const n = matrix.shape[0];
+  let current = tensor(new Array(n).fill(1));
+  let previous;
+  // Preturb the eigenvalue a litle to prevent our right hand side matrix
+  // from becoming singular.
+  const lambda = eigenValue;
+  const mi = sub(matrix, mul(eye(n), lambda));
+  for (let i = 0; i < maxIter; i++) {
+    previous = current;
+    current = linSolveQR(mi, previous);
+    current = tensorNormalize(current);
+    /**
+     * We reverse the sign of the vector if the first entry is not positive.
+     * Often the algorithm will oscilate between a vector and its negative
+     * after convergence.
+     */
+    const pivot = Number(slice(current, 0, 1).dataSync());
+    if (pivot < 0) {
+      current = neg(current);
     }
-    return current;
+    if (tensorEqual(current, previous, tol)) {
+      break;
+    }
+  }
+  return current;
+};
 
+/* Solve for the eigenvectors of a matrix M once the eigenvalues are known
+   using inverse iteration.
+*/
+export const solveEigenVectors = (matrix: Tensor, eigenValues: Tensor, tol = 1e-4, maxIter = 200): Tensor => {
+  const nEv = eigenValues.shape[0];
+  const eigenVectors = [];
+  for (let i = 0; i < nEv; i++) {
+    const eigenValue = Number(slice(eigenValues, i, 1).dataSync());
+    const eigenVector = eigenBackSolve(matrix, eigenValue, tol, maxIter);
+    eigenVectors.push(eigenVector);
+  }
+  return stack(eigenVectors);
+};
+
+/**
+ * Compute the eigenvalues and eigenvectors of a matrix M.
+  The eigenvalues are computed using the QR algorithm, then the eigenvectors
+  are computed by inverse iteration.
+ * @param matrix target matrix
+ * @param tol stop tolerence, default to 1e-4
+ * @param maxIter max iteration times, default to 200
+ */
+export const eigenSolve = (matrix: Tensor, tol = 1e-4, maxIter = 200): [Tensor, Tensor] => {
+  const eigenValues = solveEigenValues(matrix, tol, maxIter);
+  const eigenVectors = solveEigenVectors(matrix, eigenValues, tol, maxIter);
+  return [ eigenValues, eigenVectors ];
 };
