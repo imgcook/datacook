@@ -5,18 +5,31 @@ interface StringIntegerObject {
 }
 type TextInput = string | string[];
 
+/**
+ * Convert text to vector base on their number of count
+ */
 export default class CountVectorizer {
   public wordOrder: StringIntegerObject = {};
   public uniqueLength: number;
   public stopWords: string[] = [];
+
   /**
-   * Convert text to vector base on their number of count
+   * Init word dictionary base on their number of count
    * and the order to which they occur alphabetically.
    * @param textArray could be one or two dimension string array. In the case of two dimension array, each row of data should be the words list after words cutting.
    * @param stopWords stop words
    */
-  constructor(textArray: TextInput[], stopWords: string[] = []) {
+  constructor (textArray: TextInput[] = [], stopWords: string[] = []) {
+    this.initDict(textArray, stopWords);
+  }
 
+  /**
+   * Init word dictionary base on their number of count
+   * and the order to which they occur alphabetically.
+   * @param textArray could be one or two dimension string array. In the case of two dimension array, each row of data should be the words list after words cutting.
+   * @param stopWords stop words
+   */
+  public initDict(textArray: TextInput[], stopWords: string[] = []): CountVectorizer {
     let tokenArray: string[] = [];
 
     textArray.forEach((value: TextInput) => {
@@ -35,7 +48,7 @@ export default class CountVectorizer {
 
     const uniqueWord = Array.from(new Set(tokenArray)).filter((d) => stopWords.indexOf(d) == -1);
     const sortedUniqueWord: string[] = this.sort(uniqueWord);
-
+    this.stopWords = stopWords;
     // store array element as object element
     // to enable quick search of element
     // when transforming input arrays.
@@ -45,7 +58,7 @@ export default class CountVectorizer {
       }
     });
     this.uniqueLength = sortedUniqueWord.length;
-
+    return this;
   }
 
   private sort(textArray: string[]): string[] {
@@ -59,6 +72,10 @@ export default class CountVectorizer {
    * @returns number[][] array of number (vectors)
    */
   public transform(textArray: TextInput[]): number[][] {
+
+    if (this.wordOrder?.length) {
+      throw new Error('Dictionary is empty, use init function to init dictionary first');
+    }
 
     const counterVectorizer: number[][] = textArray.map((value: TextInput) => {
       const innerArray: number[] = Array.from(new Float64Array(this.uniqueLength));
@@ -88,6 +105,36 @@ export default class CountVectorizer {
     });
     return counterVectorizer;
 
+  }
+
+  /**
+   * Export model params to JSON string
+   * @returns JSON string of model parameters
+   */
+  public toJson(): string {
+    const modelParams = {
+      name: 'MultinomialNB',
+      wordOrder: this.wordOrder,
+      stopWords: this.stopWords,
+      uniqueLength: this.uniqueLength
+    };
+    return JSON.stringify(modelParams);
+  }
+
+  /**
+   * Load model parameter from JSON string
+   * @param modelJson dumped model JSON string
+   * @returns count vectorizer model itself
+   */
+  public load(modelJson: string): CountVectorizer {
+    const modelParams = JSON.parse(modelJson);
+    if (modelParams.name != 'MultinomialNB'){
+      throw new RangeError(`${modelParams.name} is not a Multinomial Naive Bayes`);
+    }
+    this.wordOrder = modelParams.priorProb;
+    this.stopWords = modelParams.stopWords;
+    this.uniqueLength = modelParams.uniqueLength;
+    return this;
   }
 }
 

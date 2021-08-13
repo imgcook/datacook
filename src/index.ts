@@ -8,6 +8,7 @@ export * as Generic from './generic';
 export { Image } from './image';
 export * as Rand from './rand';
 export * as Model from './model';
+export * as Metrics from './metrics';
 
 export const Text = {
   Counter,
@@ -19,3 +20,4 @@ export const Encoder = {
   LabelEncoder,
   OneHotEncoder
 };
+
