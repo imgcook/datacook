@@ -8,12 +8,14 @@ type TextInput = string | string[];
 export default class CountVectorizer {
   public wordOrder: StringIntegerObject = {};
   public uniqueLength: number;
+  public stopWords: string[] = [];
   /**
    * Convert text to vector base on their number of count
    * and the order to which they occur alphabetically.
-   * @param textArray
+   * @param textArray could be one or two dimension string array. In the case of two dimension array, each row of data should be the words list after words cutting.
+   * @param stopWords stop words
    */
-  constructor(textArray: TextInput[]) {
+  constructor(textArray: TextInput[], stopWords: string[] = []) {
 
     let tokenArray: string[] = [];
 
@@ -31,7 +33,7 @@ export default class CountVectorizer {
       });
     });
 
-    const uniqueWord = Array.from(new Set(tokenArray));
+    const uniqueWord = Array.from(new Set(tokenArray)).filter((d) => stopWords.indexOf(d) == -1);
     const sortedUniqueWord: string[] = this.sort(uniqueWord);
 
     // store array element as object element
