@@ -100,6 +100,8 @@ export class MultinomialNB extends BaseClassifier {
    */
   public async train(xData: Array<any> | Tensor, yData: Array<any> | Tensor): Promise<MultinomialNB> {
     const { x, y } = this.validateData(xData, yData);
+    console.log(y);
+    console.log(y.dataSync());
     const { values, indices } = unique(y);
     const nClass = values.shape[0];
     const firstCall = this.firstCall();
@@ -192,12 +194,12 @@ export class MultinomialNB extends BaseClassifier {
   public toJson(): string {
     const modelParams = {
       name: 'MultinomialNB',
-      priorProb: this.priorProb.arraySync(),
-      conditionProb: this.conditionProb.arraySync(),
-      classes: this.classes.arraySync(),
+      priorProb: this.priorProb?.arraySync(),
+      conditionProb: this.conditionProb?.arraySync(),
+      classes: this.classes?.arraySync(),
       alpha: this.alpha,
-      classCount: this.classCount.arraySync(),
-      featureCount: this.featureCount.arraySync()
+      classCount: this.classCount?.arraySync(),
+      featureCount: this.featureCount?.arraySync()
     };
     return JSON.stringify(modelParams);
   }
