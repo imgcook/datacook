@@ -41,7 +41,7 @@ export function makeObjectDetectionDatasetFromPascalVoc(annotations: Array<Pasca
         };
       });
       return {
-        data: { uri: sample.data.path },
+        data: { uri: sample.data.annotation.path },
         label: newLabels
       };
     }
