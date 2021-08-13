@@ -35,14 +35,16 @@ export interface PascalVocObject {
 }
 
 export interface Annotation {
-  folder: string;
-  filename: string;
-  path: string;
-  source: Source;
-  owner: Owner;
-  size: Size;
-  segmented: number;
-  object: Array<PascalVocObject>;
+  annotation: {
+    folder: string;
+    filename: string;
+    path: string;
+    source: Source;
+    owner: Owner;
+    size: Size;
+    segmented: number;
+    object: Array<PascalVocObject> | PascalVocObject;
+  }
 }
 
 export type Label = Array<PascalVocObject>;
