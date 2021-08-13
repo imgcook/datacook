@@ -11,3 +11,13 @@ yarn-error
 yarn.lock
 *.log
 test/
+src/
+*.tgz
+.history
+.github
+Makefile
+.eslintrc.js
+.eslintignore
+karma.conf.js
+webpack.config.js
+tsconfig.json
