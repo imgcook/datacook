@@ -21,7 +21,7 @@ export function extractCategoriesFromPascalVoc(annotations: Array<PascalVoc.Anno
     if (isAnnotationArray(annotation.annotation.object)) {
       annotation.annotation.object.forEach((obj) => {
         labelSet.add(obj.name);
-      })
+      });
     } else {
       labelSet.add(annotation.annotation.object.name);
     }
