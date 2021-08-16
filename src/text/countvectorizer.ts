@@ -30,7 +30,7 @@ export default class CountVectorizer {
    * @param stopWords stop words
    */
   public initDict(textArray: TextInput[], stopWords: string[] = []): CountVectorizer {
-    let tokenArray: string[] = [];
+    const tokenArray: string[] = [];
 
     textArray.forEach((value: TextInput) => {
       let wordElements: string[] = [];
@@ -113,7 +113,7 @@ export default class CountVectorizer {
    */
   public toJson(): string {
     const modelParams = {
-      name: 'MultinomialNB',
+      name: 'CountVecorizer',
       wordOrder: this.wordOrder,
       stopWords: this.stopWords,
       uniqueLength: this.uniqueLength
@@ -128,8 +128,8 @@ export default class CountVectorizer {
    */
   public load(modelJson: string): CountVectorizer {
     const modelParams = JSON.parse(modelJson);
-    if (modelParams.name != 'MultinomialNB'){
-      throw new RangeError(`${modelParams.name} is not a Multinomial Naive Bayes`);
+    if (modelParams.name != 'CountVecorizer'){
+      throw new RangeError(`${modelParams.name} is not a CountVecorizer`);
     }
     this.wordOrder = modelParams.priorProb;
     this.stopWords = modelParams.stopWords;

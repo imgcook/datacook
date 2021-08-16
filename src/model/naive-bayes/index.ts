@@ -1,5 +1,5 @@
 import { BaseClassifier } from '../base';
-import { Tensor, oneHot, unique, add, sub, log, argMax, cast, squeeze, exp, reshape,
+import { Tensor, oneHot, unique, add, sub, log, argMax, cast, squeeze, exp, reshape, slice,
   matMul, transpose, sum, div, booleanMaskAsync, gather, stack, Tensor2D, tensor } from '@tensorflow/tfjs-core';
 
 export type ClassMap = {
@@ -13,7 +13,7 @@ export class MultinomialNB extends BaseClassifier {
 
   private conditionProb: Tensor;
   private priorProb: Tensor;
-  private classes: Tensor;
+  public classes: Tensor;
   public alpha: number;
   public featureCount: Tensor;
   public classCount: Tensor;
@@ -88,7 +88,7 @@ export class MultinomialNB extends BaseClassifier {
   // get one-hot vector for new input data
   private getNewBatchOneHot(y: Tensor): Tensor {
     const yData = y.dataSync();
-    const yInd = yData.map((d: number) => this.classMap[d]);
+    const yInd = yData.map((d: number|string) => this.classMap[d]);
     return cast(tensor(yInd), 'int32');
   }
 
@@ -100,8 +100,6 @@ export class MultinomialNB extends BaseClassifier {
    */
   public async train(xData: Array<any> | Tensor, yData: Array<any> | Tensor): Promise<MultinomialNB> {
     const { x, y } = this.validateData(xData, yData);
-    console.log(y);
-    console.log(y.dataSync());
     const { values, indices } = unique(y);
     const nClass = values.shape[0];
     const firstCall = this.firstCall();
@@ -149,11 +147,13 @@ export class MultinomialNB extends BaseClassifier {
    * @param x input feature array, two dimension numeric array or 2D Tensor of shape (n_samples, n_features).
    * @returns 1D Tensor of shape n_samples, Predicted target value of X.
    */
-  public predict(x: Tensor2D): Tensor {
-    const logLikelihood = this.getLogLikelihood(x);
+  public predict(X: Tensor2D): Tensor {
+    const logLikelihood = this.getLogLikelihood(X);
     const axisH = 1;
-    const classInd = argMax(logLikelihood, axisH);
-    const classVal = gather(this.classes, classInd);
+    const classInd = argMax(logLikelihood, axisH).dataSync();
+    const classTensors: Tensor[] = [];
+    classInd.forEach((i: number) => { return classTensors.push(slice(this.classes, [ i ], [ 1 ])); });
+    const classVal = reshape(stack(classTensors), [ -1 ]);
     return classVal;
   }
 
@@ -184,7 +184,7 @@ export class MultinomialNB extends BaseClassifier {
       throw new RangeError(`${modelParams.name} is not a Multinomial Naive Bayes`);
     }
     this.priorProb = modelParams.priorProb ? tensor(modelParams.priorProb) : this.priorProb;
-    this.classes = modelParams.classes ? cast(tensor(modelParams.classes), 'int32') : this.classes;
+    this.classes = modelParams.classes ? tensor(modelParams.classes) : this.classes;
     this.conditionProb = modelParams.conditionProb ? tensor(modelParams.conditionProb) : this.conditionProb;
     this.alpha = modelParams.alpha ? modelParams.alpha : this.alpha;
     this.classCount = modelParams.classCount ? modelParams.classCount : this.classCount;
