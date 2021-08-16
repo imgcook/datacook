@@ -1,8 +1,11 @@
 import { Tensor, equal, sum, div } from '@tensorflow/tfjs-core';
+import { checkArray } from '../utils/validation';
 
-export const accuracyScore = ( yTrue: Tensor, yPred: Tensor ): number => {
-  const yTrueCount = yTrue.shape[0];
-  const yPredCount = yPred.shape[0];
+export const accuracyScore = ( yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | number[] ): number => {
+  const yTrueTensor = checkArray(yTrue, 'any', 1);
+  const yPredTensor = checkArray(yPred, 'any', 1);
+  const yTrueCount = yTrueTensor.shape[0];
+  const yPredCount = yPredTensor.shape[0];
   if (yTrueCount != yPredCount) {
     throw new Error('Shape of yTrue should match shape of yPred');
   }
