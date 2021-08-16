@@ -10,9 +10,9 @@ module.exports = {
   ],
   'rules': {
     'no-trailing-spaces': 'error',
-    'prefer-const': 'off',
-    'no-useless-escape': 'off',
-    '@typescript-eslint/no-var-requires': 'off',
+    'prefer-const': 'error',
+    'no-useless-escape': 'error',
+    '@typescript-eslint/no-var-requires': 'error',
     '@typescript-eslint/camelcase': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',

@@ -65,7 +65,7 @@ export default class Counter {
    */
   private wordCountFromArray(textArray: string[]) : void {
     for (let index = 0; index < textArray.length; index++) {
-      let elem = textArray[index];
+      const elem = textArray[index];
       if (elem in this.wordCount) {
         this.wordCount[elem] += 1;
       } else {

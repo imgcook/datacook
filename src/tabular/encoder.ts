@@ -1,5 +1,5 @@
 import { Tensor, Tensor1D } from '@tensorflow/tfjs-core';
-import { _zeros, getDataByType } from '../utils';
+import { zeros, getDataByType } from '../utils';
 
 /**
  * Encodes an array, Tensor or Danfo Series using unique labels
@@ -8,7 +8,7 @@ import { _zeros, getDataByType } from '../utils';
  */
 class LabelEncoder {
   public labels: Array<any>
-  private _data: Array<any>
+  private data: Array<any>
 
   /**
    * Maps data to unique integer labels
@@ -16,15 +16,15 @@ class LabelEncoder {
    * @returns Array
    */
   public async fit(data: Tensor1D[] | Array<any> | any): Promise<any> {
-    this._data = await getDataByType(data);
-    const data_set = new Set(this._data);
-    this.labels = Array.from(data_set);
-    const _label = this.labels;
-    let encoded_data = this._data.map((x: any) => {
-      return _label.indexOf(x);
+    this.data = await getDataByType(data);
+    const dataSet = new Set(this.data);
+    this.labels = Array.from(dataSet);
+    const label = this.labels;
+    const encodedData = this.data.map((x: any) => {
+      return label.indexOf(x);
     });
 
-    return encoded_data;
+    return encodedData;
   }
 
   /**
@@ -33,12 +33,12 @@ class LabelEncoder {
    * @returns Array
    */
   public async transform(data: Tensor | Array<any>): Promise<any> {
-    const _label = this.labels;
-    const data_to_encode = await getDataByType(data) || this._data;
-    let encoded_data = data_to_encode.map((x : any) => {
-      return _label.indexOf(x);
+    const label = this.labels;
+    const dataToEncode = await getDataByType(data) || this.data;
+    const encodedData = dataToEncode.map((x : any) => {
+      return label.indexOf(x);
     });
-    return encoded_data;
+    return encodedData;
   }
 }
 
@@ -49,8 +49,8 @@ class LabelEncoder {
  * @returns Array
  */
 class OneHotEncoder {
-  public labels: Array<any>
-  private _data: Tensor1D[] | Array<any>
+  public labels: Array<any>;
+  private data: Tensor1D[] | Array<any>;
 
   /**
    * Maps data to unique integer labels
@@ -58,20 +58,20 @@ class OneHotEncoder {
    * @returns Array
    */
   public async fit(data: Tensor1D[] | Array<any> | any): Promise<any> {
-    this._data = await getDataByType(data);
-    const data_set = new Set(this._data);
+    this.data = await getDataByType(data);
+    const data_set = new Set(this.data);
     this.labels = Array.from(data_set);
 
-    const data_len = this._data.length;
+    const dataLen = this.data.length;
 
-    let encoded_data = _zeros(data_len, this.labels.length);
+    const encodedData = zeros(dataLen, this.labels.length);
 
-    for (let i = 0; i < data_len; i++) {
-      let elem = this._data[i];
-      let elem_index = this.labels.indexOf(elem);
-      encoded_data[i][elem_index] = 1;
+    for (let i = 0; i < dataLen; i++) {
+      const elem = this.data[i];
+      const elemIndex = this.labels.indexOf(elem);
+      encodedData[i][elemIndex] = 1;
     }
-    return encoded_data;
+    return encodedData;
   }
 
   /**
@@ -80,17 +80,17 @@ class OneHotEncoder {
    * @returns Array
    */
   public async transform(data: Tensor | Array<any> ): Promise<any> {
-    const data_to_encode = await getDataByType(data) || this._data;
-    const _temp_labels = this.labels;
-    let encoded_data = _zeros(data_to_encode.length, _temp_labels.length);
+    const dataToEncode = await getDataByType(data) || this.data;
+    const tempLabels = this.labels;
+    const encodedData = zeros(dataToEncode.length, tempLabels.length);
 
-    for (let i = 0; i < data_to_encode.length; i++) {
-      let elem = data_to_encode[i];
-      let elem_index = _temp_labels.indexOf(elem);
-      encoded_data[i][elem_index] = 1;
+    for (let i = 0; i < dataToEncode.length; i++) {
+      const elem = dataToEncode[i];
+      const elemIndex = tempLabels.indexOf(elem);
+      encodedData[i][elemIndex] = 1;
     }
 
-    return encoded_data;
+    return encodedData;
   }
 }
 
