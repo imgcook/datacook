@@ -30,8 +30,7 @@ export class LinearRegression extends BaseEstimater {
   private fitIntercept: boolean;
   private normalize: boolean;
   private model: Sequential;
-  private batchSize: number;
-  private maxIterTime: number;
+  private featureSize: number;
   /**
    * Construction function of linear regression model
    * @param params LinearRegressionParams
@@ -40,8 +39,6 @@ export class LinearRegression extends BaseEstimater {
     super();
     this.fitIntercept = params.fitIntercept !== false;
     this.normalize = params.normalize;
-    this.batchSize = 32;
-    this.maxIterTime = 20000;
   }
 
   private initLinearModel(inputShape: number, useBias = true): Sequential {
@@ -55,11 +52,35 @@ export class LinearRegression extends BaseEstimater {
     return model;
   }
 
+  /**
+   * @param xData Tensor like of shape (n_samples, n_features), input feature
+   * @param yData Tensor like of shape (n_sample, ), input target values
+   * @param params batch size, default to 32
+   * @returns classifier itself
+   */
+  public async trainBatch(xData: Tensor | RecursiveArray<number>, yData: Tensor | RecursiveArray<number>, params: LinearRegerssionTrainParams = { batchSize: 32 }): Promise<LinearRegression> {
+    const { x, y } = this.validateData(xData, yData);
+    const nFeature = x.shape[1];
+    if (!this.model) {
+      this.model = this.initLinearModel(nFeature, this.fitIntercept);
+      this.featureSize = nFeature;
+    } else {
+      if (nFeature != this.featureSize) {
+        throw new Error('feature size does not match previous training set');
+      }
+    }
+    await this.model.fit(x, y, {
+      batchSize: params.batchSize,
+      epochs: 1,
+      shuffle: true
+    });
+    return this;
+  }
+
   /** Training linear regression model according to X, y. Here we use adam algorithm (a popular gradient-based optimization algorithm) for paramter estimation.
    * @param xData Tensor like of shape (n_samples, n_features), input feature
    * @param yData Tensor like of shape (n_sample, ), input target values
-   * @param batchSize batch size, default to 32
-   * @param maxIterTime max iteration times,default to 20000
+   * @param params batchSize: batch size: default to 32, maxIterTimes: max iteration times, default to 20000
    * @returns classifier itself
    */
   public async train(xData: Tensor | RecursiveArray<number>, yData: Tensor | RecursiveArray<number>, params: LinearRegerssionTrainParams = { batchSize: 32, maxIterTimes: 20000 }): Promise<LinearRegression> {
@@ -69,6 +90,7 @@ export class LinearRegression extends BaseEstimater {
     const batchSize = nData > params.batchSize ? params.batchSize : nData;
     const epochs = Math.ceil(params.maxIterTimes / nData);
     this.model = this.initLinearModel(nFeature, this.fitIntercept);
+    this.featureSize = nFeature;
     await this.model.fit(x, y, {
       batchSize,
       epochs,
