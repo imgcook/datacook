@@ -131,7 +131,7 @@ export default class CountVectorizer {
     if (modelParams.name != 'CountVecorizer'){
       throw new RangeError(`${modelParams.name} is not a CountVecorizer`);
     }
-    this.wordOrder = modelParams.priorProb;
+    this.wordOrder = modelParams.wordOrder;
     this.stopWords = modelParams.stopWords;
     this.uniqueLength = modelParams.uniqueLength;
     return this;
