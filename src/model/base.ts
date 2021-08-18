@@ -23,7 +23,7 @@ export class BaseClassifier {
 
   public validateData(x: Tensor | RecursiveArray<number>, y: Tensor | RecursiveArray<number>, xDimension = 2, yDimension = 1): { x: Tensor, y: Tensor } {
     const xTensor = checkArray(x, 'float32', xDimension);
-    const yTensor = checkArray(y, 'int32', yDimension);
+    const yTensor = checkArray(y, 'any', yDimension);
     const xCount = xTensor.shape[0];
     const yCount = yTensor.shape[0];
     if (xCount != yCount) {
