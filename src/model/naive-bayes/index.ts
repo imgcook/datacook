@@ -1,5 +1,5 @@
 import { BaseClassifier } from '../base';
-import { Tensor, oneHot, unique, add, sub, log, argMax, cast, squeeze, exp, reshape, slice,
+import { Tensor, oneHot, unique, add, sub, log, argMax, cast, squeeze, exp, reshape,
   matMul, transpose, sum, div, booleanMaskAsync, gather, stack, Tensor2D, tensor } from '@tensorflow/tfjs-core';
 
 export type ClassMap = {
@@ -88,7 +88,7 @@ export class MultinomialNB extends BaseClassifier {
   // get one-hot vector for new input data
   private getNewBatchOneHot(y: Tensor): Tensor {
     const yData = y.dataSync();
-    const yInd = yData.map((d: number|string) => { return this.classMap[d]; });
+    const yInd = yData.map((d: number) => { return this.classMap[d]; });
     return cast(tensor(yInd), 'int32');
   }
 
@@ -150,11 +150,8 @@ export class MultinomialNB extends BaseClassifier {
   public predict(X: Tensor2D): Tensor {
     const logLikelihood = this.getLogLikelihood(X);
     const axis_h = 1;
-    const classInd = argMax(logLikelihood, axis_h).dataSync();
-    //const classVal = gather(this.classes, classInd);
-    let classTensors: Tensor[] = [];
-    classInd.forEach((i: number) => { return classTensors.push(slice(this.classes, [ i ], [ 1 ])); });
-    const classVal = reshape(stack(classTensors), [ -1 ]);
+    const classInd = argMax(logLikelihood, axis_h);
+    const classVal = gather(this.classes, classInd);
     return classVal;
   }
 
@@ -185,7 +182,7 @@ export class MultinomialNB extends BaseClassifier {
       throw new RangeError(`${modelParams.name} is not a Multinomial Naive Bayes`);
     }
     this.priorProb = modelParams.priorProb ? tensor(modelParams.priorProb) : this.priorProb;
-    this.classes = modelParams.classes ? tensor(modelParams.classes) : this.classes;
+    this.classes = modelParams.classes ? cast(tensor(modelParams.classes), 'int32') : this.classes;
     this.conditionProb = modelParams.conditionProb ? tensor(modelParams.conditionProb) : this.conditionProb;
     this.alpha = modelParams.alpha ? modelParams.alpha : this.alpha;
     this.classCount = modelParams.classCount ? modelParams.classCount : this.classCount;
@@ -195,12 +192,12 @@ export class MultinomialNB extends BaseClassifier {
   public toJson(): string {
     const modelParams = {
       name: 'MultinomialNB',
-      priorProb: this.priorProb?.arraySync(),
-      conditionProb: this.conditionProb?.arraySync(),
-      classes: this.classes?.arraySync(),
+      priorProb: this.priorProb.arraySync(),
+      conditionProb: this.conditionProb.arraySync(),
+      classes: this.classes.arraySync(),
       alpha: this.alpha,
-      classCount: this.classCount?.arraySync(),
-      featureCount: this.featureCount?.arraySync()
+      classCount: this.classCount.arraySync(),
+      featureCount: this.featureCount.arraySync()
     };
     return JSON.stringify(modelParams);
   }

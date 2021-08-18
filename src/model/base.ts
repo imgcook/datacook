@@ -14,7 +14,7 @@ export class BaseClassifier {
     return score;
   }
 
-  public validateData(x: Tensor | RecursiveArray<number>, y: Tensor | string[] | number[], xDimension = 2, yDimension = 1): { x: Tensor, y: Tensor } {
+  public validateData(x: Tensor | RecursiveArray<number>, y: Tensor | string[] | number[], xDimension = 2): { x: Tensor, y: Tensor } {
     const xTensor = checkArray(x, 'float32', xDimension);
     let yTensor: Tensor;
     if (! (y instanceof Tensor)) {
