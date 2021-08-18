@@ -30,6 +30,7 @@ describe('Naive bayes', () => {
     await mnb.train(cases, labels);
     const prediction = mnb.predict(cases);
     prediction.print();
+  
     //assert.deepEqual(prediction.arraySync(), labels);
   });
 
@@ -49,7 +50,7 @@ describe('Naive bayes', () => {
     await mnb.train(cases, labels);
     const yPred = mnb.predict(testCases);
     yPred.print();
-//    assert.deepEqual(yPred.arraySync(), testLabels);
+    //assert.deepEqual(yPred.arraySync(), testLabels);
   });
 
   it('save and load model', async () => {

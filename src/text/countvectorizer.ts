@@ -80,7 +80,7 @@ export default class CountVectorizer {
     const counterVectorizer: number[][] = textArray.map((value: TextInput) => {
       const innerArray: number[] = Array.from(new Float64Array(this.uniqueLength));
       const cleanTextArray: string[] = [];
-      let wordElements: string[] = [];
+      let wordElements: string[];
       if (Array.isArray(value)) {
         wordElements = value;
       } else {
@@ -128,7 +128,7 @@ export default class CountVectorizer {
    */
   public load(modelJson: string): CountVectorizer {
     const modelParams = JSON.parse(modelJson);
-    if (modelParams.name != 'CountVecorizer'){
+    if (modelParams.name !== 'CountVecorizer'){
       throw new RangeError(`${modelParams.name} is not a CountVecorizer`);
     }
     this.wordOrder = modelParams.wordOrder;

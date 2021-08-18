@@ -1,6 +1,6 @@
 import { BaseClassifier } from '../base';
 import { Tensor, oneHot, unique, add, sub, log, argMax, cast, squeeze, exp, reshape, slice,
-  matMul, transpose, sum, div, booleanMaskAsync, gather, stack, Tensor2D, tensor } from '@tensorflow/tfjs-core';
+  matMul, transpose, sum, div, booleanMaskAsync, gather, stack, Tensor2D, tensor, divNoNan } from '@tensorflow/tfjs-core';
 
 export type ClassMap = {
   [ key: string ]: number
@@ -169,7 +169,7 @@ export class MultinomialNB extends BaseClassifier {
     const logLikelihood = this.getLogLikelihood(x);
     const likeliHood = exp(logLikelihood);
     const sumLikelihood = reshape(sum(likeliHood, axisH), [ -1, 1 ]);
-    const proba = div(likeliHood, sumLikelihood);
+    const proba = divNoNan(likeliHood, sumLikelihood);
     return proba;
   }
 
@@ -180,7 +180,7 @@ export class MultinomialNB extends BaseClassifier {
    */
   public load(modelJson:string): void {
     const modelParams = JSON.parse(modelJson);
-    if (modelParams.name != 'MultinomialNB'){
+    if (modelParams.name !== 'MultinomialNB'){
       throw new RangeError(`${modelParams.name} is not a Multinomial Naive Bayes`);
     }
     this.priorProb = modelParams.priorProb ? tensor(modelParams.priorProb) : this.priorProb;
@@ -189,6 +189,7 @@ export class MultinomialNB extends BaseClassifier {
     this.alpha = modelParams.alpha ? modelParams.alpha : this.alpha;
     this.classCount = modelParams.classCount ? modelParams.classCount : this.classCount;
     this.featureCount = modelParams.featureCount ? modelParams.featureCount : this.featureCount;
+    modelParams.classes && this.updateClassMap();
   }
 
   public toJson(): string {
