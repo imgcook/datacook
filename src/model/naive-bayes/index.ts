@@ -1,6 +1,11 @@
 import { BaseClassifier } from '../base';
+<<<<<<< HEAD
 import { Tensor, add, sub, log, argMax, cast, squeeze, exp, reshape, slice,
   matMul, transpose, sum, booleanMaskAsync, gather, stack, Tensor2D, tensor, divNoNan } from '@tensorflow/tfjs-core';
+=======
+import { Tensor, oneHot, unique, add, sub, log, argMax, cast, squeeze, exp, reshape, slice,
+  matMul, transpose, sum, div, booleanMaskAsync, gather, stack, Tensor2D, tensor, divNoNan } from '@tensorflow/tfjs-core';
+>>>>>>> fix
 
 export type ClassMap = {
   [ key: string ]: number
@@ -74,12 +79,34 @@ export class MultinomialNB extends BaseClassifier {
     return true;
   }
 
+<<<<<<< HEAD
   // // get one-hot vector for new input data
   // private getNewBatchOneHot(y: Tensor): Tensor {
   //   const yData = y.dataSync();
   //   const yInd = yData.map((d: number|string) => this.classMap[d]);
   //   return cast(tensor(yInd), 'int32');
   // }
+=======
+  // get class map
+  private updateClassMap(): void {
+    if (this.classes){
+      const classData = this.classes.dataSync();
+      let classMap: ClassMap = {};
+      for (let i = 0; i < classData.length; i++) {
+        const key = classData[i];
+        classMap[key] = i;
+      }
+      this.classMap = classMap;
+    }
+  }
+
+  // get one-hot vector for new input data
+  private getNewBatchOneHot(y: Tensor): Tensor {
+    const yData = y.dataSync();
+    const yInd = yData.map((d: number|string) => this.classMap[d]);
+    return cast(tensor(yInd), 'int32');
+  }
+>>>>>>> fix
 
   /**
    * Training multinomial naive bayes model according to X, y. Support training multiple batches of data
@@ -136,9 +163,15 @@ export class MultinomialNB extends BaseClassifier {
    */
   public predict(X: Tensor2D): Tensor {
     const logLikelihood = this.getLogLikelihood(X);
+<<<<<<< HEAD
     const axisH = 1;
     const classInd = argMax(logLikelihood, axisH).dataSync();
     const classTensors: Tensor[] = [];
+=======
+    const axis_h = 1;
+    const classInd = argMax(logLikelihood, axis_h).dataSync();
+    let classTensors: Tensor[] = [];
+>>>>>>> fix
     classInd.forEach((i: number) => { return classTensors.push(slice(this.classes, [ i ], [ 1 ])); });
     const classVal = reshape(stack(classTensors), [ -1 ]);
     return classVal;
@@ -155,7 +188,11 @@ export class MultinomialNB extends BaseClassifier {
     const axisH = 1;
     const logLikelihood = this.getLogLikelihood(x);
     const likeliHood = exp(logLikelihood);
+<<<<<<< HEAD
     const sumLikelihood = reshape(sum(likeliHood, axisH), [ -1, 1 ]);
+=======
+    const sumLikelihood = reshape(sum(likeliHood, axis_h), [ -1, 1 ]);
+>>>>>>> fix
     const proba = divNoNan(likeliHood, sumLikelihood);
     return proba;
   }
