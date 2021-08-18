@@ -12,7 +12,6 @@ export default class CountVectorizer {
   public wordOrder: StringIntegerObject = {};
   public uniqueLength: number;
   public stopWords: string[] = [];
-
   /**
    * Init word dictionary base on their number of count
    * and the order to which they occur alphabetically.
