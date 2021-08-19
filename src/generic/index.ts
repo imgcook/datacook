@@ -17,7 +17,7 @@ function split(inputs: Tensor[], trainRatio = .75): Tensor[]{
     throw new Error('inputs should not have length of zero');
   }
 
-  let size = inputs[0].shape[0];
+  const size = inputs[0].shape[0];
 
   for (let i = 1; i < inputs.length; i++) {
     if (size !== inputs[i].shape[0]) {

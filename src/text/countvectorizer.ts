@@ -17,7 +17,7 @@ export default class CountVectorizer {
     textArray.forEach((value) => {
       value.split(' ').forEach((text) => {
         if (text !== '') {
-          tokenArray.push(text.toLocaleLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ''));
+          tokenArray.push(text.toLocaleLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, ''));
         }
       });
     });
@@ -54,7 +54,7 @@ export default class CountVectorizer {
       const cleanTextArray: string[] = [];
       value.split(' ').forEach((text) => {
         if (text !== '') {
-          const cleanText = text.toLocaleLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+          const cleanText = text.toLocaleLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '');
           cleanTextArray.push(cleanText);
         }
       });

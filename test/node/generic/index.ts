@@ -47,7 +47,7 @@ describe('Generic Split test',
   }); 
 });
 
-describe('Generic Parse test', () => { 
+describe('Generic Parse test', () => {
   it('should read npy', () => {
     // ones npy 100*100
     const test = fs.readFileSync('test/node/generic/artifacts/test.npy').buffer;

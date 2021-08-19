@@ -1,12 +1,12 @@
 import { Tensor, Tensor1D } from '@tensorflow/tfjs-core';
 
-function _zeros(row: number, column: number): Array<any> {
-  let zero_array = [];
+function zeros(row: number, column: number): Array<number[]> {
+  const zeroArray = [];
   for (let i = 0; i < row; i++) {
-    let col_data = Array.from(new Uint8Array(column));
-    zero_array.push(col_data);
+    const colData = Array.from(new Uint8Array(column));
+    zeroArray.push(colData);
   }
-  return zero_array;
+  return zeroArray;
 }
 
 async function getDataByType(data: Tensor1D[] | Array<any> | any) : Promise<any>{
@@ -32,5 +32,5 @@ function sizeFromShape(shape: number[]): number {
 }
 
 export {
-  _zeros, getDataByType, sizeFromShape
+  zeros, getDataByType, sizeFromShape
 };
