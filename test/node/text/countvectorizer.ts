@@ -4,7 +4,7 @@ import CountVectorizer from "../../../src/text/countvectorizer";
 describe('CountVectorizer', function(){
   it('should convert words to their proper countvectorizer', function(){
     const vectorizer = new CountVectorizer(['The quick brown fox jumped over the lazy big fat dog.'], ['big', 'fat']);
-    const toVector = vectorizer.transform(['the brown brown","the the brown hat car']);
+    const toVector = vectorizer.transform(['the brown brown', 'the the brown hat car']);
     const vocab = {
                     brown: 0,
                     dog: 1,
