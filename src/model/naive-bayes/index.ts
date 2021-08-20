@@ -1,9 +1,13 @@
 import { BaseClassifier } from '../base';
-import { Tensor, oneHot, unique, add, sub, log, argMax, cast, squeeze, exp, reshape, slice,
+import { Tensor, add, sub, log, argMax, cast, squeeze, exp, reshape, slice,
   matMul, transpose, sum, booleanMaskAsync, gather, stack, Tensor2D, tensor, divNoNan } from '@tensorflow/tfjs-core';
 
 export type ClassMap = {
   [ key: string ]: number
+}
+
+export interface MultinomialNBParam {
+  alpha: number
 }
 
 /**
@@ -13,15 +17,13 @@ export class MultinomialNB extends BaseClassifier {
 
   private conditionProb: Tensor;
   private priorProb: Tensor;
-  public classes: Tensor;
   public alpha: number;
   public featureCount: Tensor;
   public classCount: Tensor;
-  public classMap: ClassMap;
 
-  constructor (alpha = 1.0) {
+  constructor (params: MultinomialNBParam = { alpha: 1.0 }) {
     super();
-    this.alpha = alpha;
+    this.alpha = params.alpha && params.alpha > 0 ? params.alpha : 1.0;
   }
 
   private updateClassLogPrior() {
@@ -72,25 +74,12 @@ export class MultinomialNB extends BaseClassifier {
     return true;
   }
 
-  // get class map
-  private updateClassMap(): void {
-    if (this.classes){
-      const classData = this.classes.dataSync();
-      const classMap: ClassMap = {};
-      for (let i = 0; i < classData.length; i++) {
-        const key = classData[i];
-        classMap[key] = i;
-      }
-      this.classMap = classMap;
-    }
-  }
-
-  // get one-hot vector for new input data
-  private getNewBatchOneHot(y: Tensor): Tensor {
-    const yData = y.dataSync();
-    const yInd = yData.map((d: number|string) => this.classMap[d]);
-    return cast(tensor(yInd), 'int32');
-  }
+  // // get one-hot vector for new input data
+  // private getNewBatchOneHot(y: Tensor): Tensor {
+  //   const yData = y.dataSync();
+  //   const yInd = yData.map((d: number|string) => this.classMap[d]);
+  //   return cast(tensor(yInd), 'int32');
+  // }
 
   /**
    * Training multinomial naive bayes model according to X, y. Support training multiple batches of data
@@ -100,25 +89,24 @@ export class MultinomialNB extends BaseClassifier {
    */
   public async train(xData: Array<any> | Tensor, yData: Array<any> | Tensor): Promise<MultinomialNB> {
     const { x, y } = this.validateData(xData, yData);
-    const { values, indices } = unique(y);
-    const nClass = values.shape[0];
+
     const firstCall = this.firstCall();
     let yOneHot;
 
-    if (firstCall) {
-      this.classes = values;
-      this.updateClassMap();
-      yOneHot = oneHot(indices, nClass);
+    if (firstCall){
+      this.initClasses(y);
+      yOneHot = this.getLabelOneHot(y);
     } else {
-      const yInd = this.getNewBatchOneHot(y);
+      //const yInd = this.getLabelOneHot(y);
       const nFeatures = x.shape[1];
       if (nFeatures != this.featureCount.shape[1]) {
         throw new Error('feature size does not match to previous training dataset');
       }
-      yOneHot = oneHot(yInd, nClass);
+      yOneHot = this.getLabelOneHot(y);
     }
 
     const axisH = 0;
+    const nClass = this.classes.shape[0];
     // update class count
     const classCount = sum(yOneHot, axisH);
     this.updateClassCount(classCount);
