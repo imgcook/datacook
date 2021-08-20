@@ -30,8 +30,8 @@ describe('Naive bayes', () => {
     await mnb.train(cases, labels);
     const prediction = mnb.predict(cases);
     prediction.print();
-  
-    //assert.deepEqual(prediction.arraySync(), labels);
+    // @ts-ignore
+    assert.deepEqual(prediction.arraySync(), labels);
   });
 
   it('predict class probabilities', async () => {
@@ -50,7 +50,8 @@ describe('Naive bayes', () => {
     await mnb.train(cases, labels);
     const yPred = mnb.predict(testCases);
     yPred.print();
-    //assert.deepEqual(yPred.arraySync(), testLabels);
+    // @ts-ignore
+    assert.deepEqual(yPred.arraySync(), testLabels);
   });
 
   it('save and load model', async () => {
@@ -60,7 +61,8 @@ describe('Naive bayes', () => {
     const mnb2 = new MultinomialNB();
     mnb2.load(modelJson);
     const yPred = mnb2.predict(testCases);
-    //assert.deepEqual(yPred.arraySync(), testLabels);
+    // @ts-ignore
+    assert.deepEqual(yPred.arraySync(), testLabels);
   });
 
 });

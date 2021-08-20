@@ -25,7 +25,7 @@ describe('CountVectorizer', function(){
   });
   it('should convert words array to their proper countvectorizer', function(){
     const vectorizer = new CountVectorizer([['The'],['quick'], ['brown'], ['fox'], ['jumped'], ['over'], ['the'], ['lazy'], ['dog']], ['the']);
-    const toVector = vectorizer.transform(["the brown brown","the the brown"]);
+    const toVector = vectorizer.transform(["the brown brown", "the the brown"]);
     const vocab = {
                     brown: 0,
                     dog: 1,
