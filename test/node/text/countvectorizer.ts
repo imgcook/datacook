@@ -16,10 +16,9 @@ describe('CountVectorizer', function(){
                     the: 7
                   };
     const expectedVector = [
-                            [2, 0, 0, 0,0, 0, 0, 1],
-                            [1, 0, 0, 0,0, 0, 0, 2]
+                            [2, 0, 0, 0, 0, 0, 0, 1],
+                            [1, 0, 0, 0, 0, 0, 0, 2]
                            ];
-
     assert.deepEqual(vectorizer.wordOrder, vocab);
     assert.deepEqual(toVector, expectedVector);
   });
@@ -33,13 +32,13 @@ describe('CountVectorizer', function(){
                     jumped: 3,
                     lazy: 4,
                     over: 5,
-                    quick: 6
+                    quick: 6,
+                    the: 7
                   };
     const expectedVector = [
-                            [2, 0, 0, 0,0, 0, 0],
-                            [1, 0, 0, 0,0, 0, 0]
+                            [2, 0, 0, 0,0, 0, 0, 1],
+                            [1, 0, 0, 0,0, 0, 0, 2]
                            ];
-    console.log(vectorizer.wordOrder);
     assert.deepEqual(vectorizer.wordOrder, vocab);
     assert.deepEqual(toVector, expectedVector);
   });

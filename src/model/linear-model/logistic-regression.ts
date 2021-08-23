@@ -136,7 +136,7 @@ export class LogisticRegression extends BaseClassifier {
       loss: losses.sigmoidCrossEntropy
     });
     this.featureSize = nFeature;
-    const yOneHot = this.getLabelOneHot(y);
+    const yOneHot = this.isBinaryClassification() ? this.getLabelOneHotBinary(y) : this.getLabelOneHot(y);
     await this.model.fit(x, yOneHot, {
       batchSize,
       epochs,
@@ -151,7 +151,7 @@ export class LogisticRegression extends BaseClassifier {
     const scores = this.model.predict(x);
     //const predY = this.getPredClass(scores);
     if (scores instanceof Tensor) {
-      return this.getPredClass(scores);
+      return this.isBinaryClassification() ? this.getLabelOneHotBinary(scores) : this.getPredClass(scores);
     }
     return scores;
   }

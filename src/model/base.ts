@@ -39,11 +39,21 @@ export class BaseClassifier {
     const yData = y.dataSync();
     const nClass = this.classes.shape[0];
     const yInd = yData.map((d: number|string) => this.classMap[d]);
-    if (nClass > 2) {
-      const yOneHot = oneHot(cast(tensor(yInd), 'int32'), nClass);
-      return yOneHot;
-    } else {
+    //if (nClass > 2) {
+    const yOneHot = oneHot(cast(tensor(yInd), 'int32'), nClass);
+    return yOneHot;
+    // } else {
+    //   return cast(tensor(yInd), 'int32');
+    // }
+  }
+
+  public getLabelOneHotBinary(y: Tensor): Tensor {
+    const yData = y.dataSync();
+    const yInd = yData.map((d: number|string) => this.classMap[d]);
+    if (this.isBinaryClassification) {
       return cast(tensor(yInd), 'int32');
+    } else {
+      throw new Error('Can only except binary classification input');
     }
   }
 
@@ -71,9 +81,22 @@ export class BaseClassifier {
     return nClass == 2;
   }
 
+  public getPredClassBinary(score: Tensor): Tensor {
+    if (!this.isBinaryClassification()) {
+      throw new Error ('Can only except binary classification input');
+    }
+    const classInd = greater(score, 0.5).dataSync();
+    const classTensors: Tensor[] = [];
+    classInd.forEach((i: number) => { return classTensors.push(slice(this.classes, [ i ], [ 1 ])); });
+    const classVal = reshape(stack(classTensors), [ -1 ]);
+    return classVal;
+
+  }
+
   public getPredClass(score: Tensor): Tensor {
     const axisH = 1;
-    const classInd = (this.isBinaryClassification) ? greater(score, 0.5).dataSync() : argMax(score, axisH).dataSync();
+    // const classInd = (this.isBinaryClassification) ? greater(score, 0.5).dataSync() : argMax(score, axisH).dataSync();
+    const classInd = argMax(score, axisH).dataSync();
     const classTensors: Tensor[] = [];
     classInd.forEach((i: number) => { return classTensors.push(slice(this.classes, [ i ], [ 1 ])); });
     const classVal = reshape(stack(classTensors), [ -1 ]);
