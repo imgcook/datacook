@@ -1,4 +1,4 @@
-import { Tensor, tensor, RecursiveArray, unique, cast, oneHot } from '@tensorflow/tfjs-core';
+import { Tensor, tensor, RecursiveArray, unique, cast, oneHot, argMax, reshape, stack, slice, greater } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
 
 export type ClassMap = {
@@ -39,8 +39,12 @@ export class BaseClassifier {
     const yData = y.dataSync();
     const nClass = this.classes.shape[0];
     const yInd = yData.map((d: number|string) => this.classMap[d]);
-    const yOneHot = oneHot(cast(tensor(yInd), 'int32'), nClass);
-    return yOneHot;
+    if (nClass > 2) {
+      const yOneHot = oneHot(cast(tensor(yInd), 'int32'), nClass);
+      return yOneHot;
+    } else {
+      return cast(tensor(yInd), 'int32');
+    }
   }
 
   public initClasses(y: Tensor): void {
@@ -61,8 +65,21 @@ export class BaseClassifier {
     }
     return { 'x': xTensor, 'y': yTensor };
   }
-}
 
+  public isBinaryClassification(): boolean {
+    const nClass = this.classes.shape[0];
+    return nClass == 2;
+  }
+
+  public getPredClass(score: Tensor): Tensor {
+    const axisH = 1;
+    const classInd = (this.isBinaryClassification) ? greater(score, 0.5).dataSync() : argMax(score, axisH).dataSync();
+    const classTensors: Tensor[] = [];
+    classInd.forEach((i: number) => { return classTensors.push(slice(this.classes, [ i ], [ 1 ])); });
+    const classVal = reshape(stack(classTensors), [ -1 ]);
+    return classVal;
+  }
+}
 
 export class BaseEstimater {
   // TODO(sugarspectre): Add evaluation functions
