@@ -1,6 +1,6 @@
-import { Tensor, cast, DataTypeMap, tensor, RecursiveArray } from '@tensorflow/tfjs-core';
+import { Tensor, cast, tensor, RecursiveArray } from '@tensorflow/tfjs-core';
 
-export function checkArray (array: Tensor | RecursiveArray<number>, dtype: keyof DataTypeMap = 'float32', ensureDimension = -1): Tensor {
+export function checkArray (array: Tensor | RecursiveArray<number>, dtype = 'any', ensureDimension = -1): Tensor {
   if (array instanceof Array) {
     array = tensor(array);
   }
@@ -10,8 +10,10 @@ export function checkArray (array: Tensor | RecursiveArray<number>, dtype: keyof
     if (ensureDimension != -1 && dim != ensureDimension){
       throw new TypeError(`Dimension of input require to be ${ensureDimension} but receive ${dim}`);
     }
-    if (dtype != arr_dtype){
-      array = cast(array, dtype);
+    if (dtype === 'string' || dtype === 'float32' || dtype === 'bool' || dtype === 'int32' || dtype === 'complex64'){
+      if (arr_dtype != dtype){
+        array = cast(array, dtype);
+      }
     }
     return array;
   } else {
