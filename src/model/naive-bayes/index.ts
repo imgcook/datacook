@@ -74,13 +74,6 @@ export class MultinomialNB extends BaseClassifier {
     return true;
   }
 
-  // // get one-hot vector for new input data
-  // private getNewBatchOneHot(y: Tensor): Tensor {
-  //   const yData = y.dataSync();
-  //   const yInd = yData.map((d: number|string) => this.classMap[d]);
-  //   return cast(tensor(yInd), 'int32');
-  // }
-
   /**
    * Training multinomial naive bayes model according to X, y. Support training multiple batches of data
    * @param xData feature array, two dimension numeric array or 2D Tensor of shape (n_samples, n_features)
