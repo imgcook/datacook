@@ -39,7 +39,6 @@ describe('CountVectorizer', function(){
                             [2, 0, 0, 0,0, 0, 0],
                             [1, 0, 0, 0,0, 0, 0]
                            ];
-    console.log(vectorizer.wordOrder);
     assert.deepEqual(vectorizer.wordOrder, vocab);
     assert.deepEqual(toVector, expectedVector);
   });
