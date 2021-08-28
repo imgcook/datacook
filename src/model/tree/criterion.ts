@@ -1,3 +1,4 @@
+import { setFlagsFromString } from "node:v8";
 
 export abstract class Criterion {
   public sampleWeight: number[];
@@ -8,6 +9,7 @@ export abstract class Criterion {
   public nOutputs: number;
   public nClasses: number;
   public pos: number;
+  public start: number;
   public end: number;
   public sumLeft: number[];
   public sumRight: number[];
@@ -47,6 +49,22 @@ export abstract class Criterion {
 
 export abstract class ClassificationCriterion extends Criterion {
   /**
+   * Reset the criterion at pos=start.
+   */
+  public reset(): void {
+    this.weightedNLeft = 0;
+    this.weightedNRight = this.weightedNNodeSamples;
+    this.pos = this.start;
+  }
+  /**
+   * Reset the criterion at pos=end.
+   */
+  public reverseReset(): void {
+    this.weightedNRight = 0;
+    this.weightedNLeft = this.weightedNNodeSamples;
+    this.pos = this.end;
+  }
+  /**
    * update statistics by moving samples to left child
    * @param newPos new ending position for which to move samples from right child to left child.
    */
@@ -63,6 +81,7 @@ export abstract class ClassificationCriterion extends Criterion {
         this.weightedNLeft += w;
       }
     } else {
+      this.reverseReset();
       for (let p = this.end - 1; p > newPos - 1; p--) {
         const i = this.samples[p];
         const w = this.sampleWeight ? this.sampleWeight[i] : 1;
@@ -76,6 +95,9 @@ export abstract class ClassificationCriterion extends Criterion {
       this.sumRight[c] = this.sumTotal[c] - this.sumLeft[c];
     }
     this.pos = newPos;
+  }
+  public nodeValue() {
+    
   }
 }
 
