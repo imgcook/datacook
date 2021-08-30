@@ -1,7 +1,7 @@
-import { linalg, Tensor, matMul, abs, sub, max, transpose } from '@tensorflow/tfjs-core';
-
+import { linalg, Tensor, matMul, abs, sub, max, transpose, tensor, mul, eye } from '@tensorflow/tfjs-core';
+import { linSolveQR } from './linsolve';
 /**
- * Compute the eigenvalues and eigenvector of a matrix using the QR algorithm.
+ * Compute the eigenvalues of a matrix using the QR algorithm.
   This is a renormalized version of power iteration that converges to a full
   set of eigenvalues.  Starting with the matrix M = M0, we iterate:
     M0 = Q0 R0, M1 = R0 Q0;
@@ -17,7 +17,7 @@ import { linalg, Tensor, matMul, abs, sub, max, transpose } from '@tensorflow/tf
    @param tol tolerence, default to 1e-4
    @param maxIter max iteration time, default to 200
  */
-export const eigenSolve = (matrix: Tensor, tol = 1e-4, maxIter = 200): [ Tensor, Tensor ] => {
+export const solveEigenValues = (matrix: Tensor, tol = 1e-4, maxIter = 200): Tensor => {
   let [ q, r ] = linalg.qr(matrix);
   let x = matrix;
   let xTr = linalg.bandPart(x, 0, 0);
@@ -38,5 +38,43 @@ export const eigenSolve = (matrix: Tensor, tol = 1e-4, maxIter = 200): [ Tensor,
   }
   const d = linalg.bandPart(matMul(r, q), 0, 0);
 
-  return [ qn, d ];
+  return d;
+};
+
+export const solveEigenVectors = (maxtrix: Tensor, eigenValues: Tensor, tol = 1e-4, maxIter = 200): Tensor => {
+  // const eigenVectors = 
+};
+
+/**
+ * Solve for the eigenvector associated with an eigenvalue using the inverse
+   iteration algorithm.
+  Given an approximate eigenvalue lambda, the inverse iteration algorithm
+  computes the matrix:
+    M' = M - lambda I
+  And then solves the following sequence of linear equations:
+    v0 = solve(M', random_vector), v0' = normalize(v0);
+    v1 = solve(M', v0'), v1' = normalize(v1);
+    v2 = solve(<', v1'), v2' = normalize(v2);
+    ...
+  This algorithm will converge to the eigenvector associated with the eigenvalue
+  closest to lambda.
+ * @param matrix 
+ * @param eigenValue 
+ * @param tol 
+ * @param maxIter 
+ */
+export const eigenBackSolve = (matrix: Tensor, eigenValue: number, tol= 1e-4, maxIter = 200) => {
+    const n = matrix.shape[0];
+    let current = tensor(new Array(n).fill(1));
+    let previous;
+    // Preturb the eigenvalue a litle to prevent our right hand side matrix
+    // from becoming singular.
+    const lambda = eigenValue + 0.00001;
+    const mi = sub(matrix, mul(eye(n), lambda));
+    for (let i = 0; i < maxIter; i++) {
+      previous = current;
+      current = linSolveQR(mi, previous);
+    }
+    return current;
+
 };

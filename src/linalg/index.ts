@@ -1,0 +1,1 @@
+export { linSolveQR } from './linsolve';
