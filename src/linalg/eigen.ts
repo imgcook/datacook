@@ -1,4 +1,4 @@
-import { linalg, Tensor, matMul, abs, sub, max, transpose, tensor, mul, eye, slice, stack } from '@tensorflow/tfjs-core';
+import { linalg, Tensor, matMul, abs, sub, max, tensor, mul, eye, slice, stack } from '@tensorflow/tfjs-core';
 import { linSolveQR } from './linsolve';
 import { tensorNormalize, tensorEqual } from './utils';
 /**
@@ -93,3 +93,15 @@ export const solveEigenVectors = (matrix: Tensor, eigenValues: Tensor, tol = 1e-
   return stack(eigenVectors);
 };
 
+/**
+ * Compute the eigenvalues and eigenvectors of a matrix M.
+  The eigenvalues are computed using the QR algorithm, then the eigenvectors
+  are computed by inverse iteration.
+ * @param matrix target matrix
+ * @param tol stop tolerence
+ */
+export const eigenSolve = (matrix: Tensor, tol: number, maxIter: number): [Tensor, Tensor] => {
+  const eigenValues = solveEigenValues(matrix, tol, maxIter);
+  const eigenVectors = solveEigenVectors(matrix, eigenValues, tol, maxIter);
+  return [ eigenValues, eigenVectors ];
+};
