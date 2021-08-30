@@ -120,3 +120,4 @@ export const eigenSolve = (matrix: Tensor, tol = 1e-4, maxIter = 200): [Tensor, 
   const eigenVectors = solveEigenVectors(matrix, eigenValues, tol, maxIter);
   return [ eigenValues, eigenVectors ];
 };
+
