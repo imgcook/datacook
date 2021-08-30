@@ -1,5 +1,6 @@
-import { linalg, Tensor, matMul, abs, sub, max, transpose, tensor, mul, eye } from '@tensorflow/tfjs-core';
+import { linalg, Tensor, matMul, abs, sub, max, transpose, tensor, mul, eye, slice, stack } from '@tensorflow/tfjs-core';
 import { linSolveQR } from './linsolve';
+import { tensorNormalize, tensorEqual } from './utils';
 /**
  * Compute the eigenvalues of a matrix using the QR algorithm.
   This is a renormalized version of power iteration that converges to a full
@@ -41,10 +42,6 @@ export const solveEigenValues = (matrix: Tensor, tol = 1e-4, maxIter = 200): Ten
   return d;
 };
 
-export const solveEigenVectors = (maxtrix: Tensor, eigenValues: Tensor, tol = 1e-4, maxIter = 200): Tensor => {
-  // const eigenVectors = 
-};
-
 /**
  * Solve for the eigenvector associated with an eigenvalue using the inverse
    iteration algorithm.
@@ -58,23 +55,41 @@ export const solveEigenVectors = (maxtrix: Tensor, eigenValues: Tensor, tol = 1e
     ...
   This algorithm will converge to the eigenvector associated with the eigenvalue
   closest to lambda.
- * @param matrix 
- * @param eigenValue 
- * @param tol 
- * @param maxIter 
+ * @param matrix matrix
+ * @param eigenValue eigen value
+ * @param tol tolerance, default to 1e-4
+ * @param maxIter max iteration time, default to 200
  */
-export const eigenBackSolve = (matrix: Tensor, eigenValue: number, tol= 1e-4, maxIter = 200) => {
-    const n = matrix.shape[0];
-    let current = tensor(new Array(n).fill(1));
-    let previous;
-    // Preturb the eigenvalue a litle to prevent our right hand side matrix
-    // from becoming singular.
-    const lambda = eigenValue + 0.00001;
-    const mi = sub(matrix, mul(eye(n), lambda));
-    for (let i = 0; i < maxIter; i++) {
-      previous = current;
-      current = linSolveQR(mi, previous);
+export const eigenBackSolve = (matrix: Tensor, eigenValue: number, tol = 1e-4, maxIter = 200): Tensor => {
+  const n = matrix.shape[0];
+  let current = tensor(new Array(n).fill(1));
+  let previous;
+  // Preturb the eigenvalue a litle to prevent our right hand side matrix
+  // from becoming singular.
+  const lambda = eigenValue + 0.00001;
+  const mi = sub(matrix, mul(eye(n), lambda));
+  for (let i = 0; i < maxIter; i++) {
+    previous = current;
+    current = linSolveQR(mi, previous);
+    current = tensorNormalize(current);
+    if (tensorEqual(current, previous, tol)) {
+      break;
     }
-    return current;
-
+  }
+  return current;
 };
+
+/* Solve for the eigenvectors of a matrix M once the eigenvalues are known
+   using inverse iteration.
+*/
+export const solveEigenVectors = (matrix: Tensor, eigenValues: Tensor, tol = 1e-4, maxIter = 200): Tensor => {
+  const nEv = eigenValues.shape[0];
+  const eigenVectors = [];
+  for (let i = 0; i < nEv; i++) {
+    const eigenValue = Number(slice(eigenValues, 1, 1).dataSync());
+    const eigenVector = eigenBackSolve(matrix, eigenValue, tol, maxIter);
+    eigenVectors.push(eigenVector);
+  }
+  return stack(eigenVectors);
+};
+
