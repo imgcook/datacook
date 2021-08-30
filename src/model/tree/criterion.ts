@@ -96,8 +96,13 @@ export abstract class ClassificationCriterion extends Criterion {
     }
     this.pos = newPos;
   }
+  /**
+   * Compute the node value of samples[start:end] into dest.
+   */
   public nodeValue() {
-    
+    for (let k = 0; i < this.nOutputs; k ++) {
+      
+    }
   }
 }
 
