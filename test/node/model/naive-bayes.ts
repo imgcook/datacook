@@ -29,7 +29,6 @@ describe('Naive bayes', () => {
     await mnb.train(cases, labels);
     await mnb.train(cases, labels);
     const prediction = mnb.predict(cases);
-    prediction.print();
     // @ts-ignore
     assert.deepEqual(prediction.arraySync(), labels);
   });
@@ -38,7 +37,6 @@ describe('Naive bayes', () => {
     const mnb = new MultinomialNB();
     await mnb.train(cases, labels);
     const probs = mnb.predictProba(cases);
-    // probs.print();
     const nCases = cases.shape[0];
     const class_prob_sum = tf.sum(probs, 1);
     const class_sum = new Array(nCases).fill(1);
@@ -49,7 +47,6 @@ describe('Naive bayes', () => {
     const mnb = new MultinomialNB();
     await mnb.train(cases, labels);
     const yPred = mnb.predict(testCases);
-    yPred.print();
     // @ts-ignore
     assert.deepEqual(yPred.arraySync(), testLabels);
   });

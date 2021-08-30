@@ -3,7 +3,7 @@ import Counter from './counter';
 interface StringIntegerObject {
   [property: string] : number
 }
-type TextInput = string | string[];
+export type TextInput = string | string[];
 
 /**
  * Convert text to vector base on their number of count
@@ -33,7 +33,7 @@ export default class CountVectorizer {
     const tokenArray: string[] = [];
 
     textArray.forEach((value: TextInput) => {
-      let wordElements: string[] = [];
+      let wordElements: string[];
       if (Array.isArray(value)) {
         wordElements = value;
       } else {
