@@ -23,4 +23,4 @@ describe('EigenSolver', () => {
     const equal = tensorEqual(recovM, matrix, 1e-3);
     assert.isTrue(equal);
   })
-})
+});
