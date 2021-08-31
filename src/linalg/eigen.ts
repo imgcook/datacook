@@ -1,4 +1,4 @@
-import { linalg, Tensor, matMul, abs, sub, max, tensor, mul, eye, slice, stack, squeeze, neg } from '@tensorflow/tfjs-core';
+import { linalg, Tensor, matMul, abs, sub, max, tensor, mul, eye, slice, stack, squeeze, neg, transpose } from '@tensorflow/tfjs-core';
 import { linSolveQR } from './linsolve';
 import { tensorNormalize, tensorEqual } from './utils';
 /**
@@ -21,16 +21,20 @@ import { tensorNormalize, tensorEqual } from './utils';
 export const solveEigenValues = (matrix: Tensor, tol = 1e-4, maxIter = 200): Tensor => {
   let [ q, r ] = linalg.qr(matrix);
   let x = matrix;
+  let prevX: Tensor;
+  let prevTr: Tensor;
   const n = matrix.shape[0];
   let xTr = linalg.bandPart(x, 0, 0);
   let qn = q;
 
   for (let i = 0; i < maxIter; i++) {
+    prevX = x;
     x = matMul(r, q);
     [ q, r ] = linalg.qr(x);
     qn = matMul(qn, q);
     xTr = linalg.bandPart(x, 0, 0);
-    const maxDis = max(abs(sub(x, xTr))).arraySync();
+    prevTr = linalg.bandPart(prevX, 0, 0);
+    const maxDis = max(abs(sub(prevTr, xTr))).arraySync();
     if ( maxDis < tol) {
       break;
     }
@@ -101,7 +105,7 @@ export const solveEigenVectors = (matrix: Tensor, eigenValues: Tensor, tol = 1e-
     const eigenVector = eigenBackSolve(matrix, eigenValue, tol, maxIter);
     eigenVectors.push(eigenVector);
   }
-  return stack(eigenVectors);
+  return transpose(stack(eigenVectors));
 };
 
 /**
