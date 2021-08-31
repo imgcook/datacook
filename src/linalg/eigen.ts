@@ -23,11 +23,9 @@ export const solveEigenValues = (matrix: Tensor, tol = 1e-4, maxIter = 200): Ten
   let x = matrix;
   const n = matrix.shape[0];
   let xTr = linalg.bandPart(x, 0, 0);
-  //let preQ = q;
   let qn = q;
 
   for (let i = 0; i < maxIter; i++) {
-    //preQ = q;
     x = matMul(r, q);
     [ q, r ] = linalg.qr(x);
     qn = matMul(qn, q);
@@ -36,7 +34,6 @@ export const solveEigenValues = (matrix: Tensor, tol = 1e-4, maxIter = 200): Ten
     if ( maxDis < tol) {
       break;
     }
-    //console.log(maxDis);
   }
   x = matMul(r, q);
   const eigenValues = [];

@@ -18,4 +18,4 @@ describe('linSolver', () => {
     const equal = tensorEqual(v, predv, 1e-3);
     assert.isTrue(equal);
   })
-})
+});
