@@ -1,5 +1,5 @@
 import '@tensorflow/tfjs-backend-cpu';
-import { tensor, matMul, reshape, sub } from '@tensorflow/tfjs-core';
+import { tensor, matMul, reshape, sub, squeeze } from '@tensorflow/tfjs-core';
 import { tensorEqual } from '../../../src/linalg/utils';
 import { linSolveQR } from '../../../src/linalg/linsolve';
 import { assert } from 'chai';
@@ -12,10 +12,9 @@ const matrix = tensor([
 const v = tensor([0, 8, 10]);
 
 describe('linSolver', () => {
-  
   it('solve matrix', () => {
     const solve = linSolveQR(matrix, v);
-    const predv = matMul(matrix, reshape(solve, [-1, 1]));
+    const predv = squeeze(matMul(matrix, reshape(solve, [-1, 1])));
     const equal = tensorEqual(v, predv, 1e-3);
     assert.isTrue(equal);
   })

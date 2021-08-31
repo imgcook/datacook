@@ -18,6 +18,7 @@ export const tensorNormalize = (tensor: Tensor): Tensor => {
 export const shapeEqual = (tensor1: Tensor, tensor2: Tensor): boolean => {
   const shape1 = tensor1.shape;
   const shape2 = tensor2.shape;
+
   if (shape1.length != shape2.length) {
     return false;
   } else {
