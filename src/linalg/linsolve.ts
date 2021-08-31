@@ -49,8 +49,6 @@ export const linSolveUpperTriangle = (r: Tensor, v: Tensor): Tensor => {
 */
 export const linSolveFromQR = (q: Tensor, r: Tensor, v: Tensor): Tensor => {
   const rhs = squeeze(matMul(transpose(q), reshape(v, [ -1, 1 ])));
-  q.print();
-  r.print();
   const solution = linSolveUpperTriangle(r, rhs);
   return solution;
 };
