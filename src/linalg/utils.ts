@@ -1,4 +1,4 @@
-import { Tensor, norm, div, max, sub, abs, lessEqual } from "@tensorflow/tfjs-core";
+import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor } from "@tensorflow/tfjs-core";
 
 /**
  * Normalize tensor by dividing its norm
@@ -46,4 +46,23 @@ export const tensorEqual = (tensor1: Tensor, tensor2: Tensor, tol = 0): boolean 
   } else {
     return false;
   }
+};
+
+/**
+ * Fill a diag matrix with shape m and n
+ * @param values diag values
+ * @param m number of rows
+ * @param n number of columns
+ */
+export const fillDiag = (values: Tensor | number[], m: number, n: number): Tensor => {
+  const svSize = m > n ? n : m;
+  const valuesData = values instanceof Tensor ? values.dataSync() : values;
+  const vSize = valuesData.length;
+  const diagData = new Array(m).fill(0).map( () => new Array(n).fill(0));
+  for (let i = 0; i < svSize; i++) {
+    if (i < vSize) {
+      diagData[i][i] = Number(slice(valuesData, i, 1).dataSync());
+    }
+  }
+  return tensor(diagData);
 };

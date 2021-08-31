@@ -1,20 +1,22 @@
 import { eigenSolve } from "./eigen";
-import { matMul, Tensor, transpose, sqrt, slice, tensor } from "@tensorflow/tfjs-core";
+import { matMul, Tensor, transpose, sqrt } from "@tensorflow/tfjs-core";
 
-export const svd = (matrix: Tensor): [ Tensor, Tensor, Tensor ] => {
+/**
+ * Singular value decomposition using QR iteration and inverse iteration algorithm
+ * the singular value decomposition (SVD) is a factorization of a real or complex matrix.
+ * It generalizes the eigendecomposition of a square normal matrix with
+ * an orthonormal eigenbasis to any m * n matrix.
+ * @param matrix target matrix
+ * @param tol tolerence, default ot 1e-4
+ * @param maxIter max iteration times, default to 200
+ * @returns [ u, d, v ], u: left singular vector, d: singluar values, v: right singular vector
+ */
+export const svd = (matrix: Tensor, tol = 1e-4, maxIter = 200): [ Tensor, Tensor, Tensor ] => {
   const m1 = matMul(matrix, transpose(matrix));
   const m2 = matMul(transpose(matrix), matrix);
   const [ m, n ] = matrix.shape;
-  const svData = new Array(m).fill(0).map( () => new Array(n).fill(0));
-  const svSize = m < n ? m : n;
-  const [ eigenValues1, eigenVectors1 ] = eigenSolve(m1);
-  const [ , eigenVectors2 ] = eigenSolve(m2);
-  const singularValues = sqrt(eigenValues1);
-  for (let i = 0; i < svSize; i++) {
-    svData[i][i] = Number(slice(singularValues, i, 1).dataSync());
-  }
-  console.log(svData);
-  const singularDiag = tensor(svData);
-  return [ eigenVectors1, singularDiag, eigenVectors2 ];
+  const [ eigenValues1, eigenVectors1 ] = eigenSolve(m1, tol, maxIter);
+  const [ eigenValues2, eigenVectors2 ] = eigenSolve(m2, tol, maxIter);
+  const singularValues = m < n ? sqrt(eigenValues1) : sqrt(eigenValues2);
+  return [ eigenVectors1, singularValues, eigenVectors2 ];
 };
-
