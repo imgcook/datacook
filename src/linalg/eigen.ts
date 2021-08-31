@@ -44,8 +44,6 @@ export const solveEigenValues = (matrix: Tensor, tol = 1e-4, maxIter = 200): Ten
     eigenValues.push(slice(x, [ i, i ], [ 1, 1 ]));
   }
   const eigenValuesTensor = squeeze(stack(eigenValues));
-  eigenValuesTensor.print();
-
   return eigenValuesTensor;
 };
 
