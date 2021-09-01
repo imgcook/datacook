@@ -4,7 +4,6 @@ import * as tf from '@tensorflow/tfjs-core';
 import { tensorEqual } from '../../../src/linalg/utils';
 import { assert } from 'chai';
 import 'mocha';
-import { max } from '@tensorflow/tfjs-core';
 
 const matrix = tf.tensor2d([
   [ 1, 2, 5, 10 ],

@@ -2,11 +2,34 @@ import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor } from "@ten
 
 /**
  * Normalize tensor by dividing its norm
- * @param tensor
+ * @param vector tensor to be normalized
  * @returns
  */
-export const tensorNormalize = (tensor: Tensor): Tensor => {
-  return div(tensor, norm(tensor));
+export const tensorNormalize = (vector: Tensor): Tensor => {
+  return div(vector, norm(vector));
+};
+
+/**
+ * Check if matrix of target dimension
+ * @param matrix matrix tensor
+ * @param dim target dimension
+ */
+export const checkDimension = (matrix: Tensor, dim: number): boolean => {
+  return matrix.shape.length === dim;
+};
+
+/**
+ * Check that if a tensor a square matrix
+ * @param matrix target matrix
+ */
+export const isSquareMatrix = (matrix: Tensor): boolean => {
+  if (checkDimension(matrix, 2)) {
+    return false;
+  }
+  if (matrix.shape[0] == matrix.shape[1]) {
+    return true;
+  }
+  return false;
 };
 
 /**
