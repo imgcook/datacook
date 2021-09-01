@@ -22,7 +22,7 @@ function toSamples(
 /**
  * Make dataset from csv.
  * @param records The csv records.
- * @param labelKeys The label colume name or index list.
+ * @param labelKeys The label column name or index list.
  * @returns Csv dataset.
  */
 export const makeDatasetFromCsv = (

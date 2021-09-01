@@ -94,7 +94,7 @@ export function parse(arrayBuffer: ArrayBuffer): numpy {
   const headerLength = new DataView(arrayBuffer.slice(8, 10)).getUint8(0);
   const dataOffset = 10 + headerLength;
 
-  let headerContent: string = new TextDecoder('utf-8').decode(
+  const headerContent = new TextDecoder('utf-8').decode(
     new Uint8Array(arrayBuffer.slice(10, headerLength + 10))
   );
   const header = JSON.parse(

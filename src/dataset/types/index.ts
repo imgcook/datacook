@@ -58,6 +58,12 @@ export * as ObjectDetection from './object-detection';
 export * as ImageClassification from './image-classification';
 export * as TextClassification from './text-classification';
 
+/**
+ * See https://cocodataset.org/#format-data for more details of coco format.
+ */
 export * as Coco from './coco';
+/**
+ * See http://host.robots.ox.ac.uk/pascal/VOC/ for more details of pascal-voc.
+ */
 export * as PascalVoc from './pascal-voc';
 export * as Csv from './csv';

@@ -58,7 +58,7 @@ export class ArrayDatasetImpl<T extends Sample> implements Dataset<T> {
   }
   /**
    * Seek cursor to offset.
-   * @param offset if small then zero, the cursor will be set to 0, if larger then data length, set to data length.
+   * @param offset if small then zero, the cursor will be set to 0, if larger than data length, set to data length.
    */
   async seek(offset: number): Promise<void> {
     if (offset < 0) {
@@ -72,7 +72,7 @@ export class ArrayDatasetImpl<T extends Sample> implements Dataset<T> {
 }
 
 /**
- * Make a transform dataset.
+ * Make a transformation dataset.
  * @param dataset Origin dataset.
  * @param transform Transform function.
  * @returns The transformed dataset.
