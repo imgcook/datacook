@@ -24,15 +24,15 @@ export const linSolveUpperTriangle = async(r: Tensor, v: Tensor): Promise<Tensor
     if (i < nEq - 1) {
       for (let j = i + 1; j <= nEq - 1; j++) {
         const l = solution[j];
-        const w = Number(slice(r, [ i, j ], [ 1, 1 ]).dataSync());
+        const w = Number(await slice(r, [ i, j ], [ 1, 1 ]).data());
         backSubsitute += l * w;
       }
-      const vi = Number(slice(v, [ i ], [ 1 ]).dataSync());
-      const ri = Number(slice(r, [ i, i ], [ 1, 1 ]).dataSync());
+      const vi = Number(await slice(v, [ i ], [ 1 ]).data());
+      const ri = Number(await slice(r, [ i, i ], [ 1, 1 ]).data());
       solution[i] = (vi - backSubsitute) * 1.0 / ri;
     } else {
-      const vi = Number(slice(v, [ i ], [ 1 ]).dataSync());
-      const ri = Number(slice(r, [ i, i ], [ 1, 1 ]).dataSync());
+      const vi = Number(await slice(v, [ i ], [ 1 ]).data());
+      const ri = Number(await slice(r, [ i, i ], [ 1, 1 ]).data());
       solution[i] = vi * 1.0 / ri;
     }
   }

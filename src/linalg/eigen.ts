@@ -34,7 +34,7 @@ export const solveEigenValues = async(matrix: Tensor, tol = 1e-4, maxIter = 200)
     qn = matMul(qn, q);
     xTr = linalg.bandPart(x, 0, 0);
     prevTr = linalg.bandPart(prevX, 0, 0);
-    const maxDis = max(abs(sub(prevTr, xTr))).arraySync();
+    const maxDis = await max(abs(sub(prevTr, xTr))).array();
     if (maxDis < tol) {
       break;
     }
@@ -82,7 +82,7 @@ export const eigenBackSolve = async(matrix: Tensor, eigenValue: number, tol = 1e
      * Often the algorithm will oscilate between a vector and its negative
      * after convergence.
      */
-    const pivot = Number(slice(current, 0, 1).dataSync());
+    const pivot = Number(await slice(current, 0, 1).data());
     if (pivot < 0) {
       current = neg(current);
     }
@@ -106,7 +106,7 @@ export const solveEigenVectors = async (matrix: Tensor, eigenValues: Tensor, tol
   const nEv = eigenValues.shape[0];
   const eigenVectors = [];
   for (let i = 0; i < nEv; i++) {
-    const eigenValue = Number(slice(eigenValues, i, 1).dataSync());
+    const eigenValue = Number(await slice(eigenValues, i, 1).data());
     const eigenVector = await eigenBackSolve(matrix, eigenValue, tol, maxIter);
     eigenVectors.push(eigenVector);
   }
