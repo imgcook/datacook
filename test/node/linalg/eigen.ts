@@ -20,5 +20,5 @@ describe('EigenSolver', () => {
     const recovM = tf.matMul(tf.matMul(q, di), tf.transpose(q));
     const equal = tensorEqual(recovM, matrix, 1e-3);
     assert.isTrue(equal);
-  })
+  });
 });
