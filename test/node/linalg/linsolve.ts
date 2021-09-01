@@ -17,5 +17,5 @@ describe('linSolver', () => {
     const predv = squeeze(matMul(matrix, reshape(solve, [-1, 1])));
     const equal = tensorEqual(v, predv, 1e-3);
     assert.isTrue(equal);
-  })
+  });
 });

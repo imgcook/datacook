@@ -13,12 +13,11 @@ const matrix = tf.tensor2d([
 const singularValues = tf.tensor([18.54, 5.01, 1.83]);
 
 describe('SVDSolver', () => {
-
   it('svd decomposition', () => {
     const [ u, d, v ] = svd(matrix);
     const equal = tensorEqual(d, singularValues, 1e-2);
     assert.isTrue(equal);
   });
-  
+
 });
 
