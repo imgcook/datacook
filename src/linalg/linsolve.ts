@@ -52,7 +52,7 @@ export const linSolveFromQR = (q: Tensor, r: Tensor, v: Tensor): Tensor => {
   return solution;
 };
 
-export const linSolveQR = (matrix: Tensor, v: Tensor): Tensor => {
+export const linSolveQR = async(matrix: Tensor, v: Tensor): Promise<Tensor> => {
   const [ q, r ] = linalg.qr(matrix);
   const solution = linSolveFromQR(q, r, v);
   return solution;

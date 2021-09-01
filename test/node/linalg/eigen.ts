@@ -14,8 +14,8 @@ const matrix = tf.tensor2d([
 
 describe('EigenSolver', () => {
     
-  it('spectrum decomposition', () => {
-    const [ d, q ] = eigenSolve(matrix);
+  it('spectrum decomposition', async () => {
+    const [ d, q ] = await eigenSolve(matrix);
     const di = tf.diag(d);
     const recovM = tf.matMul(tf.matMul(q, di), tf.transpose(q));
     const equal = tensorEqual(recovM, matrix, 1e-3);

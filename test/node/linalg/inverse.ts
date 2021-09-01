@@ -11,10 +11,10 @@ const matrix = tf.tensor2d([
     [ 10, 5, 6, 7]
 ]);
 
-describe('EigenSolver', () => {
+describe('Matrix Solver', () => {
     
-  it('spectrum decomposition', () => {
-    const invM = inverse(matrix);
+  it('get inverse matrix', async () => {
+    const invM = await inverse(matrix);
     const iM = tf.matMul(matrix, invM);
     const isIdMatrix = tensorEqual(iM, tf.eye(iM.shape[0]), 1e-2);
     assert.isTrue(isIdMatrix);
