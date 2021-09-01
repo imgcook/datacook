@@ -13,7 +13,7 @@ export const inverse = async(matrix: Tensor): Promise<Tensor> => {
   if (isSquareMatrix) {
     const [ eigenValues, eigenVectors ] = await eigenSolve(matrix);
     const minEigen = min(abs(eigenValues));
-    const invertable = Boolean(greater(minEigen, 1e-4));
+    const invertable = Boolean(greater(minEigen, 1e-4).dataSync()[0]);
     if (!invertable) {
       throw new TypeError('Singlular matrix error');
     } else {

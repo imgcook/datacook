@@ -5,9 +5,9 @@ import { linSolveQR } from '../../../src/linalg/linsolve';
 import { assert } from 'chai';
 import 'mocha';
 const matrix = tensor([
-    [1, -2, 1],
-    [0, 2, -8],
-    [5, 0, -5]
+  [1, -2, 1],
+  [0, 2, -8],
+  [5, 0, -5]
 ]);
 const v = tensor([0, 8, 10]);
 
