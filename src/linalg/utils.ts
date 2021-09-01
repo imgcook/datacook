@@ -1,4 +1,4 @@
-import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor } from "@tensorflow/tfjs-core";
+import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor } from '@tensorflow/tfjs-core';
 
 /**
  * Normalize tensor by dividing its norm
@@ -63,12 +63,7 @@ export const tensorEqual = (tensor1: Tensor, tensor2: Tensor, tol = 0): boolean 
   if (!shapeEqual(tensor1, tensor2)) {
     throw new Error('tensor1 and tensor2 not of same shape');
   }
-  const isEqual = lessEqual(max(abs(sub(tensor1, tensor2))), tol).dataSync();
-  if (isEqual) {
-    return true;
-  } else {
-    return false;
-  }
+  return Boolean(lessEqual(max(abs(sub(tensor1, tensor2))), tol).dataSync());
 };
 
 /**

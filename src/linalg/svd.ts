@@ -1,5 +1,5 @@
-import { eigenSolve } from "./eigen";
-import { matMul, Tensor, transpose, sqrt } from "@tensorflow/tfjs-core";
+import { eigenSolve } from './eigen';
+import { matMul, Tensor, transpose, sqrt } from '@tensorflow/tfjs-core';
 
 /**
  * Singular value decomposition using QR iteration and inverse iteration algorithm

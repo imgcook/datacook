@@ -9,7 +9,7 @@ const matrix = tf.tensor2d([
     [ 2, 6, 7, 5 ],
     [ 5, 7, 9, 6 ],
     [ 10, 5, 6, 7]
-  ]);
+]);
 
 describe('EigenSolver', () => {
     
@@ -19,5 +19,5 @@ describe('EigenSolver', () => {
     const isIdMatrix = tensorEqual(iM, tf.eye(iM.shape[0]), 1e-2);
     assert.isTrue(isIdMatrix);
   });
-  
+
 });
