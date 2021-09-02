@@ -3,6 +3,11 @@ import { makeDatasetFromCoco, extractCategoriesFromCoco } from './format/coco';
 import { makeDatasetFromPascalVoc } from './format/pascal-voc';
 import { makeTransform } from './';
 
+/**
+ * Make object detection dataset from coco.
+ * @param meta coco meta which is usually from `annotation.json`.
+ * @returns Dataset for object detection.
+ */
 export function makeObjectDetectionDatasetFromCoco(meta: Coco.Meta): Dataset<ObjectDetection.Sample> {
   const dataset = makeDatasetFromCoco(meta);
   const categories = extractCategoriesFromCoco(meta);
@@ -24,6 +29,11 @@ export function makeObjectDetectionDatasetFromCoco(meta: Coco.Meta): Dataset<Obj
   });
 }
 
+/**
+ * Make object detection dataset from pascal-voc.
+ * @param annotations Pascal-voc annotations.
+ * @returns Dataset for object detection.
+ */
 export function makeObjectDetectionDatasetFromPascalVoc(annotations: Array<PascalVoc.Annotation>): Dataset<ObjectDetection.Sample> {
   const dataset = makeDatasetFromPascalVoc(annotations);
   return makeTransform<PascalVoc.Sample, ObjectDetection.Sample>(

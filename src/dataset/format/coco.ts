@@ -39,11 +39,21 @@ function cocoMetaToSamples(cocoMeta: Coco.Meta): Array<Coco.Sample> {
   return cocoMeta.images.map((img: Coco.Image) => ({ data: img, label: annotationMap[img.id] }));
 }
 
+/**
+ * Make dataset from coco.
+ * @param meta Coco meta which is usually from `annotation.json`.
+ * @returns Coco dataset.
+ */
 export function makeDatasetFromCoco(meta: Coco.Meta): Dataset<Coco.Sample> {
   checkCocoMeta(meta);
   return new ArrayDatasetImpl(cocoMetaToSamples(meta));
 }
 
+/**
+ * Extract categories from coco.
+ * @param annotations Coco annotation.
+ * @returns Array of string which includes categories.
+ */
 export function extractCategoriesFromCoco(meta: Coco.Meta): Array<Coco.Category> {
   return meta.categories;
 }
