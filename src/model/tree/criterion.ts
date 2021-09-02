@@ -1,4 +1,7 @@
-import { setFlagsFromString } from "node:v8";
+/**
+ * Includes different split criterions for decision tree
+ * Code of this part refers to the implementation in scikit learn
+ */
 
 export abstract class Criterion {
   public sampleWeight: number[];
@@ -6,8 +9,14 @@ export abstract class Criterion {
   public weightedNRight: number;
   public weightedNSamples: number;
   public weightedNNodeSamples: number;
+  /**
+   * The number of target, the dimensionality of the prediction
+   */
   public nOutputs: number;
-  public nClasses: number;
+  /**
+   * The number of unique classes in each target
+   */
+  public nClasses: number[];
   public pos: number;
   public start: number;
   public end: number;
@@ -55,6 +64,10 @@ export abstract class ClassificationCriterion extends Criterion {
     this.weightedNLeft = 0;
     this.weightedNRight = this.weightedNNodeSamples;
     this.pos = this.start;
+    this.nClasses.forEach((k) => {
+      this.sumLeft[k] = 0;
+      this.sumRight[k] = this.sumTotal[k];
+    });
   }
   /**
    * Reset the criterion at pos=end.
@@ -73,10 +86,7 @@ export abstract class ClassificationCriterion extends Criterion {
       for (let p = this.pos; p < newPos; p++) {
         const i = this.samples[p];
         const w = this.sampleWeight ? this.sampleWeight[i] : 1;
-        // for (let k = 0; k < this.nOutputs; k++) {
-        //   const label
-        // }
-        const labelIndex = this.y[i];
+        const labelIndex = this.nClasses[this.y[i]];
         this.sumLeft[labelIndex] += w;
         this.weightedNLeft += w;
       }
@@ -85,29 +95,47 @@ export abstract class ClassificationCriterion extends Criterion {
       for (let p = this.end - 1; p > newPos - 1; p--) {
         const i = this.samples[p];
         const w = this.sampleWeight ? this.sampleWeight[i] : 1;
-        const labelIndex = this.y[i];
+        const labelIndex = this.nClasses[this.y[i]];
         this.sumLeft[labelIndex] -= w;
         this.weightedNLeft -= w;
       }
     }
     // update right part statistics
-    for (let c = 0; c < this.nClasses; c++) {
-      this.sumRight[c] = this.sumTotal[c] - this.sumLeft[c];
-    }
+    this.weightedNRight = this.weightedNNodeSamples - this.weightedNLeft;
+    this.nClasses.forEach((k) => {
+      this.sumRight[k] = this.sumTotal[k] - this.sumLeft[k];
+    });
     this.pos = newPos;
   }
   /**
    * Compute the node value of samples[start:end] into dest.
    */
-  public nodeValue() {
-    for (let k = 0; i < this.nOutputs; k ++) {
-      
-    }
+  public nodeValue(): number[] {
+    return this.sumTotal;
   }
 }
 
-export class Gini extends ClassificationCriterion {
-  public childrenImpurity () {
-    
-  }
+/**
+ * Evaluate the cross-entropy criterion as impurity of current node,
+ * i.e. the impurity of samples[start:end]. The smaller the impurity the
+ * better.
+ */
+export class Entropy extends ClassificationCriterion {
+  public nodeImpurity = (): number => {
+    let entropy = 0;
+    this.nClasses.forEach((k) => {
+      const countK = this.nClasses[k];
+      if (countK > 0.0) {
+        const pK = countK * 1.0 / this.weightedNNodeSamples;
+        entropy -= pK * Math.log(pK);
+      }
+    });
+    return entropy;
+  };
+  /**
+   * Evaluate the impurity in children nodes.
+   */
+  public childrenImpurity = (): number => {
+    this.nClasses
+  };
 }
