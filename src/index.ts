@@ -9,6 +9,7 @@ export { Image } from './image';
 export * as Rand from './rand';
 export * as Model from './model';
 export * as Metrics from './metrics';
+export * as Linalg from './linalg';
 
 export const Text = {
   Counter,
@@ -20,4 +21,3 @@ export const Encoder = {
   LabelEncoder,
   OneHotEncoder
 };
-
