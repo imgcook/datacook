@@ -102,18 +102,13 @@ export default class Word2Vec {
     const rslt = sqrt(mean(pow(sub(tensor(weight), wordWeight), 2), 1));
     const simArray = rslt.arraySync() as number[];
 
-    let similarities = Object.keys(this.uniqueWords);
+    const similarities = Object.keys(this.uniqueWords);
     similarities.splice(index - 1, 1); // remove word from uniquewords
 
-    let sim: Array<Array<string | number>> = similarities.map((value, i) => {
-      return [ value, simArray[i] ];
-    });
-    //sort array in descending order
-    sim.sort((a, b) => {
-      let sa = a[1] as number;
-      let sb = b[1] as number;
-      return sb - sa;
-    });
+    const sim: Array<Array<string | number>> =
+      similarities
+        .map((value, i) => [ value, simArray[i] ])
+        .sort((a, b) => (b[1] as number) - (a[1] as number));
 
     return sim;
   }

@@ -11,10 +11,10 @@ export function clean(text: string, stopwords: string[] | undefined): Array<stri
     if (value != '') {
       if (stopwords) {
         if (!stopwords.includes(value)) {
-          cleanTexts.push(value.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ''));
+          cleanTexts.push(value.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, ''));
         }
       } else {
-        cleanTexts.push(value.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, ''));
+        cleanTexts.push(value.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, ''));
       }
     }
   });
@@ -29,12 +29,12 @@ export function skipGram(
   const allText = [];
 
   for (const index in textArray) {
-    let text = textArray[index];
-    let textClean = clean(text, stopwords);
+    const text = textArray[index];
+    const textClean = clean(text, stopwords);
 
     allText.push(...textClean); //store clean text
     for (let i = 0; i < textClean.length; i++) {
-      let word = textClean[i];
+      const word = textClean[i];
       for (let j = 0; j < window; j++) {
         //skip-gram forward
         if ((i + 1 + j) < textClean.length) {

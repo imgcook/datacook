@@ -10,7 +10,7 @@ const cases = tf.tensor2d([
   [1, 0, 0, 1, 0, 0],
   [1, 0, 0, 0, 1, 1]
 ]);
-const labels = [0, 0, 0, 5];
+const labels = ['A', 'A', 'A', 'B'];
 
 const testCases = tf.tensor2d([
   [2, 0, 0, 0, 0, 0],
@@ -18,7 +18,7 @@ const testCases = tf.tensor2d([
   [1, 0, 0, 3, 0, 0],
   [0, 0, 0, 0, 4, 6]
 ]);
-const testLabels = [0, 0, 0, 5];
+const testLabels = ['A', 'A', 'A', 'B'];
 
 describe('Naive bayes', () => {
 
@@ -28,7 +28,7 @@ describe('Naive bayes', () => {
     await mnb.train(cases, labels);
     await mnb.train(cases, labels);
     const prediction = mnb.predict(cases);
-    prediction.print();
+    // @ts-ignore
     assert.deepEqual(prediction.arraySync(), labels);
   });
 
@@ -46,7 +46,7 @@ describe('Naive bayes', () => {
     const mnb = new MultinomialNB();
     await mnb.train(cases, labels);
     const yPred = mnb.predict(testCases);
-    yPred.print();
+    // @ts-ignore
     assert.deepEqual(yPred.arraySync(), testLabels);
   });
 
@@ -57,6 +57,7 @@ describe('Naive bayes', () => {
     const mnb2 = new MultinomialNB();
     mnb2.load(modelJson);
     const yPred = mnb2.predict(testCases);
+    // @ts-ignore
     assert.deepEqual(yPred.arraySync(), testLabels);
   });
 
