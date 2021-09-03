@@ -46,7 +46,7 @@ export class OneHotEncoder {
    * @param x data input used to init encoder
    * @param categories user input categories
    */
-  public async init(x: Tensor | number[] | string[]):Promise<void> {
+  public async init(x: Tensor | number[] | string[]): Promise<void> {
     const { values } = unique(x);
     this.categories = values;
     const cateData = await this.categories.data();
@@ -63,22 +63,20 @@ export class OneHotEncoder {
    * @param x feature array need to encode
    * @returns transformed one-hot feature
    */
-  public async encode (x: Tensor | number[] | string[]): Promise<Tensor> {
+  public async encode(x: Tensor | number[] | string[]): Promise<Tensor> {
     if (!this.categories) {
-      throw Error('Please init encoder using init()');
+      throw TypeError('Please init encoder using init()');
     } else {
       const xTensor = checkArray(x, 'any', 1);
       const xData = await xTensor.dataSync();
       const nCate = this.categories.shape[0];
       const xInd = xData.map((d: number|string) => this.cateMap[d]);
-      if (this.drop == 'binary-only' && nCate == 2) {
+      if (this.drop === 'binary-only' && nCate === 2) {
         return tensor(xInd);
-      } else if (this.drop == 'first') {
-        const xOneHot = oneHot(cast(sub(tensor(xInd), 1), 'int32'), nCate - 1);
-        return xOneHot;
+      } else if (this.drop === 'first') {
+        return oneHot(cast(sub(tensor(xInd), 1), 'int32'), nCate - 1);
       } else {
-        const xOneHot = oneHot(cast(tensor(xInd), 'int32'), nCate);
-        return xOneHot;
+        return oneHot(cast(tensor(xInd), 'int32'), nCate);
       }
     }
   }
@@ -87,25 +85,28 @@ export class OneHotEncoder {
    * @param x one-hot format data need to transform
    * @returns transformed category data
    */
-  public async decode (x: Tensor): Promise<Tensor> {
+  public async decode(x: Tensor): Promise<Tensor> {
+    if (!this.categories) {
+      throw TypeError('Please init encoder using init()');
+    }
     const nCate = this.categories.shape[0];
-    const codeSize = this.drop == 'first' ? nCate - 1 : this.drop == 'binary-only' && nCate == 2 ? 1 : nCate;
+    const codeSize = this.drop === 'first' ? nCate - 1 : this.drop === 'binary-only' && nCate === 2 ? 1 : nCate;
     const shapeCorrect = codeSize > 1 ? checkShape(x, [ -1, codeSize ]) : checkShape(x, [ -1 ]);
     if (!shapeCorrect) {
       throw new TypeError('Input shape does not match');
     }
-    const cateInd = (this.drop == 'binary-only' && nCate == 2) ? await x.data() : await argMax(x, 1).data();
+    const cateInd = (this.drop === 'binary-only' && nCate === 2) ? await x.data() : await argMax(x, 1).data();
     const cateTensors: Tensor[] = [];
-    if (this.drop == 'binary-only' && nCate == 2) {
+    if (this.drop === 'binary-only' && nCate === 2) {
       cateInd.forEach((ind: number) => {
         if (ind != 0 && ind != 1) {
           throw Error('Index out of range');
         }
         return cateTensors.push(slice(this.categories, ind, 1));
       });
-    } else if (this.drop == 'first') {
+    } else if (this.drop === 'first') {
       cateInd.forEach((ind: number, i: number) => {
-        if (Number(slice(x, [ i, ind ], [ 1, 1 ]).dataSync()) == 0) {
+        if (Number(slice(x, [ i, ind ], [ 1, 1 ]).dataSync()) === 0) {
           return cateTensors.push(slice(this.categories, 0, 1));
         }
         return cateTensors.push(slice(this.categories, ind + 1, 1));
@@ -115,7 +116,6 @@ export class OneHotEncoder {
         return cateTensors.push(slice(this.categories, ind, 1));
       });
     }
-    const cateVal = reshape(stack(cateTensors), [ -1 ]);
-    return cateVal;
+    return reshape(stack(cateTensors), [ -1 ]);
   }
 }
