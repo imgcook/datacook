@@ -37,8 +37,7 @@ describe('OneHot Encoder', () => {
     const encoder = new OneHotEncoder();
     await encoder.init(x);
     const xCate = await encoder.decode(xEncode);
-    // @ts-ignore
-    assert.deepEqual(xCate.dataSync(), x);
+    assert.deepEqual(xCate.dataSync() as any, x);
   });
   it('encode drop first', async () => {
     const encoder = new OneHotEncoder({drop: 'first'});
@@ -56,7 +55,6 @@ describe('OneHot Encoder', () => {
     const encoder = new OneHotEncoder({drop: 'binary-only'});
     await encoder.init(bx);
     const bxCate = await encoder.decode(bxEncodeDrop);
-    // @ts-ignore
-    assert.deepEqual(bxCate.dataSync(), bx);
+    assert.deepEqual(bxCate.dataSync() as any, bx);
   });
 });
