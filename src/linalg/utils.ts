@@ -1,4 +1,4 @@
-import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor } from '@tensorflow/tfjs-core';
+import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor, RecursiveArray } from '@tensorflow/tfjs-core';
 
 /**
  * Normalize tensor by dividing its norm
@@ -16,6 +16,25 @@ export const tensorNormalize = (vector: Tensor): Tensor => {
  */
 export const checkDimension = (matrix: Tensor, dim: number): boolean => {
   return matrix.shape.length === dim;
+};
+
+/**
+ * Check if matrix of target shape
+ * @param matrix matrix tensor
+ * @param shape target shape
+ * @returns
+ */
+export const checkShape = (matrix: Tensor, shape: number[]): boolean => {
+  const mShape = matrix.shape;
+  if (mShape.length != shape.length) {
+    return false;
+  } else {
+    for (let i = 0; i < mShape.length; i++) {
+      if (shape[i] == -1) continue;
+      if (shape[i] != mShape[i]) return false;
+    }
+  }
+  return true;
 };
 
 /**
