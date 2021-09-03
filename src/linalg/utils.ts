@@ -1,4 +1,4 @@
-import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor, RecursiveArray } from '@tensorflow/tfjs-core';
+import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor } from '@tensorflow/tfjs-core';
 
 /**
  * Normalize tensor by dividing its norm

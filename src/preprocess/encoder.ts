@@ -24,7 +24,7 @@ export class OneHotEncoder {
    *
    * Options in params
    * ---------
-   * drop: { 'none', 'binary-only', 'firsst' }
+   * drop: { 'none', 'binary-only', 'first' }
    *    Specifies a method to drop one of the categories per feature,
    *    which is useful to avoid collinear problem.
    *
@@ -32,7 +32,7 @@ export class OneHotEncoder {
    *    downstream models. For instance in linear regression model,
    *    the effect of the dropped feature might appear in intercept term.
    *
-   *    - 'none': return all features
+   *    - 'none': default, return all features
    *    - 'first': drop the first categories in each feature
    *    - 'binary-only': drop the first category in each feature with two
    *       categories.
