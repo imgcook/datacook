@@ -19,6 +19,25 @@ export const checkDimension = (matrix: Tensor, dim: number): boolean => {
 };
 
 /**
+ * Check if matrix of target shape
+ * @param matrix matrix tensor
+ * @param shape target shape
+ * @returns
+ */
+export const checkShape = (matrix: Tensor, shape: number[]): boolean => {
+  const mShape = matrix.shape;
+  if (mShape.length != shape.length) {
+    return false;
+  } else {
+    for (let i = 0; i < mShape.length; i++) {
+      if (shape[i] === -1) continue;
+      if (shape[i] !== mShape[i]) return false;
+    }
+  }
+  return true;
+};
+
+/**
  * Check that if a tensor a square matrix
  * @param matrix target matrix
  */
@@ -26,7 +45,7 @@ export const isSquareMatrix = (matrix: Tensor): boolean => {
   if (checkDimension(matrix, 2)) {
     return false;
   }
-  if (matrix.shape[0] == matrix.shape[1]) {
+  if (matrix.shape[0] === matrix.shape[1]) {
     return true;
   }
   return false;
@@ -45,7 +64,7 @@ export const shapeEqual = (tensor1: Tensor, tensor2: Tensor): boolean => {
     return false;
   } else {
     for (let i = 0; i < shape1.length; i++) {
-      if (shape1[i] != shape2[i]) {
+      if (shape1[i] !== shape2[i]) {
         return false;
       }
     }

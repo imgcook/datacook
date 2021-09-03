@@ -10,6 +10,7 @@ export * as Rand from './rand';
 export * as Model from './model';
 export * as Metrics from './metrics';
 export * as Linalg from './linalg';
+export * as Preprocess from './preprocess';
 
 export const Text = {
   Counter,
