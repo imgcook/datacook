@@ -5,6 +5,7 @@ import { checkShape } from "../linalg/utils";
 export type CateMap = {
   [ key: string ]: number
 }
+
 export type OneHotDropTypes = 'first' | 'binary-only' | 'none';
 export type OneHotEncoderParams = {
   drop: OneHotDropTypes
