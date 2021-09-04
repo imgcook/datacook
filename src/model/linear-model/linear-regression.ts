@@ -24,7 +24,9 @@ export interface LinearRegerssionTrainParams {
 
 /**
  * Linear regression model
- * LinearRegression fits a linear model with coefficients w = (w1, …, wp) to minimize the residual sum of squares between the observed targets in the dataset, and the targets predicted by the linear approximation.
+ * LinearRegression fits a linear model with coefficients w = (w1, …, wp)
+ * to minimize the residual sum of squares between the observed targets in
+ * the dataset, and the targets predicted by the linear approximation.
  */
 export class LinearRegression extends BaseEstimater {
   private fitIntercept: boolean;
@@ -34,6 +36,9 @@ export class LinearRegression extends BaseEstimater {
   /**
    * Construction function of linear regression model
    * @param params LinearRegressionParams
+   *
+   * Options of params
+   * ------------
    */
   constructor(params: LinearRegressionParams = {}) {
     super();

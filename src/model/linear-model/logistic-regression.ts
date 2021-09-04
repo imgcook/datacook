@@ -3,12 +3,6 @@ import { layers, sequential, Sequential, regularizers, callbacks } from '@tensor
 import { checkArray } from '../../utils/validation';
 import { BaseClassifier } from '../base';
 
-// export enum LogisticPenalty {
-//   L1 = 'l1',
-//   L2 = 'l2',
-//   None = 'none'
-// }
-
 export type LogisticPenalty = 'l1' | 'l2' | 'none';
 
 /**
@@ -36,21 +30,11 @@ export interface LogisticRegressionParams {
 }
 
 export interface LogisticRegressionTrainParams {
-  /**
-   * Tolerence for stopping criteria, default is 1e-4
-   */
   tol?: number,
   learningRate?: number,
   batchSize?: number,
-  maxIterTimes?: number,
+  epochs?: number,
 }
-
-const defaultLearningTrainParams = {
-  tol: 0,
-  learningRate: 0.5,
-  batchSize: 32,
-  maxIterTimes: 20000
-};
 
 /**
  * Logistic regression classifier
@@ -61,7 +45,6 @@ export class LogisticRegression extends BaseClassifier {
   private c: number;
   private model: Sequential;
   private featureSize: number;
-  private outputSize: number;
   /**
    * Construction function of linear regression model
    * @param params LinearRegressionParams
@@ -90,45 +73,61 @@ export class LogisticRegression extends BaseClassifier {
     return model;
   }
 
-  /** Train batch data
+  /** Training logistic regression model by batch
    * @param xData Tensor like of shape (n_samples, n_features), input feature
    * @param yData Tensor like of shape (n_sample, ), input target values
-   * @param params batch size, default to 32
    * @returns classifier itself
    */
-  // public async trainBatch(xData: Tensor | RecursiveArray<number>, yData: Tensor | RecursiveArray<number>, params: LogisticRegressionParams = { batchSize: 32 }): Promise<LogisticRegression> {
-  //   const { x, y } = this.validateData(xData, yData);
-  //   const nFeature = x.shape[1];
-  //   if (!this.model) {
-  //     this.initClasses(y);
-  //     this.model = this.initModel(nFeature, this.classes.shape[0], this.fitIntercept);
-  //     this.featureSize = nFeature;
-  //   } else {
-  //     if (nFeature != this.featureSize) {
-  //       throw new Error('feature size does not match previous training set');
-  //     }
-  //   }
-  //   await this.model.fit(x, y, {
-  //     batchSize: params.batchSize,
-  //     epochs: 1,
-  //     shuffle: true
-  //   });
-  //   return this;
-  // }
+  public async trainOnBatch(xData: Tensor | RecursiveArray<number>, yData: Tensor | RecursiveArray<number>, learningRate = 0.5): Promise<LogisticRegression> {
+    const { x, y } = this.validateData(xData, yData);
+    const nFeature = x.shape[1];
+    const nData = x.shape[0];
+    if (!this.model) {
+      this.initClasses(y);
+      const outputShape = this.isBinaryClassification() ? 1 : this.classes.shape[0];
+      this.model = this.initModel(nFeature, outputShape, this.fitIntercept);
+      this.model.compile({
+        optimizer: train.adam(learningRate),
+        loss: losses.sigmoidCrossEntropy
+      });
+      this.featureSize = nFeature;
+    } else {
+      if (nFeature != this.featureSize) {
+        throw new Error('feature size does not match previous training set');
+      }
+    }
+    const yOneHot = this.getLabelOneHot(y);
+    await this.model.trainOnBatch(x, yOneHot);
+    return this;
+  }
 
   /** Training linear regression model according to X, y. Here we use adam algorithm (a popular gradient-based optimization algorithm) for paramter estimation.
    * @param xData Tensor like of shape (n_samples, n_features), input feature
    * @param yData Tensor like of shape (n_sample, ), input target values
-   * @param params batchSize: batch size: default to 32, maxIterTimes: max iteration times, default to 20000
+   * @param params training parameters batchSize: batch size: default to 32, maxIterTimes: max iteration times, default to 20000
    * @returns classifier itself
+   *
+   * Options in `params`
+   * ---------
+   * learningRate: learning rate, default to 0.5
+   * batchSize: training batch size, default to 32
+   * epochs: training epochs, default to -1, which means training will not stop until converge
+   * tol: stop tolerence, default to 0
    */
-  public async train(xData: Tensor | RecursiveArray<number>, yData: Tensor | RecursiveArray<number>, params: LogisticRegressionTrainParams = defaultLearningTrainParams): Promise<LogisticRegression> {
+  public async train(xData: Tensor | RecursiveArray<number>,
+    yData: Tensor | RecursiveArray<number>, params: LogisticRegressionTrainParams = {
+      tol: 0,
+      learningRate: 0.5,
+      batchSize: 32,
+      epochs: -1
+    }): Promise<LogisticRegression> {
+
     const { x, y } = this.validateData(xData, yData);
     this.initClasses(y);
     const nFeature = x.shape[1];
     const nData = x.shape[0];
     const batchSize = nData > params.batchSize ? params.batchSize : nData;
-    const epochs = Math.ceil(params.maxIterTimes / nData);
+    const epochs = params.epochs > 0 ? params.epochs : null;
     const outputShape = this.isBinaryClassification() ? 1 : this.classes.shape[0];
     this.model = this.initModel(nFeature, outputShape, this.fitIntercept);
     this.model.compile({
@@ -137,11 +136,12 @@ export class LogisticRegression extends BaseClassifier {
     });
     this.featureSize = nFeature;
     const yOneHot = this.getLabelOneHot(y);
+
     await this.model.fit(x, yOneHot, {
       batchSize,
       epochs,
       shuffle: true,
-      callbacks: callbacks.earlyStopping({ monitor: 'loss', minDelta: 0 })
+      callbacks: callbacks.earlyStopping({ monitor: 'loss', minDelta: params.tol })
     });
     return this;
   }
