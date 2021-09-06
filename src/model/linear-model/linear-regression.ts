@@ -12,7 +12,7 @@ export interface LinearRegressionParams {
   /**
    * Whether to calculate the intercept for this model. If set to False, no intercept will be used in calculations
    */
-  fitIntercept?: boolean,
+  fitIntercept?: boolean, 
   /**
    * This parameter is ignored when fit_intercept is set to False. If True, the regressors X will be normalized before regression by subtracting the mean and dividing by the l2-norm.
    */
