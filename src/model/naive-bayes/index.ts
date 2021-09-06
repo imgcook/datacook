@@ -82,6 +82,7 @@ export class MultinomialNB extends BaseClassifier {
    */
   public async train(xData: Array<any> | Tensor, yData: Array<any> | Tensor): Promise<MultinomialNB> {
     const { x, y } = this.validateData(xData, yData);
+
     const firstCall = this.firstCall();
     let yOneHot;
 
