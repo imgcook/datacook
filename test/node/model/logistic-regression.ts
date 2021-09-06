@@ -15,7 +15,7 @@ describe('Logistic ', () => {
 	it('train simple dataset', async () => {
 		const lr = new LogisticRegression({fitIntercept: true});
 		await lr.train(cases, y); 
-		const predY = lr.predict(cases);
+		const predY = await lr.predict(cases);
 		if (predY instanceof Tensor){
 			const acc = accuracyScore(y, predY);
 			assert.isTrue(acc >= 0.95);
@@ -30,7 +30,7 @@ describe('Logistic ', () => {
 			const batchY = tf.slice(y, [j * 100], [100]);
 			await lr.trainOnBatch(batchX, batchY)
 		}
-		const predY = lr.predict(cases);
+		const predY = await lr.predict(cases);
 		if (predY instanceof Tensor){
 			const acc = accuracyScore(y, predY);
 			assert.isTrue(acc >= 0.95);

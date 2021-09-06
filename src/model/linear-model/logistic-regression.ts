@@ -106,8 +106,8 @@ export class LogisticRegression extends BaseClassifier {
     const { x, y } = this.validateData(xData, yData);
     const nFeature = x.shape[1];
     if (!this.model) {
-      this.initClasses(y);
-      const outputShape = this.isBinaryClassification() ? 1 : this.classes.shape[0];
+      await this.initClasses(y, 'binary-only');
+      const outputShape = this.isBinaryClassification() ? 1 : this.classes().shape[0];
       this.model = this.initModel(nFeature, outputShape, this.fitIntercept);
       this.featureSize = nFeature;
     } else {
@@ -115,7 +115,7 @@ export class LogisticRegression extends BaseClassifier {
         throw new Error('feature size does not match previous training set');
       }
     }
-    const yOneHot = this.getLabelOneHot(y);
+    const yOneHot = await this.getLabelOneHot(y);
     await this.model.trainOnBatch(x, yOneHot);
     return this;
   }
@@ -143,15 +143,15 @@ export class LogisticRegression extends BaseClassifier {
     }): Promise<LogisticRegression> {
 
     const { x, y } = this.validateData(xData, yData);
-    this.initClasses(y);
+    await this.initClasses(y, 'binary-only');
     const nFeature = x.shape[1];
     const nData = x.shape[0];
     const batchSize = nData > params.batchSize ? params.batchSize : nData;
     const epochs = params.epochs > 0 ? params.epochs : null;
-    const outputShape = this.isBinaryClassification() ? 1 : this.classes.shape[0];
+    const outputShape = this.isBinaryClassification() ? 1 : this.classes().shape[0];
     this.model = this.initModel(nFeature, outputShape, this.fitIntercept);
     this.featureSize = nFeature;
-    const yOneHot = this.getLabelOneHot(y);
+    const yOneHot = await this.getLabelOneHot(y);
 
     await this.model.fit(x, yOneHot, {
       batchSize,
@@ -162,11 +162,12 @@ export class LogisticRegression extends BaseClassifier {
     return this;
   }
 
-  public predict(xData: Tensor | RecursiveArray<number>) : Tensor | Tensor[] {
+  public async predict(xData: Tensor | RecursiveArray<number>) : Promise<Tensor | Tensor[]> {
     const x = checkArray(xData, 'float32');
     const scores = this.model.predict(x);
     if (scores instanceof Tensor) {
-      return this.getPredClass(scores);
+      const predClasses = await this.getPredClass(scores);
+      return predClasses;
     }
     return scores;
   }

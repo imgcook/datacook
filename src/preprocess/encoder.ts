@@ -1,4 +1,4 @@
-import { Tensor, unique, oneHot, cast, tensor, argMax, reshape, slice, stack, sub } from "@tensorflow/tfjs-core";
+import { Tensor, unique, oneHot, cast, tensor, argMax, reshape, slice, stack, sub, squeeze, greaterEqual } from "@tensorflow/tfjs-core";
 import { checkArray } from "../utils/validation";
 import { checkShape } from "../linalg/utils";
 
@@ -92,11 +92,11 @@ export class OneHotEncoder {
     }
     const nCate = this.categories.shape[0];
     const codeSize = this.drop === 'first' ? nCate - 1 : this.drop === 'binary-only' && nCate === 2 ? 1 : nCate;
-    const shapeCorrect = codeSize > 1 ? checkShape(x, [ -1, codeSize ]) : checkShape(x, [ -1 ]);
+    const shapeCorrect = codeSize > 1 ? checkShape(x, [ -1, codeSize ]) : (checkShape(x, [ -1 ]) || (checkShape(x, [ -1, 1 ])));
     if (!shapeCorrect) {
       throw new TypeError('Input shape does not match');
     }
-    const cateInd = (this.drop === 'binary-only' && nCate === 2) ? await x.data() : await argMax(x, 1).data();
+    const cateInd = (this.drop === 'binary-only' && nCate === 2) ? await greaterEqual(squeeze(x), 0.5).data() : await argMax(x, 1).data();
     const cateTensors: Tensor[] = [];
     if (this.drop === 'binary-only' && nCate === 2) {
       cateInd.forEach((ind: number) => {
