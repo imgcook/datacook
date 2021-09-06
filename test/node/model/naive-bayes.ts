@@ -1,4 +1,3 @@
-
 import { MultinomialNB } from '../../../src/model/naive-bayes';
 import '@tensorflow/tfjs-backend-cpu';
 import * as tf from '@tensorflow/tfjs-core';
