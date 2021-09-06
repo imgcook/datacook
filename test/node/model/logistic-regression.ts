@@ -18,34 +18,23 @@ describe('Logistic Regression', () => {
 		const { coefficients, intercept } = lr.getCoef();
 		const predY = lr.predict(cases);
 		if (predY instanceof Tensor){
-			y.print();
-			predY.print();
 			const acc = accuracyScore(y, predY);
-			console.log(acc);
-			const coefs = lr.getCoef();
-			coefs.coefficients.print();
-			coefs.intercept.print();
+			assert.isTrue(acc >= 0.95);
 		}
 	});
 	it('train simple dataset on batch', async () => {
-		const lr = new LogisticRegression();	
+		const optimizer = tf.train.adam(0.01);
+		const lr = new LogisticRegression({optimizer});	
 		for (let i = 0; i < 800; i++) {
 			const j = Math.floor(i%(100));
 			const batchX = tf.slice(cases, [j * 100, 0], [100 ,5]);
 			const batchY = tf.slice(y, [j * 100], [100]);
-			await lr.trainOnBatch(batchX, batchY, 0.01)
+			await lr.trainOnBatch(batchX, batchY)
 		}
 		const predY = lr.predict(cases);
 		if (predY instanceof Tensor){
-			y.print();
-			predY.print();
 			const acc = accuracyScore(y, predY);
-			console.log(acc);
-			const coefs = lr.getCoef();
-			coefs.coefficients.print();
-			coefs.intercept.print();
+			assert.isTrue(acc >= 0.95);
 		}
-
 	})
-	
 })
