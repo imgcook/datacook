@@ -1,10 +1,10 @@
 /**
  * Types definination for tfjs optimizers
  */
-import { SGDOptimizer, MomentumOptimizer, AdagradOptimizer, AdadeltaOptimizer, AdamOptimizer, AdamaxOptimizer, RMSPropOptimizer } from '@tensorflow/tfjs-core'
-export type OptimizerTypes = 'sgd' | 'momentum' | 'autograd' | 'adadelta' | 'adam' | 'adamax' | 'rmsprop'
-export type Optimizer = SGDOptimizer | MomentumOptimizer | AdagradOptimizer | AdadeltaOptimizer | AdamaxOptimizer | AdamOptimizer | RMSPropOptimizer
-export interface SGDPropsTypes{
+import { SGDOptimizer, MomentumOptimizer, AdagradOptimizer, AdadeltaOptimizer, AdamOptimizer, AdamaxOptimizer, RMSPropOptimizer } from '@tensorflow/tfjs-core';
+export type OptimizerTypes = 'sgd' | 'momentum' | 'autograd' | 'adadelta' | 'adam' | 'adamax' | 'rmsprop';
+export type Optimizer = SGDOptimizer | MomentumOptimizer | AdagradOptimizer | AdadeltaOptimizer | AdamaxOptimizer | AdamOptimizer | RMSPropOptimizer;
+export type SGDPropsTypes = {
   learningRate: number
 };
 export type MomentumPropsTypes = {

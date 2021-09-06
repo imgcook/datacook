@@ -11,11 +11,10 @@ const weight = tf.tensor([ 2, 3, 1, 4, 6 ])
 const eta = tf.add(tf.sum(tf.mul(cases, weight), 1), -20);
 const y = tf.greater(tf.sigmoid(eta), 0.5);
 
-describe('Logistic Regression', () => {
+describe('Logistic ', () => {
 	it('train simple dataset', async () => {
 		const lr = new LogisticRegression({fitIntercept: true});
 		await lr.train(cases, y); 
-		const { coefficients, intercept } = lr.getCoef();
 		const predY = lr.predict(cases);
 		if (predY instanceof Tensor){
 			const acc = accuracyScore(y, predY);

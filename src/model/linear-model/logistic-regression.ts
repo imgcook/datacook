@@ -1,6 +1,6 @@
 import { Tensor, RecursiveArray, losses, train, squeeze, tensor } from '@tensorflow/tfjs-core';
 import { layers, sequential, Sequential, regularizers, callbacks } from '@tensorflow/tfjs-layers';
-import { Optimizer } from '../../utils/optimizer-types';
+import { Optimizer } from '@tensorflow/tfjs-core';
 
 import { checkArray } from '../../utils/validation';
 import { BaseClassifier } from '../base';
@@ -54,7 +54,7 @@ export class LogisticRegression extends BaseClassifier {
    * Construction function of linear regression model
    * @param params LinearRegressionParams
    *
-   * Option in `params`
+   * Options in `params`
    * ---------
    *
    * `penalty`: {'l1', 'l2', 'none'}, default to 'l2', Specify the norm used in the penalization.
@@ -129,11 +129,11 @@ export class LogisticRegression extends BaseClassifier {
    * Options in `params`
    * --------------
    *
-   * batchSize: training batch size, default to 32
+   * `batchSize`: training batch size, default to 32
    *
-   * epochs: training epochs, default to -1, which means training will not stop until converge
+   * `epochs`: training epochs, default to -1, which means training will not stop until converge
    *
-   * tol: stop tolerence, default to 0
+   * `tol`: stop tolerence, default to 0
    */
   public async train(xData: Tensor | RecursiveArray<number>,
     yData: Tensor | RecursiveArray<number>, params: LogisticRegressionTrainParams = {
