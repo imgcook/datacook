@@ -28,7 +28,7 @@ export class BaseClassifier {
     return yOnehot;
   }
 
-  public async initClasses(y: Tensor, drop: OneHotDropTypes = 'none'): Promise<void> {
+  public async initClasses(y: Tensor | number[] | string[], drop: OneHotDropTypes = 'none'): Promise<void> {
     this.classOneHotEncoder = new OneHotEncoder({ drop });
     await this.classOneHotEncoder.init(y);
   }

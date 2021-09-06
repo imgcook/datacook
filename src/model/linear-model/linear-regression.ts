@@ -122,6 +122,11 @@ export class LinearRegression extends BaseEstimater {
     return predY;
   }
 
+  /**
+   * Get linear regression coefficients
+   * @returns Linear regression coefficients with structure 
+   * {'coefficient': Tensor, 'intercept': Tensor}
+   */
   public getCoef(): { 'coefficients': Tensor, 'intercept': Tensor} {
     return {
       'coefficients': squeeze(this.model.getWeights()[0]),

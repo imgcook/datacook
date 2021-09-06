@@ -1,9 +1,10 @@
-import { Tensor, RecursiveArray, losses, train, squeeze, tensor } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, losses, squeeze, tensor } from '@tensorflow/tfjs-core';
 import { layers, sequential, Sequential, regularizers, callbacks } from '@tensorflow/tfjs-layers';
 import { Optimizer } from '@tensorflow/tfjs-core';
 
 import { checkArray } from '../../utils/validation';
 import { BaseClassifier } from '../base';
+import { OptimizerProps, OptimizerType, getOptimizer } from '../../utils/optimizer-types';
 
 export type LogisticPenalty = 'l1' | 'l2' | 'none';
 /**
@@ -29,9 +30,13 @@ export interface LogisticRegressionParams {
    */
   c?: number,
   /**
-   * Optimizer for training
+   * Optimizer types
    */
-  optimizer?: Optimizer,
+  optimizerType?: OptimizerType,
+  /**
+   * Optimizer properties
+   */
+  optimizerProps?: OptimizerProps
 }
 
 export interface LogisticRegressionTrainParams {
@@ -49,6 +54,9 @@ export class LogisticRegression extends BaseClassifier {
   private c: number;
   private model: Sequential;
   private featureSize: number;
+  private outputSize: number;
+  private optimizerType: OptimizerType;
+  private optimizerProps: OptimizerProps;
   private optimizer: Optimizer;
   /**
    * Construction function of linear regression model
@@ -71,16 +79,19 @@ export class LogisticRegression extends BaseClassifier {
     penalty: 'l2',
     fitIntercept: true,
     c: 1,
-    optimizer: train.adam(0.1)
+    optimizerType: 'adam',
+    optimizerProps: { learningRate: 0.1 }
   }) {
     super();
     this.fitIntercept = params.fitIntercept !== false;
     this.penalty = params.penalty;
-    this.c = params.c;
-    this.optimizer = params.optimizer ? params.optimizer : train.adam(0.1);
+    this.c = params.c ? params.c : 1;
+    this.optimizerType = params.optimizerType ? params.optimizerType : 'adam';
+    this.optimizerProps = params.optimizerProps ? params.optimizerProps : { learningRate: 0.1 };
+    this.optimizer = getOptimizer(this.optimizerType, this.optimizerProps);
   }
 
-  private initModel(inputShape: number, outputShape: number, useBias = true): Sequential {
+  private initModel(inputShape: number, outputShape: number, useBias = true, modelWeights: Tensor[] = []): void {
     const model = sequential();
     const c = this.c;
     const penalty = this.penalty;
@@ -94,7 +105,8 @@ export class LogisticRegression extends BaseClassifier {
       optimizer: this.optimizer,
       loss: losses.sigmoidCrossEntropy
     });
-    return model;
+    modelWeights.length && model.setWeights(modelWeights);
+    this.model = model;
   }
 
   /** Training logistic regression model by batch
@@ -108,8 +120,9 @@ export class LogisticRegression extends BaseClassifier {
     if (!this.model) {
       await this.initClasses(y, 'binary-only');
       const outputShape = this.isBinaryClassification() ? 1 : this.classes().shape[0];
-      this.model = this.initModel(nFeature, outputShape, this.fitIntercept);
+      this.initModel(nFeature, outputShape, this.fitIntercept);
       this.featureSize = nFeature;
+      this.outputSize = outputShape;
     } else {
       if (nFeature != this.featureSize) {
         throw new Error('feature size does not match previous training set');
@@ -149,8 +162,9 @@ export class LogisticRegression extends BaseClassifier {
     const batchSize = nData > params.batchSize ? params.batchSize : nData;
     const epochs = params.epochs > 0 ? params.epochs : null;
     const outputShape = this.isBinaryClassification() ? 1 : this.classes().shape[0];
-    this.model = this.initModel(nFeature, outputShape, this.fitIntercept);
+    this.initModel(nFeature, outputShape, this.fitIntercept);
     this.featureSize = nFeature;
+    this.outputSize = outputShape;
     const yOneHot = await this.getLabelOneHot(y);
 
     await this.model.fit(x, yOneHot, {
@@ -177,5 +191,59 @@ export class LogisticRegression extends BaseClassifier {
       'coefficients': squeeze(this.model.getWeights()[0]),
       'intercept': this.fitIntercept ? this.model.getWeights()[1] : tensor(0)
     };
+  }
+
+  public async getModelWeightsArray(): Promise<RecursiveArray<number>> {
+    const weights = [];
+    for (const w of this.model.getWeights()) {
+      weights.push(await w.array());
+    }
+    return weights;
+  }
+
+  public initModelFromWeights(inputShape: number, outputShape: number, useBias: boolean, weights: (Float32Array | Int32Array | Uint8Array)[]): void {
+    const weightsTensors = [];
+    for (const w of weights) {
+      weightsTensors.push(tensor(w));
+    }
+    this.initModel(inputShape, outputShape, useBias, weightsTensors);
+  }
+
+  public async fromJson(modelJson: string): Promise<LogisticRegression> {
+    const modelParams = JSON.parse(modelJson);
+    if (modelParams.name !== 'LogisticRegression'){
+      throw new RangeError(`${modelParams.name} is not Logistic Regression`);
+    }
+    const { classes, fitIntercept, penalty, c, optimizerType, optimizerProps,
+      modelWeights, featureSize, outputSize } = modelParams;
+    classes && this.initClasses(classes, 'binary-only');
+    this.fitIntercept = (fitIntercept as boolean);
+    penalty && (this.penalty = penalty);
+    c && (this.c = c);
+    if (optimizerType as OptimizerType && optimizerProps as OptimizerProps) {
+      this.optimizerType = optimizerType;
+      this.optimizerProps = optimizerProps;
+      this.optimizer = getOptimizer(optimizerType, optimizerProps);
+    }
+    if (modelWeights?.length) {
+      this.initModelFromWeights(featureSize, outputSize, fitIntercept, modelWeights);
+    }
+    return this;
+  }
+
+  public async toJson(): Promise<string> {
+    const modelParams = {
+      name: 'LogisticRegression',
+      classes: await this.classes()?.array(),
+      fitIntercept: await this.fitIntercept,
+      penalty: this.penalty,
+      c: this.c,
+      optimizerType: this.optimizerType,
+      optimizerProps: this.optimizerProps,
+      modelWeights: await this.getModelWeightsArray(),
+      featureSize: this.featureSize,
+      outputSize: this.outputSize
+    };
+    return JSON.stringify(modelParams);
   }
 }
