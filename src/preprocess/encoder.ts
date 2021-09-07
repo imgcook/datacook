@@ -1,4 +1,4 @@
-import { Tensor, unique, oneHot, cast, tensor, argMax, reshape, slice, stack, sub, squeeze, greaterEqual } from "@tensorflow/tfjs-core";
+import { Tensor, unique, oneHot, cast, tensor, argMax, reshape, slice, stack, sub, squeeze, greaterEqual, topk } from "@tensorflow/tfjs-core";
 import { checkArray } from "../utils/validation";
 import { checkShape } from "../linalg/utils";
 
@@ -49,7 +49,13 @@ export class OneHotEncoder {
    */
   public async init(x: Tensor | number[] | string[]): Promise<void> {
     const { values } = unique(x);
-    this.categories = values;
+    if (values.dtype == 'int32' || values.dtype == 'float32') {
+      this.categories = topk(values, values.shape[0], false).values;
+    } else if (values.dtype == 'bool') {
+      this.categories = tensor([ false, true ]);
+    } else {
+      this.categories = values;
+    }
     const cateData = await this.categories.data();
     const cateMap: CateMap = {};
     for (let i = 0; i < cateData.length; i++) {
