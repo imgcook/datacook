@@ -1,4 +1,4 @@
-import { Tensor, RecursiveArray, losses, squeeze, tensor } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, losses, squeeze, tensor, stack } from '@tensorflow/tfjs-core';
 import { layers, sequential, Sequential, regularizers, callbacks } from '@tensorflow/tfjs-layers';
 import { Optimizer } from '@tensorflow/tfjs-core';
 
@@ -190,8 +190,8 @@ export class LogisticRegression extends BaseClassifier {
 
   /**
    * Make predictions using logistic regression model.
-   * @param xData Input feaures
-   * @returns predicted classes
+   * @param xData Input features
+   * @returns Predicted classes
    */
   public async predict(xData: Tensor | RecursiveArray<number>) : Promise<Tensor | Tensor[]> {
     const x = checkArray(xData, 'float32');
@@ -201,6 +201,21 @@ export class LogisticRegression extends BaseClassifier {
       return predClasses;
     }
     return scores;
+  }
+
+  /**
+   * Predict probabilities using logistic regression model.
+   * @param xData Input features
+   * @returns Predicted probabilities
+   */
+  public async predictProba(xData: Tensor | RecursiveArray<number>) : Promise<Tensor> {
+    const x = checkArray(xData, 'float32');
+    const scores = this.model.predict(x);
+    if (scores instanceof Array){
+      return stack(scores);
+    } else {
+      return scores;
+    }
   }
 
   public getCoef(): { 'coefficients': Tensor, 'intercept': Tensor} {
