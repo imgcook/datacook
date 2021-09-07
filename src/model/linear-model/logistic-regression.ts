@@ -72,8 +72,20 @@ export class LogisticRegression extends BaseClassifier {
    *
    * `c`: Regularization strength; must be a positive float. Larger values specify stronger regularization. Default to 1.
    *
-   * `optimizer`: Optimizer for training. All of the optimizers in tensorflow.js (https://js.tensorflow.org/api/latest/#Training-Optimizers)
-   *  can be applied. Default to adam optimzer with learning rate 0.1.
+   * `optimizerType`: optimizer types for training. All of the following optimizers types supported in tensorflow.js
+   *  (https://js.tensorflow.org/api/latest/#Training-Optimizers) can be applied. Default to 'adam':
+   *  - 'sgd': stochastic optimizer
+   *  - 'momentum': momentum optimizer
+   *  - 'adagrad': adagrad optimizer
+   *  - 'adadelta': adadelta optimizer
+   *  - 'adam': adam optimizer
+   *  - 'adamax': adamax optimizer
+   *  - 'rmsprop': rmsprop optimizer
+   *
+   * `optimizerProps`: parameters used to init corresponding optimizer, you can refer to documentations in tensorflow.js
+   *  (https://js.tensorflow.org/api/latest/#Training-Optimizers) to find the supported initailization paratemters for a
+   *  given type of optimizer. For example, `{ learningRate: 0.1, beta1: 0.1, beta2: 0.2, epsilon: 0.1 }` could be used
+   *  to initialize adam optimizer.
    */
   constructor(params: LogisticRegressionParams = {
     penalty: 'l2',
@@ -176,6 +188,11 @@ export class LogisticRegression extends BaseClassifier {
     return this;
   }
 
+  /**
+   * Make predictions using logistic regression model.
+   * @param xData Input feaures
+   * @returns predicted classes
+   */
   public async predict(xData: Tensor | RecursiveArray<number>) : Promise<Tensor | Tensor[]> {
     const x = checkArray(xData, 'float32');
     const scores = this.model.predict(x);

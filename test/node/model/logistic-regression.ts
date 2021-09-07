@@ -1,4 +1,5 @@
 import { LogisticRegression } from '../../../src/model/linear-model/logistic-regression';
+import { LogisticRegressionPredictor } from '../../../src/model/linear-model/logistic-regression-predictor';
 import '@tensorflow/tfjs-backend-cpu';
 import * as tf from '@tensorflow/tfjs-core';
 import { assert } from 'chai';
@@ -35,11 +36,23 @@ describe('Logistic ', () => {
 			assert.isTrue(acc >= 0.95);
 		}
 	});
-	it('save model', async () => {
+	it('save and load model', async () => {
 		const lr = new LogisticRegression({fitIntercept: true});
 		await lr.train(cases, y); 
 		const modelJson = await lr.toJson();
 		const lr2 = new LogisticRegression();
+		await lr2.fromJson(modelJson);
+		const predY = await lr2.predict(cases);
+		if (predY instanceof Tensor){
+			const acc = accuracyScore(y, predY);
+			assert.isTrue(acc >= 0.95);
+		}
+	});
+	it('save and load model as predictor', async () => {
+		const lr = new LogisticRegression({fitIntercept: true});
+		await lr.train(cases, y); 
+		const modelJson = await lr.toJson();
+		const lr2 = new LogisticRegressionPredictor();
 		await lr2.fromJson(modelJson);
 		const predY = await lr2.predict(cases);
 		if (predY instanceof Tensor){

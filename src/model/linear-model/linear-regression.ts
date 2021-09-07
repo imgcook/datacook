@@ -1,8 +1,9 @@
-import { Tensor, RecursiveArray, losses, train, squeeze, tensor } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, losses, squeeze, tensor } from '@tensorflow/tfjs-core';
 import { layers, sequential, Sequential } from '@tensorflow/tfjs-layers';
 import { BaseEstimater } from '../base';
 import { checkArray } from '../../utils/validation';
 import { Optimizer } from '@tensorflow/tfjs-core';
+import { OptimizerProps, OptimizerType, getOptimizer } from '../../utils/optimizer-types';
 
 /**
  * Parameters for linear regression
@@ -16,7 +17,14 @@ export interface LinearRegressionParams {
    * This parameter is ignored when fit_intercept is set to False. If True, the regressors X will be normalized before regression by subtracting the mean and dividing by the l2-norm.
    */
   normalize?: boolean,
-  optimizer?: Optimizer
+  /**
+   * Optimizer types
+   */
+   optimizerType?: OptimizerType,
+   /**
+    * Optimizer properties
+    */
+   optimizerProps?: OptimizerProps
 }
 
 export interface LinearRegerssionTrainParams {
@@ -37,6 +45,8 @@ export class LinearRegression extends BaseEstimater {
   private model: Sequential;
   private featureSize: number;
   private optimizer: Optimizer;
+  private optimizerType: OptimizerType;
+  private optimizerProps: OptimizerProps;
   /**
    * Construction function of linear regression model
    * @param params LinearRegressionParams
@@ -50,17 +60,32 @@ export class LinearRegression extends BaseEstimater {
    * `normalize`: This parameter is ignored when fit_intercept is set to False. If True,
    * the regressors X will be normalized before regression by subtracting the mean and dividing by the l2-norm.
    *
-   * `optimizer`: Optimizer for training. All of the optimizers in tensorflow.js (https://js.tensorflow.org/api/latest/#Training-Optimizers)
-   *  can be applied. Default to adam optimzer with learning rate 0.1.
+   * `optimizerType`: optimizer types for training. All of the following optimizers types supported in tensorflow.js
+   *  (https://js.tensorflow.org/api/latest/#Training-Optimizers) can be applied. Default to 'adam':
+   *  - 'sgd': stochastic optimizer
+   *  - 'momentum': momentum optimizer
+   *  - 'adagrad': adagrad optimizer
+   *  - 'adadelta': adadelta optimizer
+   *  - 'adam': adam optimizer
+   *  - 'adamax': adamax optimizer
+   *  - 'rmsprop': rmsprop optimizer
+   *
+   * `optimizerProps`: parameters used to init corresponding optimizer, you can refer to documentations in tensorflow.js
+   *  (https://js.tensorflow.org/api/latest/#Training-Optimizers) to find the supported initailization paratemters for a
+   *  given type of optimizer. For example, `{ learningRate: 0.1, beta1: 0.1, beta2: 0.2, epsilon: 0.1 }` could be used
+   *  to initialize adam optimizer.
    */
   constructor(params: LinearRegressionParams = {}) {
     super();
     this.fitIntercept = params.fitIntercept !== false;
     this.normalize = params.normalize;
-    this.optimizer = params.optimizer && params.optimizer instanceof Optimizer ? params.optimizer : train.adam(0.1);
+    //this.optimizer = params.optimizer && params.optimizer instanceof Optimizer ? params.optimizer : train.adam(0.1);
+    this.optimizerType = params.optimizerType ? params.optimizerType : 'adam';
+    this.optimizerProps = params.optimizerProps ? params.optimizerProps : { learningRate: 0.1 };
+    this.optimizer = getOptimizer(this.optimizerType, this.optimizerProps);
   }
 
-  private initLinearModel(inputShape: number, useBias = true): Sequential {
+  private initLinearModel(inputShape: number, useBias = true, weightsTensors: Tensor[] = []): void {
     const model = sequential();
     model.add(layers.dense({ inputShape: [ inputShape ], units: 1, useBias }));
     model.compile({
@@ -68,7 +93,8 @@ export class LinearRegression extends BaseEstimater {
       loss: losses.meanSquaredError,
       metrics: [ 'mse' ]
     });
-    return model;
+    if (weightsTensors?.length) model.setWeights(weightsTensors);
+    this.model = model;
   }
 
   /** Training logistic regression model by batch
@@ -80,7 +106,7 @@ export class LinearRegression extends BaseEstimater {
     const { x, y } = this.validateData(xData, yData);
     const nFeature = x.shape[1];
     if (!this.model) {
-      this.model = this.initLinearModel(nFeature, this.fitIntercept);
+      this.initLinearModel(nFeature, this.fitIntercept);
       this.featureSize = nFeature;
     } else {
       if (nFeature != this.featureSize) {
@@ -106,7 +132,7 @@ export class LinearRegression extends BaseEstimater {
     const nData = x.shape[0];
     const batchSize = nData > params.batchSize ? params.batchSize : nData;
     const epochs = params.epochs > 0 ? params.epochs : null;
-    this.model = this.initLinearModel(nFeature, this.fitIntercept);
+    this.initLinearModel(nFeature, this.fitIntercept);
     this.featureSize = nFeature;
     await this.model.fit(x, y, {
       batchSize,
@@ -119,12 +145,21 @@ export class LinearRegression extends BaseEstimater {
   public predict(xData: Tensor | RecursiveArray<number>): Tensor | Tensor[] {
     const x = checkArray(xData, 'float32');
     const predY = this.model.predict(x);
+    if (predY instanceof Tensor) return squeeze(predY);
     return predY;
+  }
+
+  public initModelFromWeights(inputShape: number, useBias: boolean, weights: (Float32Array | Int32Array | Uint8Array)[]): void {
+    const weightsTensors = [];
+    for (const w of weights) {
+      weightsTensors.push(tensor(w));
+    }
+    this.initLinearModel(inputShape, useBias, weightsTensors);
   }
 
   /**
    * Get linear regression coefficients
-   * @returns Linear regression coefficients with structure 
+   * @returns Linear regression coefficients with structure
    * {'coefficient': Tensor, 'intercept': Tensor}
    */
   public getCoef(): { 'coefficients': Tensor, 'intercept': Tensor} {
@@ -132,5 +167,54 @@ export class LinearRegression extends BaseEstimater {
       'coefficients': squeeze(this.model.getWeights()[0]),
       'intercept': this.fitIntercept ? this.model.getWeights()[1] : tensor(0)
     };
+  }
+
+  public async getModelWeightsArray(): Promise<RecursiveArray<number>> {
+    const weights = [];
+    for (const w of this.model.getWeights()) {
+      weights.push(await w.array());
+    }
+    return weights;
+  }
+
+  /**
+   * Load model paramters from json string object
+   * @param modelJson model json saved as string object
+   * @returns model itself
+   */
+  public async fromJson(modelJson: string): Promise<LinearRegression> {
+    const modelParams = JSON.parse(modelJson);
+    if (modelParams.name !== 'LinearRegression'){
+      throw new RangeError(`${modelParams.name} is not Linear Regression`);
+    }
+    const { fitIntercept, optimizerType, optimizerProps,
+      modelWeights, featureSize } = modelParams;
+    this.fitIntercept = (fitIntercept as boolean);
+    this.featureSize = featureSize;
+    if (optimizerType as OptimizerType && optimizerProps as OptimizerProps) {
+      this.optimizerType = optimizerType;
+      this.optimizerProps = optimizerProps;
+      this.optimizer = getOptimizer(optimizerType, optimizerProps);
+    }
+    if (modelWeights?.length) {
+      this.initModelFromWeights(featureSize, fitIntercept, modelWeights);
+    }
+    return this;
+  }
+
+  /**
+   * Dump model parameters to json string.
+   * @returns Stringfied model parameters
+   */
+  public async toJson(): Promise<string> {
+    const modelParams = {
+      name: 'LinearRegression',
+      fitIntercept: await this.fitIntercept,
+      optimizerType: this.optimizerType,
+      optimizerProps: this.optimizerProps,
+      modelWeights: await this.getModelWeightsArray(),
+      featureSize: this.featureSize
+    };
+    return JSON.stringify(modelParams);
   }
 }
