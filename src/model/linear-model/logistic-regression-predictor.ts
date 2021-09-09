@@ -1,8 +1,8 @@
-import { RecursiveArray, Tensor, matMul, tensor, add, stack } from "@tensorflow/tfjs-core";
-import { checkShape } from "../../linalg";
+import { RecursiveArray, Tensor, matMul, tensor, add, stack, sigmoid } from "@tensorflow/tfjs-core";
+import { checkShape } from "../../linalg/utils";
 import { checkArray } from "../../utils/validation";
 import { BaseClassifier } from "../base";
-
+import '@tensorflow/tfjs-backend-cpu';
 /**
  * Logistic regression predictor
  * */
@@ -32,7 +32,7 @@ export class LogisticRegressionPredictor extends BaseClassifier {
     if (!checkShape(x, [ -1, this.featureSize ])) {
       throw TypeError('Feature size does not match');
     }
-    const scores = add(matMul(x, tensor(this.modelWeights[0])), this.modelWeights[1]);
+    const scores = sigmoid(add(matMul(x, tensor(this.modelWeights[0])), this.modelWeights[1]));
     if (scores instanceof Array){
       return stack(scores);
     } else {

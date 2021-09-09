@@ -1,6 +1,5 @@
 import { LogisticRegression } from '../../../src/model/linear-model/logistic-regression';
 import { LogisticRegressionPredictor } from '../../../src/model/linear-model/logistic-regression-predictor';
-import '@tensorflow/tfjs-backend-cpu';
 import * as tf from '@tensorflow/tfjs-core';
 import { assert } from 'chai';
 import 'mocha';
