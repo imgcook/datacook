@@ -1,0 +1,124 @@
+<html>
+
+<div id='container' style="width: 800px; height: 500px;"></div>
+<div id='container2' style="width: 800px; height: 500px;"></div>
+</html>
+<script src="https://cdn.jsdelivr.net/npm/regenerator-runtime@0.13.9/runtime.min.js"></script>
+<script src="https://gw.alipayobjects.com/os/lib/antv/g2/4.1.25/dist/g2.min.js"></script>
+<script src="../dist/logisticPredictor.bundle.js"></script>
+<script src="../dist/logisticRegression.bundle.js"></script>
+
+<script>
+  let cases = [];
+  const weight = [20, -20];
+  const nData = 2000;
+  for (let i = 0; i < nData; i++) {
+    cases.push([Math.random()*100, Math.random()*100]);
+  }
+  const eta = cases.map((c) => {
+    return 1.0 / (1.0 + Math.exp( - c[0] * weight[0] - c[1] * weight[1]));
+  })
+  const y = eta.map((c) => (c > 0.5) ? 'apple' : 'banana')
+  const lr = new datacook.LogisticRegression({c: 0});
+  let predY;
+  let predProba;
+  const train = async() => {
+    
+    await lr.train(cases, y);
+    predY = (await lr.predict(cases)).dataSync();
+    predProba = (await lr.predictProba(cases)).dataSync();
+    const { coefficients, intercept } = lr.getCoef();
+    
+    console.log(coefficients.dataSync());
+    console.log(intercept.dataSync());
+    console.log(await lr.toJson());
+    console.log(predProba);
+    return cases.map((d, i) => {
+      return {x1: d[0], x2: d[1], trueClass: y[i], predClass: predY[i]}
+    });
+  }
+
+  train().then((data) => {
+    const chart = new G2.Chart({
+      container: 'container',
+      autoFit: true,
+      height: 500
+    });
+    chart.data(data);
+    chart.scale({
+      height: { nice: true },
+      weight: { nice: true },
+    });
+    chart.tooltip({
+      showTitle: false,
+      showCrosshairs: true,
+      crosshairs: {
+        type: 'xy',
+      },
+      itemTpl: '<li class="g2-tooltip-list-item" data-index={index} style="margin-bottom:4px;">'
+        + '<span style="background-color:{color};" class="g2-tooltip-marker"></span>'
+        + '{name}<br/>'
+        + '{value}'
+        + '</li>'
+    });
+    chart
+      .point()
+      .position('x1*x2')
+      .color('predClass')
+      .shape('circle')
+      .tooltip('predClass*x1*x2', (predClass, x1, x2) => {
+        return {
+          name: predClass,
+          value: x1 + '(cm), ' +x2 + '(cm)'
+        };
+      })
+      .style({
+        fillOpacity: 0.85
+      });
+    chart.interaction('legend-highlight');
+    chart.render();
+
+    // render original data
+    const chart2 = new G2.Chart({
+      container: 'container2',
+      autoFit: true,
+      height: 500
+    });
+    chart2.data(data);
+    chart2.scale({
+      height: { nice: true },
+      weight: { nice: true },
+    });
+    chart2.tooltip({
+      showTitle: false,
+      showCrosshairs: true,
+      crosshairs: {
+        type: 'xy',
+      },
+      itemTpl: '<li class="g2-tooltip-list-item" data-index={index} style="margin-bottom:4px;">'
+        + '<span style="background-color:{color};" class="g2-tooltip-marker"></span>'
+        + '{name}<br/>'
+        + '{value}'
+        + '</li>'
+    });
+    chart2
+      .point()
+      .position('x1*x2')
+      .color('trueClass')
+      .shape('circle')
+      .tooltip('class*x1*x2', (trueClass, x1, x2) => {
+        return {
+          name: trueClass,
+          value: x1 + '(cm), ' +x2 + '(cm)'
+        };
+      })
+      .style({
+        fillOpacity: 0.85
+      });
+    chart2.interaction('legend-highlight');
+    chart2.render();
+  });
+  
+  
+
+</script>
