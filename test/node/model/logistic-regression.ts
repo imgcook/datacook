@@ -15,7 +15,7 @@ describe('Logistic ', () => {
 
   it('predict class probabilities', async () => {
   const lr = new LogisticRegression({fitIntercept: true});
-    await lr.train(cases, y); 
+    await lr.fit(cases, y); 
     const probs = await lr.predictProba(cases);
     const trueCount = tf.sum(tf.lessEqual(probs, 1)).dataSync()[0];
     assert.deepEqual(trueCount, 10000);
@@ -23,7 +23,7 @@ describe('Logistic ', () => {
 
   it('train simple dataset', async () => {
     const lr = new LogisticRegression({fitIntercept: true});
-    await lr.train(cases, y); 
+    await lr.fit(cases, y); 
     const predY = await lr.predict(cases);
     if (predY instanceof Tensor){
       const acc = accuracyScore(y, predY);
@@ -47,7 +47,7 @@ describe('Logistic ', () => {
   });
   it('save and load model', async () => {
     const lr = new LogisticRegression({fitIntercept: true});
-    await lr.train(cases, y); 
+    await lr.fit(cases, y); 
     const modelJson = await lr.toJson();
     const lr2 = new LogisticRegression();
     await lr2.fromJson(modelJson);
@@ -59,7 +59,7 @@ describe('Logistic ', () => {
   });
   it('save and load model as predictor', async () => {
     const lr = new LogisticRegression({fitIntercept: true});
-    await lr.train(cases, y); 
+    await lr.fit(cases, y); 
     const modelJson = await lr.toJson();
     const lr2 = new LogisticRegressionPredictor();
     await lr2.fromJson(modelJson);

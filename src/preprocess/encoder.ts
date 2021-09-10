@@ -49,9 +49,9 @@ export class OneHotEncoder {
    */
   public async init(x: Tensor | number[] | string[]): Promise<void> {
     const { values } = unique(x);
-    if (values.dtype == 'int32' || values.dtype == 'float32') {
+    if (values.dtype === 'int32' || values.dtype === 'float32') {
       this.categories = topk(values, values.shape[0], false).values;
-    } else if (values.dtype == 'bool') {
+    } else if (values.dtype === 'bool') {
       this.categories = tensor([ false, true ]);
     } else {
       this.categories = values;

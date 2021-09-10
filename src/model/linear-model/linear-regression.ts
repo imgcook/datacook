@@ -117,13 +117,13 @@ export class LinearRegression extends BaseEstimater {
     return this;
   }
 
-  /** Training linear regression model according to X, y. Here we use adam algorithm (a popular gradient-based optimization algorithm) for paramter estimation.
+  /** Fit linear regression model according to X, y. Here we use adam algorithm (a popular gradient-based optimization algorithm) for paramter estimation.
    * @param xData Tensor like of shape (n_samples, n_features), input feature
    * @param yData Tensor like of shape (n_sample, ), input target values
    * @param params batchSize: batch size: default to 32, maxIterTimes: max iteration times, default to 20000
    * @returns classifier itself
    */
-  public async train(xData: Tensor | RecursiveArray<number>,
+  public async fit(xData: Tensor | RecursiveArray<number>,
     yData: Tensor | RecursiveArray<number>,
     params: LinearRegerssionTrainParams = { batchSize: 32, epochs: -1 }): Promise<LinearRegression> {
 

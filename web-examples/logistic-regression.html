@@ -23,7 +23,7 @@
   let predProba;
   const train = async() => {
     
-    await lr.train(cases, y);
+    await lr.fit(cases, y);
     predY = (await lr.predict(cases)).dataSync();
     predProba = (await lr.predictProba(cases)).dataSync();
     const { coefficients, intercept } = lr.getCoef();

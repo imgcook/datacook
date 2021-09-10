@@ -145,7 +145,7 @@ export class LogisticRegression extends BaseClassifier {
     return this;
   }
 
-  /** Training linear regression model according to X, y.
+  /** Fit linear regression model according to X, y.
    * @param xData Tensor like of shape (n_samples, n_features), input feature
    * @param yData Tensor like of shape (n_sample, ), input target values
    * @param params training parameters batchSize: batch size: default to 32, maxIterTimes: max iteration times, default to 20000
@@ -160,7 +160,7 @@ export class LogisticRegression extends BaseClassifier {
    *
    * `tol`: stop tolerence, default to 0
    */
-  public async train(xData: Tensor | RecursiveArray<number>,
+  public async fit(xData: Tensor | RecursiveArray<number>,
     yData: Tensor | RecursiveArray<number>, params: LogisticRegressionTrainParams = {
       tol: 0,
       batchSize: 32,

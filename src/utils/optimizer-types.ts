@@ -112,5 +112,8 @@ export const getOptimizer = (optimizerTypes: OptimizerType, optimizerProps: Opti
       throw new TypeError('Illegal properties to init optimizer');
     }
   }
+  default: {
+    throw new TypeError('Illegal optimizer type');
+  }
   }
 };

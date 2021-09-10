@@ -14,7 +14,7 @@ describe('Linear Regression', () => {
 
   it('train simple dataset', async () => {
     const lm = new LinearRegression({optimizerType: 'adam', optimizerProps: {learningRate: 0.1}});
-    await lm.train(cases, y); 
+    await lm.fit(cases, y); 
     const { coefficients } = lm.getCoef();
     assert.isTrue(tensorEqual(coefficients, weight, 1e-1));
   });
@@ -33,7 +33,7 @@ describe('Linear Regression', () => {
 
   it('save and load model', async () => {
     const lr = new LinearRegression({fitIntercept: true});
-    await lr.train(cases, y); 
+    await lr.fit(cases, y); 
     const modelJson = await lr.toJson();
     const lr2 = new LinearRegression();
     await lr2.fromJson(modelJson);

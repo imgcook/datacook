@@ -6,7 +6,7 @@ const createConfig = (target) => {
     devtool: "source-map",
     context: path.resolve(__dirname),
     entry: {
-      //index: './dist/index.js',
+      // TODO: recover index entry
       logisticPredictor: './dist/model/linear-model/logistic-regression-predictor.js',
       logisticRegression: './dist/model/linear-model/logistic-regression.js'
     },
@@ -35,8 +35,7 @@ const createConfig = (target) => {
       fallback: {
         fs: false
       }
-    },
-    node: { fs: "empty" }
+    }
   };
 };
 
