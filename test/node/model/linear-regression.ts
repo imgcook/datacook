@@ -20,26 +20,26 @@ describe('Linear Regression', () => {
   });
 
   it('train simple dataset on batch', async () => {
-		const lm = new LinearRegression({optimizerType: 'adam', optimizerProps: {learningRate: 0.1}});	
-		for (let i = 0; i < 800; i++) {
-			const j = Math.floor(i%(100));
-			const batchX = tf.slice(cases, [j * 100, 0], [100 ,5]);
-			const batchY = tf.slice(y, [j * 100], [100]);
-			await lm.trainOnBatch(batchX, batchY)
-		}
+    const lm = new LinearRegression({optimizerType: 'adam', optimizerProps: {learningRate: 0.1}});
+    for (let i = 0; i < 800; i++) {
+      const j = Math.floor(i%(100));
+      const batchX = tf.slice(cases, [j * 100, 0], [100 ,5]);
+      const batchY = tf.slice(y, [j * 100], [100]);
+      await lm.trainOnBatch(batchX, batchY)
+    }
     const { coefficients } = lm.getCoef();
     assert.isTrue(tensorEqual(coefficients, weight, 1e-1));
-	});
+  });
 
   it('save and load model', async () => {
-		const lr = new LinearRegression({fitIntercept: true});
-		await lr.train(cases, y); 
-		const modelJson = await lr.toJson();
-		const lr2 = new LinearRegression();
-		await lr2.fromJson(modelJson);
+    const lr = new LinearRegression({fitIntercept: true});
+    await lr.train(cases, y); 
+    const modelJson = await lr.toJson();
+    const lr2 = new LinearRegression();
+    await lr2.fromJson(modelJson);
     const predY = lr2.predict(cases);
     if (predY instanceof Tensor) {
       assert.isTrue(tensorEqual(predY, y, 1));
     }
-	});
+  });
 });

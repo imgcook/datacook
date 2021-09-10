@@ -35,8 +35,8 @@ const createConfig = (target) => {
       fallback: {
         fs: false
       }
-    }
-    //node: { fs: "empty" }
+    },
+    node: { fs: "empty" }
   };
 };
 

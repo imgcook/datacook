@@ -1,13 +1,12 @@
 <html>
-
-<div id='container' style="width: 800px; height: 500px;"></div>
-<div id='container2' style="width: 800px; height: 500px;"></div>
-</html>
+  <body>
+    <div id='container' style="width: 800px; height: 500px;"></div>
+    <div id='container2' style="width: 800px; height: 500px;"></div>
+  </body>
 <script src="https://cdn.jsdelivr.net/npm/regenerator-runtime@0.13.9/runtime.min.js"></script>
 <script src="https://gw.alipayobjects.com/os/lib/antv/g2/4.1.25/dist/g2.min.js"></script>
 <script src="../dist/logisticPredictor.bundle.js"></script>
 <script src="../dist/logisticRegression.bundle.js"></script>
-
 <script>
   let cases = [];
   const weight = [20, -20];
@@ -29,10 +28,6 @@
     predProba = (await lr.predictProba(cases)).dataSync();
     const { coefficients, intercept } = lr.getCoef();
     
-    console.log(coefficients.dataSync());
-    console.log(intercept.dataSync());
-    console.log(await lr.toJson());
-    console.log(predProba);
     return cases.map((d, i) => {
       return {x1: d[0], x2: d[1], trueClass: y[i], predClass: predY[i]}
     });
@@ -104,7 +99,7 @@
     chart2
       .point()
       .position('x1*x2')
-      .color('trueClass')
+      .color('trueClass')     
       .shape('circle')
       .tooltip('class*x1*x2', (trueClass, x1, x2) => {
         return {
@@ -118,7 +113,5 @@
     chart2.interaction('legend-highlight');
     chart2.render();
   });
-  
-  
-
 </script>
+</html>
