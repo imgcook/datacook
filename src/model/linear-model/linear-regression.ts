@@ -20,11 +20,11 @@ export interface LinearRegressionParams {
   /**
    * Optimizer types
    */
-   optimizerType?: OptimizerType,
-   /**
-    * Optimizer properties
-    */
-   optimizerProps?: OptimizerProps
+  optimizerType?: OptimizerType,
+  /**
+   * Optimizer properties
+   */
+  optimizerProps?: OptimizerProps
 }
 
 export interface LinearRegerssionTrainParams {
