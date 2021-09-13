@@ -1,5 +1,7 @@
-import { Tensor, tensor, RecursiveArray, unique, cast, oneHot } from '@tensorflow/tfjs-core';
+import { Tensor, tensor, RecursiveArray } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
+import { OneHotEncoder } from '../preprocess';
+import { OneHotDropTypes } from '../preprocess/encoder';
 
 export type ClassMap = {
   [ key: string ]: number
@@ -7,7 +9,7 @@ export type ClassMap = {
 
 export class BaseClassifier {
   public estimatorType = 'classifier';
-  public classes: Tensor;
+  public classOneHotEncoder: OneHotEncoder;
   public classMap: ClassMap;
 
   public score( x: Tensor, y: Tensor ): Tensor {
@@ -20,33 +22,29 @@ export class BaseClassifier {
     const score = tensor([ 0 ]);
     return score;
   }
-
-  // update class map
-  public updateClassMap(): void {
-    if (this.classes){
-      const classData = this.classes.dataSync();
-      const classMap: ClassMap = {};
-      for (let i = 0; i < classData.length; i++) {
-        const key = classData[i];
-        classMap[key] = i;
-      }
-      this.classMap = classMap;
-    }
-  }
-
   // get label one-hot expression
-  public getLabelOneHot(y: Tensor): Tensor {
-    const yData = y.dataSync();
-    const nClass = this.classes.shape[0];
-    const yInd = yData.map((d: number|string) => this.classMap[d]);
-    const yOneHot = oneHot(cast(tensor(yInd), 'int32'), nClass);
-    return yOneHot;
+  public async getLabelOneHot(y: Tensor): Promise<Tensor> {
+    const yOnehot = await this.classOneHotEncoder.encode(y);
+    return yOnehot;
   }
 
-  public initClasses(y: Tensor): void {
-    const { values } = unique(y);
-    this.classes = values;
-    this.updateClassMap();
+  public async initClasses(y: Tensor | number[] | string[], drop: OneHotDropTypes = 'none'): Promise<void> {
+    this.classOneHotEncoder = new OneHotEncoder({ drop });
+    await this.classOneHotEncoder.init(y);
+  }
+
+  public classes(): Tensor {
+    return this.classOneHotEncoder.categories;
+  }
+
+  public isBinaryClassification(): boolean {
+    const nClass = this.classes().shape[0];
+    return nClass == 2;
+  }
+
+  public async getPredClass(score: Tensor): Promise<Tensor> {
+    const predClass = await this.classOneHotEncoder.decode(score);
+    return predClass;
   }
 
   public validateData(x: Tensor | RecursiveArray<number>, y: Tensor | RecursiveArray<number>, xDimension = 2, yDimension = 1): { x: Tensor, y: Tensor } {

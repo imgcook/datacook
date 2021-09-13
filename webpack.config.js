@@ -1,19 +1,24 @@
 const path = require("path");
-
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const createConfig = (target) => {
   return {
     mode: "production",
     devtool: "source-map",
     context: path.resolve(__dirname),
     entry: {
-      index: './dist/index.js'
+      // TODO: recover index entry
+      logisticPredictor: './dist/model/linear-model/logistic-regression-predictor.js',
+      logisticRegression: './dist/model/linear-model/logistic-regression.js'
     },
     target: target,
     output: {
       path: path.resolve(__dirname, "dist"),
-      filename: 'index.bundle.js',
+      filename: '[name].bundle.js',
       library: "datacook"
     },
+    plugins: [
+      new BundleAnalyzerPlugin()
+    ],
     module: {
       rules: [
         {
@@ -26,7 +31,11 @@ const createConfig = (target) => {
         }
       ]
     },
-    node: { fs: "empty" }
+    resolve: {
+      fallback: {
+        fs: false
+      }
+    }
   };
 };
 
