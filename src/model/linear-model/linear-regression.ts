@@ -79,7 +79,6 @@ export class LinearRegression extends BaseEstimater {
     super();
     this.fitIntercept = params.fitIntercept !== false;
     this.normalize = params.normalize;
-    //this.optimizer = params.optimizer && params.optimizer instanceof Optimizer ? params.optimizer : train.adam(0.1);
     this.optimizerType = params.optimizerType ? params.optimizerType : 'adam';
     this.optimizerProps = params.optimizerProps ? params.optimizerProps : { learningRate: 0.1 };
     this.optimizer = getOptimizer(this.optimizerType, this.optimizerProps);

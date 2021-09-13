@@ -96,7 +96,7 @@ export class LogisticRegression extends BaseClassifier {
   }) {
     super();
     this.fitIntercept = params.fitIntercept !== false;
-    this.penalty = params.penalty;
+    this.penalty = params.penalty ? params.penalty : 'l2';
     this.c = params.c ? params.c : 1;
     this.optimizerType = params.optimizerType ? params.optimizerType : 'adam';
     this.optimizerProps = params.optimizerProps ? params.optimizerProps : { learningRate: 0.1 };
@@ -112,12 +112,14 @@ export class LogisticRegression extends BaseClassifier {
       units: outputShape,
       useBias,
       activation: 'sigmoid',
-      kernelRegularizer: penalty == 'l2' ? regularizers.l2({ l2: c }) : penalty == 'l1' ? regularizers.l1({ l1: c }) : null }));
+      kernelRegularizer: penalty === 'l2' ? regularizers.l2({ l2: c }) : penalty === 'l1' ? regularizers.l1({ l1: c }) : null }));
     model.compile({
       optimizer: this.optimizer,
       loss: losses.sigmoidCrossEntropy
     });
-    modelWeights.length && model.setWeights(modelWeights);
+    if (modelWeights.length > 0) {
+      model.setWeights(modelWeights);
+    }
     this.model = model;
   }
 
@@ -136,7 +138,7 @@ export class LogisticRegression extends BaseClassifier {
       this.featureSize = nFeature;
       this.outputSize = outputShape;
     } else {
-      if (nFeature != this.featureSize) {
+      if (nFeature !== this.featureSize) {
         throw new Error('feature size does not match previous training set');
       }
     }
@@ -218,10 +220,10 @@ export class LogisticRegression extends BaseClassifier {
     }
   }
 
-  public getCoef(): { 'coefficients': Tensor, 'intercept': Tensor} {
+  public getCoef(): { coefficients: Tensor, intercept: Tensor} {
     return {
-      'coefficients': squeeze(this.model.getWeights()[0]),
-      'intercept': this.fitIntercept ? this.model.getWeights()[1] : tensor(0)
+      coefficients: squeeze(this.model.getWeights()[0]),
+      intercept: this.fitIntercept ? this.model.getWeights()[1] : tensor(0)
     };
   }
 
