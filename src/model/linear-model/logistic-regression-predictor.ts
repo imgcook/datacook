@@ -47,12 +47,14 @@ export class LogisticRegressionPredictor extends BaseClassifier {
    */
   public async fromJson(modelJson: string): Promise<LogisticRegressionPredictor> {
     const modelParams = JSON.parse(modelJson);
-    if (modelParams.name !== 'LogisticRegression'){
+    if (modelParams.name !== 'LogisticRegression') {
       throw new RangeError(`${modelParams.name} is not Logistic Regression`);
     }
     const { classes, modelWeights, featureSize } = modelParams;
     this.featureSize = featureSize;
-    classes && this.initClasses(classes, 'binary-only');
+    if (classes) {
+      this.initClasses(classes, 'binary-only');
+    }
     if (modelWeights?.length) {
       this.modelWeights = modelWeights;
     }
