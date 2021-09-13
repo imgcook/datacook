@@ -43,6 +43,46 @@ export type RMSPropProps = {
 }
 export type OptimizerProps = SGDProps | MomentumProps | AdagradProps | AdadeltaProps | AdamProps | AdamaxProps | RMSPropProps;
 
+function isSGDProps(arg: any): arg is SGDProps {
+  if (arg?.learningRate > 0) {
+    return true;
+  }
+  return false;
+}
+
+function isMomentumProps(arg: any): arg is MomentumProps {
+  if (arg?.learningRate > 0 && arg?.momentum > 0) {
+    return true;
+  }
+  return false;
+}
+
+function isAdagradProps(arg: any): arg is AdadeltaProps {
+  if (arg?.learningRate > 0 && arg?.initialAccumulatorValue > 0) {
+    return true;
+  }
+  return false;
+}
+
+function isAdadeltaProps(arg: any): arg is AdadeltaProps {
+  return true;
+}
+
+function isAdamProps(arg: any): arg is AdamProps {
+  return true;
+}
+
+function isAdaMaxProps(arg:any): arg is AdamProps {
+  return true;
+}
+
+function isRMSPropProps(arg: any): arg is RMSPropProps {
+  if (arg?.learningRate > 0) {
+    return true;
+  }
+  return false;
+}
+
 /**
  * Create optimizer depending on given type and props
  * @param optimizerTypes optimizer types
@@ -51,7 +91,7 @@ export type OptimizerProps = SGDProps | MomentumProps | AdagradProps | AdadeltaP
 export const getOptimizer = (optimizerTypes: OptimizerType, optimizerProps: OptimizerProps): Optimizer => {
   switch (optimizerTypes) {
   case 'sgd': {
-    const props = (optimizerProps as SGDProps);
+    const props = isSGDProps(optimizerProps) ? (optimizerProps as SGDProps) : null;
     if (props) {
       return train.sgd(props.learningRate);
     } else {
@@ -59,7 +99,7 @@ export const getOptimizer = (optimizerTypes: OptimizerType, optimizerProps: Opti
     }
   }
   case 'momentum':{
-    const props = (optimizerProps as MomentumProps);
+    const props = isMomentumProps(optimizerProps) ? (optimizerProps as MomentumProps) : null;
     if (props) {
       const { learningRate, momentum, useNesterov } = props;
       return train.momentum(learningRate, momentum, useNesterov);
@@ -68,7 +108,7 @@ export const getOptimizer = (optimizerTypes: OptimizerType, optimizerProps: Opti
     }
   }
   case 'adagrad': {
-    const props = (optimizerProps as AdagradProps);
+    const props = isAdagradProps(optimizerProps) ? (optimizerProps as AdagradProps) : null;
     if (props) {
       const { learningRate, initialAccumulatorValue } = props;
       return train.adagrad(learningRate, initialAccumulatorValue);
@@ -77,7 +117,7 @@ export const getOptimizer = (optimizerTypes: OptimizerType, optimizerProps: Opti
     }
   }
   case 'adadelta': {
-    const props = (optimizerProps as AdadeltaProps);
+    const props = isAdadeltaProps(optimizerProps) ? (optimizerProps as AdadeltaProps) : null;
     if (props) {
       const { learningRate, rho, epsilon } = props;
       return train.adadelta(learningRate, rho, epsilon);
@@ -86,7 +126,7 @@ export const getOptimizer = (optimizerTypes: OptimizerType, optimizerProps: Opti
     }
   }
   case 'adam': {
-    const props = (optimizerProps as AdamProps);
+    const props = isAdamProps(optimizerProps) ? (optimizerProps as AdamProps) : null;
     if (props) {
       const { learningRate, beta1, beta2, epsilon } = props;
       return train.adam(learningRate, beta1, beta2, epsilon);
@@ -95,7 +135,7 @@ export const getOptimizer = (optimizerTypes: OptimizerType, optimizerProps: Opti
     }
   }
   case 'adamax': {
-    const props = (optimizerProps as AdamaxProps);
+    const props = isAdaMaxProps(optimizerProps) ? (optimizerProps as AdamaxProps) : null;
     if (props) {
       const { learningRate, beta1, beta2, epsilon, decay } = props;
       return train.adamax(learningRate, beta1, beta2, epsilon, decay);
@@ -104,7 +144,7 @@ export const getOptimizer = (optimizerTypes: OptimizerType, optimizerProps: Opti
     }
   }
   case 'rmsprop': {
-    const props = (optimizerProps as RMSPropProps);
+    const props = isRMSPropProps(optimizerProps) ? (optimizerProps as RMSPropProps) : null;
     if (props) {
       const { learningRate, decay, momentum, epsilon, centered } = props;
       return train.rmsprop(learningRate, decay, momentum, epsilon, centered);

@@ -98,7 +98,7 @@ export class OneHotEncoder {
     }
     const nCate = this.categories.shape[0];
     const codeSize = this.drop === 'first' ? nCate - 1 : this.drop === 'binary-only' && nCate === 2 ? 1 : nCate;
-    const shapeCorrect = codeSize > 1 ? checkShape(x, [ -1, codeSize ]) : (checkShape(x, [ -1 ]) || (checkShape(x, [ -1, 1 ])));
+    const shapeCorrect = codeSize > 1 ? checkShape(x, [ -1, codeSize ]) : (checkShape(x, [ -1 ]) || checkShape(x, [ -1, 1 ]));
     if (!shapeCorrect) {
       throw new TypeError('Input shape does not match');
     }
