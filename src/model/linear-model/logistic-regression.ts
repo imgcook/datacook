@@ -1,5 +1,5 @@
-import { Tensor, RecursiveArray, losses, squeeze, tensor, stack } from '@tensorflow/tfjs-core';
-import { layers, sequential, Sequential, regularizers, callbacks } from '@tensorflow/tfjs-layers';
+import { Tensor, RecursiveArray, losses, squeeze, tensor, stack, sigmoid, softmax } from '@tensorflow/tfjs-core';
+import { layers, sequential, Sequential, regularizers, callbacks, initializers } from '@tensorflow/tfjs-layers';
 import { Optimizer } from '@tensorflow/tfjs-core';
 
 import { checkArray } from '../../utils/validation';
@@ -12,7 +12,7 @@ export type LogisticPenalty = 'l1' | 'l2' | 'none';
  */
 export interface LogisticRegressionParams {
   /**
-   * {'l1', 'l2', 'none'}, default = 'l2'
+   * {'l1', 'l2', 'none'}, default = 'none'
    * Specify the norm used in the penalization.
    */
   penalty?: LogisticPenalty,
@@ -65,7 +65,7 @@ export class LogisticRegression extends BaseClassifier {
    * Options in `params`
    * ---------
    *
-   * `penalty`: {'l1', 'l2', 'none'}, default to 'l2', Specify the norm used in the penalization.
+   * `penalty`: {'l1', 'l2', 'none'}, default to 'none', Specify the norm used in the penalization.
    *
    * `fitIntercept`: Whether to calculate the intercept for this model. If set to False,
    *    no intercept will be used in calculations.
@@ -88,7 +88,7 @@ export class LogisticRegression extends BaseClassifier {
    *  to initialize adam optimizer.
    */
   constructor(params: LogisticRegressionParams = {
-    penalty: 'l2',
+    penalty: 'none',
     fitIntercept: true,
     c: 1,
     optimizerType: 'adam',
@@ -96,7 +96,7 @@ export class LogisticRegression extends BaseClassifier {
   }) {
     super();
     this.fitIntercept = params.fitIntercept !== false;
-    this.penalty = params.penalty ? params.penalty : 'l2';
+    this.penalty = params.penalty ? params.penalty : 'none';
     this.c = params.c ? params.c : 1;
     this.optimizerType = params.optimizerType ? params.optimizerType : 'adam';
     this.optimizerProps = params.optimizerProps ? params.optimizerProps : { learningRate: 0.1 };
@@ -111,11 +111,13 @@ export class LogisticRegression extends BaseClassifier {
       inputShape: [ inputShape ],
       units: outputShape,
       useBias,
-      activation: 'sigmoid',
-      kernelRegularizer: penalty === 'l2' ? regularizers.l2({ l2: c }) : penalty === 'l1' ? regularizers.l1({ l1: c }) : null }));
+      kernelInitializer: initializers.zeros(),
+      biasInitializer: initializers.zeros(),
+      kernelRegularizer: penalty === 'l2' ? regularizers.l2({ l2: c }) : penalty === 'l1' ? regularizers.l1({ l1: c }) : null
+    }));
     model.compile({
       optimizer: this.optimizer,
-      loss: losses.sigmoidCrossEntropy
+      loss: this.isBinaryClassification() ? losses.sigmoidCrossEntropy : losses.softmaxCrossEntropy
     });
     if (modelWeights.length > 0) {
       model.setWeights(modelWeights);
@@ -132,7 +134,7 @@ export class LogisticRegression extends BaseClassifier {
     const { x, y } = this.validateData(xData, yData);
     const nFeature = x.shape[1];
     if (!this.model) {
-      await this.initClasses(y, 'binary-only');
+      if (!this.classes() || !this.classes().shape[0]) await this.initClasses(y, 'binary-only');
       const outputShape = this.isBinaryClassification() ? 1 : this.classes().shape[0];
       this.initModel(nFeature, outputShape, this.fitIntercept);
       this.featureSize = nFeature;
@@ -214,9 +216,9 @@ export class LogisticRegression extends BaseClassifier {
     const x = checkArray(xData, 'float32');
     const scores = this.model.predict(x);
     if (scores instanceof Array){
-      return stack(scores);
+      return this.isBinaryClassification() ? stack(scores) : softmax(stack(scores));
     } else {
-      return scores;
+      return this.isBinaryClassification() ? sigmoid(scores) : softmax(scores);
     }
   }
 
