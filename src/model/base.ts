@@ -34,7 +34,7 @@ export class BaseClassifier {
   }
 
   public classes(): Tensor {
-    return this.classOneHotEncoder.categories;
+    return this.classOneHotEncoder?.categories;
   }
 
   public isBinaryClassification(): boolean {
