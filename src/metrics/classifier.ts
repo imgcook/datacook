@@ -13,3 +13,16 @@ export const accuracyScore = ( yTrue: Tensor | string[] | number[], yPred: Tenso
   const score = div(sum(equal(yPred, yTrue)), yTrueCount).dataSync()[0];
   return score;
 };
+
+/**
+ * Check that yTrue and yPred belong to classification task
+ * @param yTrue 
+ * @param yPred 
+ */
+export const checkTarget = (yTrue, yPred) {
+  
+}
+
+export const confusionMatrix = (yTrue: Tensor | string[] | number[], yPred, sampleWeight) {
+
+}
