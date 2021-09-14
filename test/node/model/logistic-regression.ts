@@ -70,7 +70,7 @@ describe('Logistic ', () => {
     await lr.initClasses([ 1, 2, 3, 4 ], 'binary-only');
     const batchSize = 32;
     for (let i = 0; i < 800; i++) {
-      const j = Math.floor(i%(batchSize));
+      const j = Math.floor(i % batchSize);
       const batchX = tf.slice(cases, [j * batchSize, 0], [batchSize ,5]);
       const batchY = tf.slice(yMult, [j * batchSize], [batchSize]);
       await lr.trainOnBatch(batchX, batchY)
