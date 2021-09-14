@@ -1,5 +1,4 @@
-import { Tensor, mean, matMul, sub, transpose, RecursiveArray, ones, sqrt, add, divNoNan } from "@tensorflow/tfjs-core";
-import { setFlagsFromString } from "node:v8";
+import { Tensor, mean, matMul, sub, transpose, RecursiveArray, ones, sqrt, add, divNoNan, mul } from "@tensorflow/tfjs-core";
 import { svd } from "../../linalg";
 import { checkArray } from "../../utils/validation";
 
@@ -41,10 +40,10 @@ export class FactorAnalysis {
     const s = matMul(transpose(xCentered), xCentered);
     const small = 1e-12;
     let psi = ones([ nFeatures ]);
-    /*for (let i = 0; i < this.maxIterTimes; i++) {
+    for (let i = 0; i < this.maxIterTimes; i++) {
       const sqrtPsi = add(sqrt(psi), small);
-      const [ u, v, m ] = svd(divNoNan(xCentered, ))
+      const [ u, v, m ] = svd(divNoNan(xCentered, mul(sqrtPsi, nSqrt)));
+      
     }
-    */
   }
 }
