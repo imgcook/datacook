@@ -18,7 +18,7 @@ import { tensorNormalize, tensorEqual } from './utils';
  * @param tol tolerence, default to 1e-4
  * @param maxIter max iteration time, default to 200
  */
-export const solveEigenValues = async(matrix: Tensor, tol = 1e-4, maxIter = 200): Promise<Tensor> => {
+export const solveEigenValues = async (matrix: Tensor, tol = 1e-4, maxIter = 200): Promise<Tensor> => {
   let [ q, r ] = linalg.qr(matrix);
   let x = matrix;
   let prevX: Tensor;
@@ -65,7 +65,7 @@ export const solveEigenValues = async(matrix: Tensor, tol = 1e-4, maxIter = 200)
  * @param tol tolerance, default to 1e-4
  * @param maxIter max iteration time, default to 200
  */
-export const eigenBackSolve = async(matrix: Tensor, eigenValue: number, tol = 1e-4, maxIter = 200): Promise<Tensor> => {
+export const eigenBackSolve = async (matrix: Tensor, eigenValue: number, tol = 1e-4, maxIter = 200): Promise<Tensor> => {
   const nCols = matrix.shape[0];
   let current = tensor(new Array(nCols).fill(1));
   let previous;
@@ -121,7 +121,7 @@ export const solveEigenVectors = async (matrix: Tensor, eigenValues: Tensor, tol
  * @param tol stop tolerence, default to 1e-4
  * @param maxIter max iteration times, default to 200
  */
-export const eigenSolve = async(matrix: Tensor, tol = 1e-4, maxIter = 200): Promise<[Tensor, Tensor]> => {
+export const eigenSolve = async (matrix: Tensor, tol = 1e-4, maxIter = 200): Promise<[Tensor, Tensor]> => {
   const eigenValues = await solveEigenValues(matrix, tol, maxIter);
   const eigenVectors = await solveEigenVectors(matrix, eigenValues, tol, maxIter);
   return [ eigenValues, eigenVectors ];
