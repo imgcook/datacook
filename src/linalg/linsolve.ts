@@ -15,7 +15,7 @@ import { Tensor, matMul, transpose, tensor, slice, squeeze, linalg, reshape } fr
  * @param r upper triangle matrix
  * @param v target value
  */
-export const linSolveUpperTriangle = async(r: Tensor, v: Tensor): Promise<Tensor> => {
+export const linSolveUpperTriangle = async (r: Tensor, v: Tensor): Promise<Tensor> => {
   const nEq = v.shape[0];
   const solution = new Array(nEq).fill(0);
   let backSubsitute: number;
@@ -46,13 +46,13 @@ export const linSolveUpperTriangle = async(r: Tensor, v: Tensor): Promise<Tensor
  * reduces the problem to solving a linear equation Rx = y for an upper
  * triangular matrix R.
 */
-export const linSolveFromQR = async(q: Tensor, r: Tensor, v: Tensor): Promise<Tensor> => {
+export const linSolveFromQR = async (q: Tensor, r: Tensor, v: Tensor): Promise<Tensor> => {
   const rhs = squeeze(matMul(transpose(q), reshape(v, [ -1, 1 ])));
   const solution = await linSolveUpperTriangle(r, rhs);
   return solution;
 };
 
-export const linSolveQR = async(matrix: Tensor, v: Tensor): Promise<Tensor> => {
+export const linSolveQR = async (matrix: Tensor, v: Tensor): Promise<Tensor> => {
   const [ q, r ] = linalg.qr(matrix);
   const solution = await linSolveFromQR(q, r, v);
   return solution;

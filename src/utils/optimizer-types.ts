@@ -15,32 +15,33 @@ export type MomentumProps = {
 export type AdagradProps = {
   learningRate: number,
   initialAccumulatorValue: number
-}
+};
 export type AdadeltaProps = {
   learningRate?: number,
   rho?: number,
   epsilon?: number
-}
+};
 export type AdamProps = {
   learningRate?: number,
   beta1?: number,
   beta2?: number,
   epsilon?: number
-}
+};
 export type AdamaxProps = {
   learningRate?: number,
   beta1?: number,
   beta2?: number,
   epsilon?: number,
   decay?: number
-}
+};
 export type RMSPropProps = {
   learningRate: number,
   decay?: number,
   momentum?: number,
   epsilon?: number,
   centered?: boolean
-}
+};
+
 export type OptimizerProps = SGDProps | MomentumProps | AdagradProps | AdadeltaProps | AdamProps | AdamaxProps | RMSPropProps;
 
 function isSGDProps(arg: any): arg is SGDProps {

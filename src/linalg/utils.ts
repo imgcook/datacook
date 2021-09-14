@@ -42,7 +42,7 @@ export const checkShape = (matrix: Tensor, shape: number[]): boolean => {
  * @param matrix target matrix
  */
 export const isSquareMatrix = (matrix: Tensor): boolean => {
-  if (checkDimension(matrix, 2)) {
+  if (!checkDimension(matrix, 2)) {
     return false;
   }
   if (matrix.shape[0] === matrix.shape[1]) {

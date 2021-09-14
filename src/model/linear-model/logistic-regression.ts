@@ -44,10 +44,9 @@ export interface LogisticRegressionTrainParams {
   batchSize?: number,
   epochs?: number,
 }
-
 /**
  * Logistic regression classifier
- * */
+ */
 export class LogisticRegression extends BaseClassifier {
   private fitIntercept: boolean;
   private penalty: LogisticPenalty;
@@ -70,7 +69,8 @@ export class LogisticRegression extends BaseClassifier {
    * `fitIntercept`: Whether to calculate the intercept for this model. If set to False,
    *    no intercept will be used in calculations.
    *
-   * `c`: Regularization strength; must be a positive float. Larger values specify stronger regularization. Default to 1.
+   * `c`: Regularization strength; must be a positive float. Larger values specify stronger regularization.
+   * Default to 1.
    *
    * `optimizerType`: optimizer types for training. All of the following optimizers types supported in tensorflow.js
    *  (https://js.tensorflow.org/api/latest/#Training-Optimizers) can be applied. Default to 'adam':
@@ -133,19 +133,17 @@ export class LogisticRegression extends BaseClassifier {
   public async trainOnBatch(xData: Tensor | RecursiveArray<number>, yData: Tensor | RecursiveArray<number>): Promise<LogisticRegression> {
     const { x, y } = this.validateData(xData, yData);
     const nFeature = x.shape[1];
+    if (this.model && nFeature != this.featureSize) {
+      throw new Error('feature size does not match previous training set');
+    }
     if (!this.model) {
       if (!this.classes() || !this.classes().shape[0]) await this.initClasses(y, 'binary-only');
       const outputShape = this.isBinaryClassification() ? 1 : this.classes().shape[0];
       this.initModel(nFeature, outputShape, this.fitIntercept);
       this.featureSize = nFeature;
       this.outputSize = outputShape;
-    } else {
-      if (nFeature !== this.featureSize) {
-        throw new Error('feature size does not match previous training set');
-      }
     }
-    const yOneHot = await this.getLabelOneHot(y);
-    await this.model.trainOnBatch(x, yOneHot);
+    await this.model.trainOnBatch(x, await this.getLabelOneHot(y));
     return this;
   }
 
@@ -201,8 +199,7 @@ export class LogisticRegression extends BaseClassifier {
     const x = checkArray(xData, 'float32');
     const scores = this.model.predict(x);
     if (scores instanceof Tensor) {
-      const predClasses = await this.getPredClass(scores);
-      return predClasses;
+      return await this.getPredClass(scores);
     }
     return scores;
   }
@@ -229,25 +226,23 @@ export class LogisticRegression extends BaseClassifier {
     };
   }
 
-  public async getModelWeightsArray(): Promise<RecursiveArray<number>> {
-    const weights = [];
-    for (const w of this.model.getWeights()) {
-      weights.push(await w.array());
-    }
-    return weights;
+  public getModelWeightsArray(): Promise<RecursiveArray<number>> {
+    return Promise.all(this.model.getWeights().map((w: Tensor) => w.array()));
   }
 
   public initModelFromWeights(inputShape: number, outputShape: number, useBias: boolean, weights: (Float32Array | Int32Array | Uint8Array)[]): void {
-    const weightsTensors = [];
-    for (const w of weights) {
-      weightsTensors.push(tensor(w));
-    }
+    const weightsTensors = weights.map((w) => tensor(w));
     this.initModel(inputShape, outputShape, useBias, weightsTensors);
   }
 
+  /**
+   * Load model paramters from json string object
+   * @param modelJson model json saved as string object
+   * @returns model itself
+   */
   public async fromJson(modelJson: string): Promise<LogisticRegression> {
     const modelParams = JSON.parse(modelJson);
-    if (modelParams.name !== 'LogisticRegression'){
+    if (modelParams.name !== 'LogisticRegression') {
       throw new RangeError(`${modelParams.name} is not Logistic Regression`);
     }
     const { classes, fitIntercept, penalty, c, optimizerType, optimizerProps,
@@ -266,7 +261,10 @@ export class LogisticRegression extends BaseClassifier {
     }
     return this;
   }
-
+  /**
+   * Dump model parameters to json string.
+   * @returns Stringfied model parameters
+   */
   public async toJson(): Promise<string> {
     const modelParams = {
       name: 'LogisticRegression',

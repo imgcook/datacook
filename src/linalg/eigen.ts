@@ -94,7 +94,7 @@ export const eigenBackSolve = async (matrix: Tensor, eigenValue: number, tol = 1
 };
 
 /**
- * Solve for the eigenvectors of a matrix M once the eigenvalues are known
+ * Solve for the eigenvectors of a matrix once the eigenvalues are known
  * using inverse iteration.
  * @param matrix target matrix
  * @param eigenValues eigen values
@@ -114,7 +114,7 @@ export const solveEigenVectors = async (matrix: Tensor, eigenValues: Tensor, tol
 };
 
 /**
- * Compute the eigenvalues and eigenvectors of a matrix M.
+ * Compute the eigenvalues and eigenvectors of a matrix.
  * The eigenvalues are computed using the QR algorithm, then the eigenvectors
  * are computed by inverse iteration.
  * @param matrix target matrix
