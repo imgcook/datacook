@@ -22,7 +22,7 @@ describe('Linear Regression', () => {
   it('train simple dataset on batch', async () => {
     const lm = new LinearRegression({optimizerType: 'adam', optimizerProps: {learningRate: 0.1}});
     for (let i = 0; i < 800; i++) {
-      const j = Math.floor(i%(100));
+      const j = Math.floor(i % 100);
       const batchX = tf.slice(cases, [j * 100, 0], [100 ,5]);
       const batchY = tf.slice(y, [j * 100], [100]);
       await lm.trainOnBatch(batchX, batchY)
