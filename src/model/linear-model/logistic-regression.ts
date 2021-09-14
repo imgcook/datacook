@@ -199,9 +199,9 @@ export class LogisticRegression extends BaseClassifier {
     const x = checkArray(xData, 'float32');
     const scores = this.model.predict(x);
     if (scores instanceof Tensor) {
-      return await this.getPredClass(scores);
+      return this.getPredClass(scores);
     } else {
-      return await this.getPredClass(stack(scores));
+      return this.getPredClass(stack(scores));
     }
   }
 
@@ -220,7 +220,7 @@ export class LogisticRegression extends BaseClassifier {
     }
   }
 
-  public getCoef(): { coefficients: Tensor, intercept: Tensor} {
+  public getCoef(): { coefficients: Tensor, intercept: Tensor } {
     return {
       coefficients: squeeze(this.model.getWeights()[0]),
       intercept: this.fitIntercept ? this.model.getWeights()[1] : tensor(0)
@@ -244,7 +244,7 @@ export class LogisticRegression extends BaseClassifier {
   public async fromJson(modelJson: string): Promise<LogisticRegression> {
     const modelParams = JSON.parse(modelJson);
     if (modelParams.name !== 'LogisticRegression') {
-      throw new RangeError(`${modelParams.name} is not Logistic Regression`);
+      throw new TypeError(`${modelParams.name} is not Logistic Regression`);
     }
     const { classes, fitIntercept, penalty, c, optimizerType, optimizerProps,
       modelWeights, featureSize, outputSize } = modelParams;
@@ -276,7 +276,7 @@ export class LogisticRegression extends BaseClassifier {
     const modelParams = {
       name: 'LogisticRegression',
       classes: await this.classes()?.array(),
-      fitIntercept: await this.fitIntercept,
+      fitIntercept: this.fitIntercept,
       penalty: this.penalty,
       c: this.c,
       optimizerType: this.optimizerType,

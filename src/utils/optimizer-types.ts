@@ -45,24 +45,15 @@ export type RMSPropProps = {
 export type OptimizerProps = SGDProps | MomentumProps | AdagradProps | AdadeltaProps | AdamProps | AdamaxProps | RMSPropProps;
 
 function isSGDProps(arg: any): arg is SGDProps {
-  if (arg?.learningRate > 0) {
-    return true;
-  }
-  return false;
+  return arg?.learningRate > 0;
 }
 
 function isMomentumProps(arg: any): arg is MomentumProps {
-  if (arg?.learningRate > 0 && arg?.momentum > 0) {
-    return true;
-  }
-  return false;
+  return arg?.learningRate > 0 && arg?.momentum > 0;
 }
 
 function isAdagradProps(arg: any): arg is AdadeltaProps {
-  if (arg?.learningRate > 0 && arg?.initialAccumulatorValue > 0) {
-    return true;
-  }
-  return false;
+  return arg?.learningRate > 0 && arg?.initialAccumulatorValue > 0;
 }
 
 function isAdadeltaProps(arg: any): arg is AdadeltaProps {
@@ -78,83 +69,55 @@ function isAdaMaxProps(arg: any): arg is AdamProps {
 }
 
 function isRMSPropProps(arg: any): arg is RMSPropProps {
-  if (arg?.learningRate > 0) {
-    return true;
-  }
-  return false;
+  return arg?.learningRate > 0;
 }
-
+const optimizerTypeAssertMap: Record<string, any> = {
+  sgd: isSGDProps,
+  momentum: isMomentumProps,
+  adagrad: isAdagradProps,
+  adadelta: isAdadeltaProps,
+  adam: isAdamProps,
+  adamax: isAdaMaxProps,
+  rmsprop: isRMSPropProps
+};
 /**
  * Create optimizer depending on given type and props
  * @param optimizerType optimizer type
  * @param optimizerProps optimizer properties
  */
 export const getOptimizer = (optimizerType: OptimizerType, optimizerProps: OptimizerProps): Optimizer => {
-  switch (optimizerType) {
-  case 'sgd': {
-    const props = isSGDProps(optimizerProps) ? (optimizerProps as SGDProps) : null;
-    if (props) {
-      return train.sgd(props.learningRate);
-    } else {
-      throw new TypeError('Illegal properties to init optimizer');
-    }
+  const typeCheck = optimizerTypeAssertMap[optimizerType];
+  if (typeCheck && !typeCheck(optimizerProps)) {
+    throw new TypeError('Illegal properties to init optimizer');
   }
-  case 'momentum':{
-    const props = isMomentumProps(optimizerProps) ? (optimizerProps as MomentumProps) : null;
-    if (props) {
-      const { learningRate, momentum, useNesterov } = props;
-      return train.momentum(learningRate, momentum, useNesterov);
-    } else {
-      throw new TypeError('Illegal properties to init optimizer');
-    }
+  switch (optimizerType) {
+  case 'sgd':
+    return train.sgd((optimizerProps as SGDProps).learningRate);
+  case 'momentum': {
+    const { learningRate, momentum, useNesterov } = optimizerProps as MomentumProps;
+    return train.momentum(learningRate, momentum, useNesterov);
   }
   case 'adagrad': {
-    const props = isAdagradProps(optimizerProps) ? (optimizerProps as AdagradProps) : null;
-    if (props) {
-      const { learningRate, initialAccumulatorValue } = props;
-      return train.adagrad(learningRate, initialAccumulatorValue);
-    } else {
-      throw new TypeError('Illegal properties to init optimizer');
-    }
+    const { learningRate, initialAccumulatorValue } = optimizerProps as AdagradProps;
+    return train.adagrad(learningRate, initialAccumulatorValue);
   }
   case 'adadelta': {
-    const props = isAdadeltaProps(optimizerProps) ? (optimizerProps as AdadeltaProps) : null;
-    if (props) {
-      const { learningRate, rho, epsilon } = props;
-      return train.adadelta(learningRate, rho, epsilon);
-    } else {
-      throw new TypeError('Illegal properties to init optimizer');
-    }
+    const { learningRate, rho, epsilon } = optimizerProps as AdadeltaProps;
+    return train.adadelta(learningRate, rho, epsilon);
   }
   case 'adam': {
-    const props = isAdamProps(optimizerProps) ? (optimizerProps as AdamProps) : null;
-    if (props) {
-      const { learningRate, beta1, beta2, epsilon } = props;
-      return train.adam(learningRate, beta1, beta2, epsilon);
-    } else {
-      throw new TypeError('Illegal properties to init optimizer');
-    }
+    const { learningRate, beta1, beta2, epsilon } = optimizerProps as AdamProps;
+    return train.adam(learningRate, beta1, beta2, epsilon);
   }
   case 'adamax': {
-    const props = isAdaMaxProps(optimizerProps) ? (optimizerProps as AdamaxProps) : null;
-    if (props) {
-      const { learningRate, beta1, beta2, epsilon, decay } = props;
-      return train.adamax(learningRate, beta1, beta2, epsilon, decay);
-    } else {
-      throw new TypeError('Illegal properties to init optimizer');
-    }
+    const { learningRate, beta1, beta2, epsilon, decay } = optimizerProps as AdamaxProps;
+    return train.adamax(learningRate, beta1, beta2, epsilon, decay);
   }
   case 'rmsprop': {
-    const props = isRMSPropProps(optimizerProps) ? (optimizerProps as RMSPropProps) : null;
-    if (props) {
-      const { learningRate, decay, momentum, epsilon, centered } = props;
-      return train.rmsprop(learningRate, decay, momentum, epsilon, centered);
-    } else {
-      throw new TypeError('Illegal properties to init optimizer');
-    }
+    const { learningRate, decay, momentum, epsilon, centered } = optimizerProps as RMSPropProps;
+    return train.rmsprop(learningRate, decay, momentum, epsilon, centered);
   }
-  default: {
+  default:
     throw new TypeError('Illegal optimizer type: ' + optimizerType);
-  }
   }
 };
