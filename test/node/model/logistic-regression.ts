@@ -34,22 +34,18 @@ describe('Logistic ', () => {
     const lr = new LogisticRegression();
     await lr.fit(cases, y);
     const predY = await lr.predict(cases);
-    if (predY instanceof Tensor){
-      const acc = accuracyScore(y, predY);
-      console.log('accuracy: ', acc);
-      assert.isTrue(acc >= 0.95);
-    }
+    const acc = accuracyScore(y, predY);
+    console.log('accuracy:', acc);
+    assert.isTrue(acc >= 0.95);
   });
 
   it('train simple dataset (multi-classification)', async () => {
     const lr = new LogisticRegression();
     await lr.fit(cases, yMult);
     const predY = await lr.predict(cases);
-    if (predY instanceof Tensor){
-      const acc = accuracyScore(yMult, predY);
-      console.log('accuracy: ', acc);
-      assert.isTrue(acc >= 0.75);
-    }
+    const acc = accuracyScore(yMult, predY);
+    console.log('accuracy:', acc);
+    assert.isTrue(acc >= 0.75);
   });
 
   it('train simple dataset on batch', async () => {
@@ -57,17 +53,15 @@ describe('Logistic ', () => {
     await lr.initClasses([ 0, 1 ], 'binary-only');
     const batchSize = 32;
     for (let i = 0; i < 800; i++) {
-      const j = Math.floor(i%(batchSize));
+      const j = Math.floor(i % batchSize);
       const batchX = tf.slice(cases, [j * batchSize, 0], [batchSize ,5]);
       const batchY = tf.slice(y, [j * batchSize], [batchSize]);
       await lr.trainOnBatch(batchX, batchY)
     }
     const predY = await lr.predict(cases);
-    if (predY instanceof Tensor){
-      const acc = accuracyScore(y, predY);
-      console.log('accuracy: ', acc);
-      assert.isTrue(acc >= 0.95);
-    }
+    const acc = accuracyScore(y, predY);
+    console.log('accuracy:', acc);
+    assert.isTrue(acc >= 0.95);
   });
 
   it('train simple dataset on batch (multi-classification)', async () => {
@@ -82,11 +76,9 @@ describe('Logistic ', () => {
       await lr.trainOnBatch(batchX, batchY)
     }
     const predY = await lr.predict(cases);
-    if (predY instanceof Tensor){
-      const acc = accuracyScore(yMult, predY);
-      console.log('accuracy: ', acc);
-      assert.isTrue(acc >= 0.75);
-    }
+    const acc = accuracyScore(yMult, predY);
+    console.log('accuracy:', acc);
+    assert.isTrue(acc >= 0.75);
   });
   it('save and load model', async () => {
     const lr = new LogisticRegression();
@@ -95,11 +87,9 @@ describe('Logistic ', () => {
     const lr2 = new LogisticRegression();
     await lr2.fromJson(modelJson);
     const predY = await lr2.predict(cases);
-    if (predY instanceof Tensor){
-      const acc = accuracyScore(y, predY);
-      console.log('accuracy: ', acc);
-      assert.isTrue(acc >= 0.95);
-    }
+    const acc = accuracyScore(y, predY);
+    console.log('accuracy:', acc);
+    assert.isTrue(acc >= 0.95);
   });
   it('save and load model (multi-classification)', async () => {
     const lr = new LogisticRegression();
@@ -108,11 +98,9 @@ describe('Logistic ', () => {
     const lr2 = new LogisticRegression();
     await lr2.fromJson(modelJson);
     const predY = await lr2.predict(cases);
-    if (predY instanceof Tensor){
-      const acc = accuracyScore(yMult, predY);
-      console.log('accuracy: ', acc);
-      assert.isTrue(acc >= 0.75);
-    }
+    const acc = accuracyScore(yMult, predY);
+    console.log('accuracy:', acc);
+    assert.isTrue(acc >= 0.75);
   });
   it('save and load model as predictor', async () => {
     const lr = new LogisticRegression();
@@ -121,11 +109,9 @@ describe('Logistic ', () => {
     const lr2 = new LogisticRegressionPredictor();
     await lr2.fromJson(modelJson);
     const predY = await lr2.predict(cases);
-    if (predY instanceof Tensor){
-      const acc = accuracyScore(y, predY);
-      console.log('accuracy: ', acc);
-      assert.isTrue(acc >= 0.95);
-    }
+    const acc = accuracyScore(y, predY);
+    console.log('accuracy:', acc);
+    assert.isTrue(acc >= 0.95);
   });
   it('save and load model as predictor (multi-classification)', async () => {
     const lr = new LogisticRegression();
@@ -134,10 +120,8 @@ describe('Logistic ', () => {
     const lr2 = new LogisticRegressionPredictor();
     await lr2.fromJson(modelJson);
     const predY = await lr2.predict(cases);
-    if (predY instanceof Tensor){
-      const acc = accuracyScore(yMult, predY);
-      console.log('accuracy: ', acc);
-      assert.isTrue(acc >= 0.75);
-    }
+    const acc = accuracyScore(yMult, predY);
+    console.log('accuracy:', acc);
+    assert.isTrue(acc >= 0.75);
   });
 });

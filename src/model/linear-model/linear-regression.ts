@@ -1,4 +1,4 @@
-import { Tensor, RecursiveArray, losses, squeeze, tensor } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, losses, squeeze, tensor, stack } from '@tensorflow/tfjs-core';
 import { layers, sequential, Sequential } from '@tensorflow/tfjs-layers';
 import { BaseEstimater } from '../base';
 import { checkArray } from '../../utils/validation';
@@ -140,11 +140,14 @@ export class LinearRegression extends BaseEstimater {
     return this;
   }
 
-  public predict(xData: Tensor | RecursiveArray<number>): Tensor | Tensor[] {
+  public async predict(xData: Tensor | RecursiveArray<number>): Promise<Tensor> {
     const x = checkArray(xData, 'float32');
     const predY = this.model.predict(x);
-    if (predY instanceof Tensor) return squeeze(predY);
-    return predY;
+    if (predY instanceof Tensor) {
+      return squeeze(predY);
+    } else {
+      return squeeze(stack(predY));
+    }
   }
 
   public initModelFromWeights(inputShape: number, useBias: boolean, weights: (Float32Array | Int32Array | Uint8Array)[]): void {
@@ -178,7 +181,7 @@ export class LinearRegression extends BaseEstimater {
    */
   public async fromJson(modelJson: string): Promise<LinearRegression> {
     const modelParams = JSON.parse(modelJson);
-    if (modelParams.name !== 'LinearRegression'){
+    if (modelParams.name !== 'LinearRegression') {
       throw new TypeError(`${modelParams.name} is not Linear Regression`);
     }
     const { fitIntercept, optimizerType, optimizerProps,

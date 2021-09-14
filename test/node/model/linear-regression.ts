@@ -37,9 +37,7 @@ describe('Linear Regression', () => {
     const modelJson = await lr.toJson();
     const lr2 = new LinearRegression();
     await lr2.fromJson(modelJson);
-    const predY = lr2.predict(cases);
-    if (predY instanceof Tensor) {
-      assert.isTrue(tensorEqual(predY, y, 1));
-    }
+    const predY = await lr2.predict(cases);
+    assert.isTrue(tensorEqual(predY, y, 1));
   });
 });

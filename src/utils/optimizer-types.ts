@@ -73,7 +73,7 @@ function isAdamProps(arg: any): arg is AdamProps {
   return true;
 }
 
-function isAdaMaxProps(arg:any): arg is AdamProps {
+function isAdaMaxProps(arg: any): arg is AdamProps {
   return true;
 }
 
@@ -86,11 +86,11 @@ function isRMSPropProps(arg: any): arg is RMSPropProps {
 
 /**
  * Create optimizer depending on given type and props
- * @param optimizerTypes optimizer types
+ * @param optimizerType optimizer type
  * @param optimizerProps optimizer properties
  */
-export const getOptimizer = (optimizerTypes: OptimizerType, optimizerProps: OptimizerProps): Optimizer => {
-  switch (optimizerTypes) {
+export const getOptimizer = (optimizerType: OptimizerType, optimizerProps: OptimizerProps): Optimizer => {
+  switch (optimizerType) {
   case 'sgd': {
     const props = isSGDProps(optimizerProps) ? (optimizerProps as SGDProps) : null;
     if (props) {
@@ -154,7 +154,7 @@ export const getOptimizer = (optimizerTypes: OptimizerType, optimizerProps: Opti
     }
   }
   default: {
-    throw new TypeError('Illegal optimizer type');
+    throw new TypeError('Illegal optimizer type: ' + optimizerType);
   }
   }
 };

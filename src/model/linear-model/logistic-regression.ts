@@ -195,13 +195,14 @@ export class LogisticRegression extends BaseClassifier {
    * @param xData Input features
    * @returns Predicted classes
    */
-  public async predict(xData: Tensor | RecursiveArray<number>) : Promise<Tensor | Tensor[]> {
+  public async predict(xData: Tensor | RecursiveArray<number>): Promise<Tensor> {
     const x = checkArray(xData, 'float32');
     const scores = this.model.predict(x);
     if (scores instanceof Tensor) {
       return await this.getPredClass(scores);
+    } else {
+      return await this.getPredClass(stack(scores));
     }
-    return scores;
   }
 
   /**
@@ -209,7 +210,7 @@ export class LogisticRegression extends BaseClassifier {
    * @param xData Input features
    * @returns Predicted probabilities
    */
-  public async predictProba(xData: Tensor | RecursiveArray<number>) : Promise<Tensor> {
+  public async predictProba(xData: Tensor | RecursiveArray<number>): Promise<Tensor> {
     const x = checkArray(xData, 'float32');
     const scores = this.model.predict(x);
     if (scores instanceof Array){
@@ -247,10 +248,16 @@ export class LogisticRegression extends BaseClassifier {
     }
     const { classes, fitIntercept, penalty, c, optimizerType, optimizerProps,
       modelWeights, featureSize, outputSize } = modelParams;
-    classes && this.initClasses(classes, 'binary-only');
+    if (classes) {
+      this.initClasses(classes, 'binary-only');
+    }
     this.fitIntercept = (fitIntercept as boolean);
-    penalty && (this.penalty = penalty);
-    c && (this.c = c);
+    if (penalty) {
+      this.penalty = penalty;
+    }
+    if (c) {
+      this.c = c;
+    }
     if (optimizerType as OptimizerType && optimizerProps as OptimizerProps) {
       this.optimizerType = optimizerType;
       this.optimizerProps = optimizerProps;

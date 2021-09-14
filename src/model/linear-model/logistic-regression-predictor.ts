@@ -16,11 +16,10 @@ export class LogisticRegressionPredictor extends BaseClassifier {
    * @param xData Input feaures
    * @returns predicted classes
    */
-  public async predict(xData: Tensor | RecursiveArray<number>) : Promise<Tensor | Tensor[]> {
+  public async predict(xData: Tensor | RecursiveArray<number>) : Promise<Tensor> {
     const x = checkArray(xData, 'float32');
     const scores = add(matMul(x, tensor(this.modelWeights[0])), this.modelWeights[1]);
-    const predClasses = await this.getPredClass(scores);
-    return predClasses;
+    return await this.getPredClass(scores);
   }
   /**
    * Predict probabilities using logistic regression model.
