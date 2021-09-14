@@ -1,4 +1,4 @@
-import { Tensor, mean, matMul, sub, transpose, RecursiveArray, ones, sqrt, add, divNoNan, mul, gather, slice, linalg, diag, eye, log, sum } from "@tensorflow/tfjs-core";
+import { Tensor, mean, matMul, sub, transpose, RecursiveArray, ones, sqrt, add, divNoNan, mul, gather, slice, linalg, diag, eye, log, sum, clipByValue, neg, range, cast } from "@tensorflow/tfjs-core";
 import { svd, tensorEqual } from "../../linalg";
 import { checkArray } from "../../utils/validation";
 
@@ -28,7 +28,7 @@ export class FactorAnalysis {
   constructor(params: FactorAnalysisParams) {
     this.nComponents = params.nComponent ? params.nComponent : -1;
     this.tol = params.tol ? params.tol : 1e-2;
-    this.maxIterTimes = params.maxIterTimes ? params.maxIterTimes : 10000;
+    this.maxIterTimes = params.maxIterTimes ? params.maxIterTimes : 20;
   }
 
   public async fit(xData: Tensor | RecursiveArray<number>): Promise<FactorAnalysis> {
@@ -37,29 +37,54 @@ export class FactorAnalysis {
     const nComponent = (!this.nComponents || this.nComponents === -1 || this.nComponents > nFeatures) ? nFeatures : this.nComponents;
     const xMeans = mean(xTensor, 0);
     const nSqrt = Math.sqrt(nSamples);
-    const xCentered = sub(xTensor, xMeans);
-    const sigmaDiag = linalg.bandPart(matMul(transpose(xCentered), xCentered), 0, 0);
+    const xCentered = transpose(sub(xTensor, xMeans));
+    const sigmaDiag = linalg.bandPart(matMul(xCentered, transpose(xCentered)), 0, 0);
     const small = 1e-12;
-    let oldll: Tensor;
-    let psi = ones([ nFeatures ]);
+    const llConst = nFeatures * Math.log(2.0 * Math.PI) + nComponent;
+    let oldllDelta: Tensor;
+    let psi: Tensor = eye(nFeatures);
+
     for (let i = 0; i < this.maxIterTimes; i++) {
-      const sqrtPsi = add(sqrt(psi), small);
-      const xd = divNoNan(xCentered, mul(sqrtPsi, nSqrt));
+      const sqrtPsi = linalg.bandPart(add(sqrt(psi), small), 0, 0);
+      const xd = divNoNan(matMul(sqrtPsi, xCentered), nSqrt);
+      console.log('xd');
+      xd.print();
+      console.log('sqrtpsi');
+      sqrtPsi.print();
       const [ u, m, w ] = await svd(xd);
-      const firstNInd = [ ...Array(nComponent).keys() ];
+      const firstNInd = cast(range(0, nComponent), 'int32');
+      const lastNInd = cast(range(nComponent, nFeatures), 'int32');
       const uh = gather(u, firstNInd, 1);
-      const mh = gather(mul(m, m), firstNInd);
-      const f = matMul(matMul(sqrtPsi, uh), sqrt(sub(diag(mh), eye(nComponent))));
+      const ms = mul(m, m);
+      const mh = gather(ms, firstNInd);
+      const f = matMul(matMul(sqrtPsi, uh), sqrt(clipByValue(sub(diag(mh), eye(nComponent)), 0, 1e12)));
       // update pasi
-      psi = sub(sigmaDiag, diag(matMul(transpose(f), f)));
-      const llDelta = add(sum(log(psi)), sum(log(mh)));
-      if (oldll && tensorEqual(llDelta, oldll, this.tol)) {
+
+      psi = clipByValue(sub(sigmaDiag, diag(sum(mul(f, f), 1))), 1e-12, 1e12);
+      const mNorm = lastNInd.shape ? sum(gather(ms, lastNInd)) : 0;
+      const llDelta = divNoNan(mul(add(add(sum(log(psi)), sum(log(mh))), mNorm), nSamples), 2.0);
+      //const llDelta = divNoNan(neg(add(add(sum(log(psi)), sum(log(mh))), mNorm), 2.0);
+      console.log('sigma');
+      sigmaDiag.print();
+      console.log('f');
+      f.print();
+      console.log('mh');
+      mh.print();
+      console.log('psi');
+      psi.print();
+      console.log('ll');
+      llDelta.print();
+      console.log(i);
+      if (oldllDelta) sub(llDelta, oldllDelta).print();
+      if (oldllDelta && tensorEqual(llDelta, oldllDelta, this.tol)) {
+        console.log(i);
         this.factorLoadings = f;
         break;
       }
       if (i == this.maxIterTimes - 1) {
         this.factorLoadings = f;
       }
+      oldllDelta = llDelta;
     }
     return this;
   }
