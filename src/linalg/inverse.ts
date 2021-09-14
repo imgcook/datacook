@@ -9,7 +9,7 @@ import { isSquareMatrix } from './utils';
  * @param matrix target matrix
  * @returns inverse of the target matrix
  */
-export const inverse = async(matrix: Tensor): Promise<Tensor> => {
+export const inverse = async (matrix: Tensor): Promise<Tensor> => {
   if (isSquareMatrix) {
     const [ eigenValues, eigenVectors ] = await eigenSolve(matrix);
     const minEigen = min(abs(eigenValues));
