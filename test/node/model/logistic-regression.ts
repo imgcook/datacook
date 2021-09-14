@@ -8,13 +8,11 @@ import { Tensor } from '@tensorflow/tfjs-core';
 import { accuracyScore } from '../../../src/metrics/classifier';
 import { tensorEqual } from '../../../src/linalg/utils';
 
-const cases = tf.mul(tf.randomNormal([10000, 5]),[ 100, 100, 200, 100, 10 ]);
+const cases = tf.mul(tf.randomNormal([ 10000, 5 ]), [ 100, 100, 200, 100, 10 ]);
 const weight = tf.tensor([ 2, 3, 1, -4, 6 ])
 const eta = tf.add(tf.sum(tf.mul(cases, weight), 1), -20).arraySync() as number[];
 const y = tf.greater(eta, 0);
-const yMult = eta.map((e: number): number => {
-  return e < -200 ? 1 : e < 0 ? 2 : e < 200 ? 3 : 4
-});
+const yMult = eta.map((e: number): number => e < -200 ? 1 : e < 0 ? 2 : e < 200 ? 3 : 4);
 
 describe('Logistic ', () => {
 
