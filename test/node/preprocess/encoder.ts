@@ -1,10 +1,9 @@
-import { eigenSolve } from '../../../src/linalg/eigen';
 import '@tensorflow/tfjs-backend-cpu';
 import * as tf from '@tensorflow/tfjs-core';
-import { tensorEqual } from '../../../src/linalg/utils';
 import { assert } from 'chai';
 import 'mocha';
-import { OneHotEncoder } from '../../../src/preprocess';
+import { OneHotEncoder, LabelEncoder } from '../../../src/preprocess';
+
 
 const x = ['tree', 'apple', 'banana', 'tree', 'apple', 'banana'];
 const xEncode = tf.tensor([
@@ -15,6 +14,7 @@ const xEncode = tf.tensor([
   [0, 1, 0],
   [0, 0, 1],
 ]);
+const xLabelEncode = tf.tensor([0, 1, 2, 0, 1, 2]);
 const xEncodeDrop = tf.tensor([
   [0, 0],
   [1, 0],
@@ -57,4 +57,19 @@ describe('OneHot Encoder', () => {
     const bxCate = await encoder.decode(bxEncodeDrop);
     assert.deepEqual(bxCate.dataSync() as any, bx);
   });
+});
+
+describe('Label Encoder', () => {
+  it('encode', async () => {
+    const encoder = new LabelEncoder();
+    await encoder.init(x);
+    const xEncode = await encoder.encode(x);
+    assert.deepEqual(xEncode.dataSync(), xLabelEncode.dataSync());
+  });
+  it('decode', async () => {
+    const encoder = new LabelEncoder();
+    await encoder.init(x);
+    const xDecode = await encoder.decode(xLabelEncode);
+    assert.deepEqual(x, xDecode.dataSync() as any);
+  })
 });

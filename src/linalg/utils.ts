@@ -1,4 +1,5 @@
-import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor } from '@tensorflow/tfjs-core';
+import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor, squeeze, stack } from '@tensorflow/tfjs-core';
+import { checkArray } from '../utils/validation';
 
 /**
  * Normalize tensor by dividing its norm
@@ -95,4 +96,20 @@ export const fillDiag = (values: Tensor | number[], m: number, n: number): Tenso
     }
   }
   return tensor(diagData);
+};
+
+/**
+ * Get the digonal elements in a matrix
+ * @param matrix target matrix
+ * @returns tensor of diagnal elements
+ */
+export const getDiagElements = (matrix: Tensor | number[]): Tensor => {
+  const matrixTensor = checkArray(matrix, 'any', 2);
+  const [ m, n ] = matrixTensor.shape;
+  const rank = m > n ? n : m;
+  const diagElements = [];
+  for (let i = 0; i < rank; i++) {
+    diagElements.push(slice(matrixTensor, [ i, i ], [ 1, 1 ]));
+  }
+  return squeeze(stack(diagElements));
 };
