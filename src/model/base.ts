@@ -3,8 +3,52 @@ import { checkArray } from '../utils/validation';
 import { OneHotEncoder } from '../preprocess';
 import { OneHotDropTypes } from '../preprocess/encoder';
 
+export type FeatureInputType = Tensor | RecursiveArray<number>;
+export type LabelInputType = Tensor | RecursiveArray<number>;
+
 export type ClassMap = {
   [ key: string ]: number
+}
+
+export abstract class BaseEstimator {
+  public estimatorType: string;
+  public nFeature: number;
+
+  /**
+   * Check if input feature match the required feature size.
+   * @param x Input feature of shape (nSample, nFeatures).
+   * @param reset if true, the `nFeatures` attribute is set to `x.shape[1]`.
+   */
+  public checkNFeatures(x: Tensor, reset: boolean): void {
+    if (x?.shape?.length !== 2) {
+      throw new TypeError('Input should be 2D tensor');
+    }
+    const featureCount = x.shape[1];
+    if (reset || !this.nFeature) {
+      this.nFeature = x.shape[1];
+    } else {
+      if (featureCount != this.nFeature) {
+        throw new TypeError(`X has ${featureCount} features, but is expected to have ${this.nFeature} features as input.`);
+      }
+    }
+  }
+}
+
+export class BaseClustering extends BaseEstimator{
+  constructor() {
+    super();
+    this.estimatorType = 'clustering';
+  }
+  /**
+   * Validate the input of clustering task
+   * @param x input data
+   * @returns tensor of input data
+   */
+  public validateData(x: FeatureInputType, reset: boolean): Tensor {
+    const xTensor = checkArray(x, 'float32', 2);
+    this.checkNFeatures(xTensor, reset);
+    return xTensor;
+  }
 }
 
 export class BaseClassifier {
