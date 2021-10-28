@@ -11,8 +11,12 @@ const clust3 = tf.add(tf.mul(tf.randomNormal([ 100, 2 ]), tf.tensor([ 2, 2 ])), 
 const clusData = tf.concat([ clust1, clust2, clust3 ]);
 
 const checkPredTrueCnt = (predClus: Tensor) => {
-  return tf.max(tf.stack([tf.sum(tf.equal(predClus, 0)), tf.sum(tf.equal(predClus, 1)), tf.sum(tf.equal(predClus, 2))])).dataSync()[0];
-}
+  return tf.max(tf.stack([
+    tf.sum(tf.equal(predClus, 0)), 
+    tf.sum(tf.equal(predClus, 1)), 
+    tf.sum(tf.equal(predClus, 2))
+  ])).dataSync()[0];
+};
 
 const checkClusAccuracy = async (predClus: Tensor) => {
   const predClus1 = tf.slice(predClus, 0, 100);
@@ -22,9 +26,10 @@ const checkClusAccuracy = async (predClus: Tensor) => {
   const predTrue2 = checkPredTrueCnt(predClus2);
   const predTrue3 = checkPredTrueCnt(predClus3);
   return (predTrue1 + predTrue2 + predTrue3) * 1.00 / 300.0;
-}
+};
 
 describe('KMeans', () => {
+
   it('train clust', async () => {
     const kmeans = new KMeans({ nClusters: 3 });
     await kmeans.fit(clusData);
@@ -33,6 +38,7 @@ describe('KMeans', () => {
     console.log('accuracy:', accuracy);
     assert.isTrue(accuracy > 0.9);
   });
+
   it('train clust on batch', async () => {
     const kmeans = new KMeans({ nClusters: 3 });
     const batchSize = 30;
@@ -47,6 +53,7 @@ describe('KMeans', () => {
     console.log('accuracy:', accuracy);
     assert.isTrue(accuracy > 0.9);
   });
+
   it('save and load model', async () => {
     const kmeans = new KMeans({ nClusters: 3 });
     await kmeans.fit(clusData);
@@ -57,5 +64,5 @@ describe('KMeans', () => {
     const accuracy = await checkClusAccuracy(predClus);
     console.log('accuracy:', accuracy);
     assert.isTrue(accuracy > 0.9);
-  })
+  });
 });

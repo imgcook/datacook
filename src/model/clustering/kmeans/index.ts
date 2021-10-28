@@ -1,23 +1,24 @@
-import { BaseClustering, FeatureInputType } from "../../base";
-import { tensorEqual } from "../../../linalg";
+import { BaseClustering, FeatureInputType } from '../../base';
+import { tensorEqual } from '../../../linalg';
 import { Tensor, sub, norm, gather, stack, min, sum, slice, add, tensor, mul,
-  transpose, mean, booleanMaskAsync, equal, argMin, divNoNan, squeeze, zeros, reshape, RecursiveArray, square, neg } from "@tensorflow/tfjs-core";
-import { shuffle } from "../../../generic";
-import { checkArray } from "../../../utils/validation";
+  transpose, mean, booleanMaskAsync, equal, argMin, divNoNan, squeeze, zeros, reshape, RecursiveArray, square, neg } from '@tensorflow/tfjs-core';
+import { shuffle } from '../../../generic';
+import { checkArray } from '../../../utils/validation';
 
 export type KMeansInitType = 'kmeans++' | 'random' | Tensor | RecursiveArray<number>;
 const defaultMaxIterTimes = 1000;
+const defaultNClusters = 8;
 const defaultTol = 1e-5;
 const defaultNInit = 10;
 const defaultInit = 'kmeans++';
 
 export type KMeansParams = {
-  nClusters: number,
+  nClusters?: number,
   tol?: number,
   nInit?: number,
   maxIterTimes?: number,
   init?: KMeansInitType,
-}
+};
 
 export class KMeans extends BaseClustering {
   public nClusters: number;
@@ -29,7 +30,6 @@ export class KMeans extends BaseClustering {
   public centroids: Tensor;
   private clusWeightedSum: Tensor;
   private firstTrainOnBatch: boolean;
-
 
   /**
    * Initialize KMeans model.
@@ -68,7 +68,7 @@ export class KMeans extends BaseClustering {
       throw new TypeError('nClusters is not specified');
     }
     this.nInit = params.nInit ? params.nInit : defaultNInit;
-    this.nClusters = params.nClusters;
+    this.nClusters = params.nClusters ? params.nClusters : defaultNClusters;
     this.maxIterTimes = params.maxIterTimes ? params.maxIterTimes : defaultMaxIterTimes;
     this.tol = params.tol ? params.tol : defaultTol;
     this.firstTrainOnBatch = true;
@@ -341,5 +341,4 @@ export class KMeans extends BaseClustering {
     };
     return JSON.stringify(modelParams);
   }
-
 }
