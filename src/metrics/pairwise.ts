@@ -1,4 +1,4 @@
-import { Tensor, abs, sub, norm } from "@tensorflow/tfjs-core";
+import { Tensor, sub, norm } from "@tensorflow/tfjs-core";
 import { shapeEqual } from "../linalg";
 
 export const euclideanDistance = (x: Tensor, y: Tensor): number => {
@@ -7,7 +7,3 @@ export const euclideanDistance = (x: Tensor, y: Tensor): number => {
   }
   return norm(sub(x, y)).dataSync()[0];
 };
-
-export const manhattanDistance = (x: Tensor, y: Tensor): number {
-  
-}
