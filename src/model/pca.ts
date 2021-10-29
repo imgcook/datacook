@@ -80,7 +80,7 @@ export class PCA extends BaseEstimater {
    */
   private async fitFull(xTensor: Tensor, nComponents: number, method: PCAMethodType = 'covariance'): Promise<void> {
     const corcovMatrix = this.getCorcovMatrix(xTensor, method);
-    const [ eigenValues, eigenVectors ] = await eigenSolve(corcovMatrix);
+    const [ eigenValues, eigenVectors ] = await eigenSolve(corcovMatrix, 1e-4, 200, true);
     const nFeatures = eigenValues.shape[0];
     this.mean = mean(xTensor, 0);
     this.variance = getVariance(xTensor);

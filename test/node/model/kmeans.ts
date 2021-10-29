@@ -4,9 +4,9 @@ import * as tf from '@tensorflow/tfjs-core';
 import 'mocha';
 import { assert } from 'chai';
 
-const clust1 = tf.add(tf.mul(tf.randomNormal([ 100, 2 ]), tf.tensor([ 2, 2 ])), tf.tensor([ 5, 5 ]));
-const clust2 = tf.add(tf.mul(tf.randomNormal([ 100, 2 ]), tf.tensor([ 2, 2 ])), tf.tensor([ 10, 0 ]));
-const clust3 = tf.add(tf.mul(tf.randomNormal([ 100, 2 ]), tf.tensor([ 2, 2 ])), tf.tensor([ -10, 0 ]));
+const clust1 = tf.add(tf.mul(tf.randomNormal([ 200000, 2 ]), tf.tensor([ 2, 2 ])), tf.tensor([ 5, 5 ]));
+const clust2 = tf.add(tf.mul(tf.randomNormal([ 200000, 2 ]), tf.tensor([ 2, 2 ])), tf.tensor([ 10, 0 ]));
+const clust3 = tf.add(tf.mul(tf.randomNormal([ 200000, 2 ]), tf.tensor([ 2, 2 ])), tf.tensor([ -10, 0 ]));
 const clusData = tf.concat([ clust1, clust2, clust3 ]);
 
 const checkPredTrueCnt = (predClus: tf.Tensor) => {
@@ -41,7 +41,7 @@ describe('KMeans', () => {
   })
 
   it('train clust', async () => {
-    const kmeans = new KMeans({ nClusters: 3 });
+    const kmeans = new KMeans({ nClusters: 3, init: 'random', verbose: true });
     await kmeans.fit(clusData);
     const predClus = await kmeans.predict(clusData);
     const accuracy = await checkClusAccuracy(predClus);
@@ -51,11 +51,10 @@ describe('KMeans', () => {
 
   it('train clust on batch', async () => {
     const kmeans = new KMeans({ nClusters: 3 });
-    const batchSize = 30;
-    const epochSize = Math.floor(clusData.shape[0] / batchSize);
-    for (let i = 0; i < 1000; i++) {
-      const j = Math.floor(i % epochSize);
-      const batchX = tf.slice(clusData, [j * batchSize, 0], [batchSize ,2]);
+    const batchSize = 500;
+    for (let i = 0; i < 100; i++) {
+      const idx = tf.cast(tf.mul(tf.randomUniform([batchSize]), clusData.shape[0]),'int32');
+      const batchX = tf.gather(clusData, idx);
       await kmeans.trainOnBatch(batchX);
     }
     const predClus = await kmeans.predict(clusData);

@@ -1,7 +1,7 @@
 import { BaseClustering, FeatureInputType } from '../../base';
 import { tensorEqual } from '../../../linalg';
 import { Tensor, sub, norm, gather, stack, min, sum, slice, add, tensor, mul,
-  transpose, mean, booleanMaskAsync, equal, argMin, divNoNan, squeeze, zeros, reshape, RecursiveArray, square, neg } from '@tensorflow/tfjs-core';
+  transpose, mean, booleanMaskAsync, equal, argMin, divNoNan, squeeze, zeros, reshape, RecursiveArray, square, neg, scalar, greater, cumsum } from '@tensorflow/tfjs-core';
 import { shuffle } from '../../../generic';
 import { checkArray } from '../../../utils/validation';
 
@@ -180,7 +180,7 @@ export class KMeans extends BaseClustering {
     if (this.init === 'random') {
       const shuffleIndices = Array.from(Array(xTensor.shape[0]).keys());
       shuffle(shuffleIndices);
-      return gather(xTensor, shuffleIndices.slice(this.nClusters));
+      return gather(xTensor, shuffleIndices.slice(0, this.nClusters));
     }
     if (this.init instanceof Tensor || this.init instanceof Array) {
       const initTensor = checkArray(this.init, 'float32', 2);
@@ -228,7 +228,7 @@ export class KMeans extends BaseClustering {
     const axisH = 1;
     const dists = this.getClusDist(xTensor, centroids);
     const minDists = min(dists, axisH);
-    return sum(square(minDists)).dataSync()[0];
+    return sum(minDists).dataSync()[0];
   }
 
   /**
@@ -240,6 +240,7 @@ export class KMeans extends BaseClustering {
     const centroids: Tensor[] = [];
     const nData = xTensor.shape[0];
     const axisH = 1;
+    // choose first centroid randomly
     const initRnd = Math.floor(Math.random() * nData);
 
     centroids.push(squeeze(gather(xTensor, [ initRnd ])));
@@ -247,13 +248,12 @@ export class KMeans extends BaseClustering {
       const dists = this.getClusDist(xTensor, stack(centroids));
       const minDists = min(dists, axisH);
       const sumDists = sum(minDists);
-      const probs = divNoNan(minDists, sumDists);
-      const rnd = Math.random();
-      let cumProb = 0;
+      //const probs = minDists;
+      const rnd = Math.random() * sumDists.dataSync()[0];
+      let cumProb = cumsum(minDists).dataSync();
       let idx = 0;
       for (; idx < nData - 1; idx++) {
-        cumProb += slice(probs, idx, 1).dataSync()[0];
-        if (cumProb > rnd) {
+        if (cumProb[idx] > rnd) {
           break;
         }
       }
@@ -291,7 +291,7 @@ export class KMeans extends BaseClustering {
     const newDistsData: Tensor[] = [];
     const nCluster = centroids.shape[0];
     for (let i = 0; i < nCluster; i++) {
-      newDistsData.push(norm(sub(xTensor, gather(centroids, i)), 'euclidean', axisH));
+      newDistsData.push(sum(square(sub(xTensor, gather(centroids, i))), axisH));
     }
     return transpose(stack(newDistsData));
   }

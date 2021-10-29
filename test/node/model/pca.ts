@@ -159,6 +159,8 @@ const irisData = tf.tensor2d([
   [ 5.9, 3., 5.1, 1.8 ]
 ]);
 
+const mdData = tf.randomNormal([ 600000, 40 ]);
+
 /**
  * calculated in sklearn
  * ```python
@@ -172,17 +174,17 @@ const irisData = tf.tensor2d([
 const irisExplainedVariance = tf.tensor([ 4.22824171, 0.24267075, 0.0782095 ]);
 const irisExplainedVarianceRatio = tf.tensor([ 0.92461872, 0.05306648, 0.01710261 ]);
 const irisTransformedFirst3 = tf.tensor([
-  [ -2.68412563, 0.31939725, 0.02791483 ],
-  [ -2.71414169, -0.17700123, 0.21046427 ],
-  [ -2.88899057, -0.14494943,  -0.01790026 ]
+  [ 2.68412563, -0.31939725, 0.02791483 ],
+  [ 2.71414169, 0.17700123, 0.21046427 ],
+  [ 2.88899057, 0.14494943, -0.01790026 ]
 ]);
 
 const irisExplainedVarianceCorr = tf.tensor([ 2.91808505, 0.9141649 , 0.14674182 ]);
 const irisExplainedVarianceRatioCorr = tf.tensor([ 0.72962445, 0.22850762, 0.03668922 ]);
 const irisTransformedFirst3Corr = tf.tensor([
-  [ -2.26470281, 0.4800266 , 0.12770602 ],
-  [ -2.08096115, -0.67413356, 0.23460885 ],
-  [ -2.36422905, -0.34190802, -0.04420148 ]
+  [ -2.26470281, 0.4800266 , -0.12770602 ],
+  [ -2.08096115, -0.67413356, -0.23460885 ],
+  [ -2.36422905, -0.34190802, 0.04420148 ]
 ]);
 
 describe('Principle Component Analysis', () => {
@@ -202,7 +204,7 @@ describe('Principle Component Analysis', () => {
     const transformedData = await pca.transform(irisData);
     const transformedFirst3 = tf.slice(transformedData, [ 0, 0 ], [ 3, -1 ]);
     console.log('predicted result for first 3 samples', transformedFirst3.arraySync());
-    assert.isTrue(tensorEqual(transformedFirst3, irisTransformedFirst3, 1e-4));
+    assert.isTrue(tensorEqual(transformedFirst3, irisTransformedFirst3, 1e-2));
   });
 
   it('iris decomposition (correlation)', async () => {
@@ -221,5 +223,11 @@ describe('Principle Component Analysis', () => {
     const transformedFirst3 = tf.slice(transformedData, [ 0, 0 ], [ 3, -1 ]);
     console.log('predicted result for first 3 samples', transformedFirst3.arraySync());
     assert.isTrue(tensorEqual(transformedFirst3, irisTransformedFirst3Corr, 1e-2));
+  });
+
+  it('multi-dimension data', async () => {
+    const pca = new PCA({ nComponents: 10, method: 'correlation' });
+    await pca.fit(mdData);
+    pca.eigenValues.print();
   });
 });
