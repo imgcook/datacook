@@ -11,13 +11,43 @@ const defaultNClusters = 8;
 const defaultTol = 1e-5;
 const defaultNInit = 10;
 const defaultInit = 'kmeans++';
+const defaultVerbose = false;
 
+/**
+ * `nClusters` : number, default=8\
+ *    The number of clusters to form as well as the number of centroids
+ *    to generate.
+ *
+ * `init`: {'kmeans++', 'random'} or an array of shape (nClusters, nFeatures),
+ *    default = 'kmeans++'
+ *
+ *    - 'kmeans++': select initial cluster centroids using kmeans++
+ *    - 'random': randomly select initial centroids
+ *    - array of shape (nClusters, nFeatures): use user defined centroids.
+ *
+ * `nInit`: number, default=10.\
+ *    Number of time the algorithm will be run with different initialization
+ *    centroid seeds. The final results will be the best output of nInit
+ *    consecutive runs in terms of inertia.
+ *
+ *  `maxIterTimes` : number, default=1000\
+ *    Maximum number of iterations of the k-means algorithm for a single run.
+ *
+ *  `tol` : number, default=1e-5\
+ *    Relative tolerance with regards to Frobenius norm of the difference
+ *    in the cluster centers of two consecutive iterations to declare
+ *    convergence.
+ *
+ *  `verbose` : boolean, default=false\
+ *     Verbosity mode.
+ */
 export type KMeansParams = {
   nClusters?: number,
   tol?: number,
   nInit?: number,
   maxIterTimes?: number,
   init?: KMeansInitType,
+  verbose?: boolean,
 };
 
 export class KMeans extends BaseClustering {
@@ -27,6 +57,7 @@ export class KMeans extends BaseClustering {
   public maxIterTimes: number;
   public tol: number;
   public randomState: number;
+  public verbose: boolean;
   public centroids: Tensor;
   private clusWeightedSum: Tensor;
   private firstTrainOnBatch: boolean;
@@ -61,6 +92,9 @@ export class KMeans extends BaseClustering {
    *    Relative tolerance with regards to Frobenius norm of the difference
    *    in the cluster centers of two consecutive iterations to declare
    *    convergence.
+   *
+   *  `verbose` : boolean, default=false\
+   *     Verbosity mode.
    */
   constructor(params: KMeansParams) {
     super();
@@ -73,6 +107,7 @@ export class KMeans extends BaseClustering {
     this.tol = params.tol ? params.tol : defaultTol;
     this.firstTrainOnBatch = true;
     this.init = params.init ? params.init : defaultInit;
+    this.verbose = params.verbose ? !!params.verbose : defaultVerbose;
   }
 
   /**
@@ -86,7 +121,7 @@ export class KMeans extends BaseClustering {
     }
     if (this.init === 'random') {
       const shuffleIndices = Array.from(Array(xTensor.shape[0]).keys());
-      shuffle(Array.from(Array(xTensor.shape[0]).keys()));
+      shuffle(shuffleIndices);
       return gather(xTensor, shuffleIndices.slice(this.nClusters));
     }
     if (this.init instanceof Tensor || this.init instanceof Array) {
@@ -102,10 +137,12 @@ export class KMeans extends BaseClustering {
    * @param xTensor
    * @returns centroids seledted from nInit iterations
    */
-  public async initCentroids(xTensor: Tensor): Promise<Tensor> {
+  public async initCentroids(xTensor: Tensor): Promise<{ selectedCentroids: Tensor, inertia: number }> {
     // If initialized centroids are defined
     if (this.init instanceof Tensor || this.init instanceof Array) {
-      return this.getInitCentroids(xTensor);
+      const selectedCentroids = this.getInitCentroids(xTensor);
+      const inertia = this.inertiaDense(xTensor, selectedCentroids);
+      return { selectedCentroids, inertia };
     }
     // Initialize for nInit times to find the best centroids according to interia criteria.
     let minInertia = Number.MAX_SAFE_INTEGER;
@@ -119,7 +156,7 @@ export class KMeans extends BaseClustering {
         selectedCentroids = newCentroids;
       }
     }
-    return selectedCentroids;
+    return { selectedCentroids, inertia: minInertia };
   }
 
   /**
@@ -173,7 +210,7 @@ export class KMeans extends BaseClustering {
    * @param centroids
    */
   public validataCentroidsShape(xTensor: Tensor, centroids: Tensor): void {
-    if (centroids.shape[1] !== this.nClusters) {
+    if (centroids.shape[0] !== this.nClusters) {
       throw new TypeError(
         `The shape of the initial centers ${centroids.shape} does not match the number of clusters ${this.nClusters}.`
       );
@@ -238,13 +275,37 @@ export class KMeans extends BaseClustering {
    */
   public async fit(xData: FeatureInputType): Promise<void> {
     const xTensor = this.validateData(xData, true);
-    this.centroids = await this.initCentroids(xTensor);
+    let oldClusIndex: Tensor;
+    const { selectedCentroids, inertia } = await this.initCentroids(xTensor);
+    this.centroids = selectedCentroids;
+    if (this.verbose) {
+      console.log(`Initialization complete with inertia ${inertia}`);
+    }
     for (let i = 0; i < this.maxIterTimes; i++) {
-      const { newCentroids } = await this.update(xTensor, this.centroids);
+      const { newCentroids, newClusIndex } = await this.update(xTensor, this.centroids);
+
+      if (this.verbose) {
+        const inertia = this.inertiaDense(xTensor, this.centroids);
+        console.log(`Iteration ${i}, inertia ${inertia}.`);
+      }
+
+      // check strict convergence
+      if (oldClusIndex && tensorEqual(newClusIndex, oldClusIndex)) {
+        if (this.verbose) {
+          console.log(`Converged at iteration ${i}: strict converge.`);
+        }
+        return;
+      }
+
+      // No strict convergence, check for tol based convergence.
       if (tensorEqual(newCentroids, this.centroids, this.tol)) {
+        if (this.verbose) {
+          console.log(`Converged at iteration ${i}: center shift within tolerance ${this.tol}.`);
+        }
         return;
       }
       this.centroids = newCentroids;
+      oldClusIndex = newClusIndex;
     }
   }
 
@@ -256,7 +317,7 @@ export class KMeans extends BaseClustering {
   public async trainOnBatch(xData: FeatureInputType): Promise<void> {
     const xTensor = this.validateData(xData, this.firstTrainOnBatch);
     if (this.firstTrainOnBatch) {
-      this.centroids = await this.initCentroids(xTensor);
+      this.centroids = (await this.initCentroids(xTensor)).selectedCentroids;
       this.firstTrainOnBatch = false;
       this.clusWeightedSum = zeros([ this.nClusters ]);
     }
@@ -321,6 +382,7 @@ export class KMeans extends BaseClustering {
     this.firstTrainOnBatch = true;
     this.init = params.init ? params.init : defaultInit;
     this.centroids = params.centroids ? tensor(params.centroids) : null;
+    this.nFeature = params.nFeature;
     return this;
   }
 
@@ -337,7 +399,8 @@ export class KMeans extends BaseClustering {
       tol: this.tol,
       firstTrainOnBatch: this.firstTrainOnBatch,
       init: this.init,
-      centroids: await this.centroids.array()
+      centroids: await this.centroids.array(),
+      nFeature: this.nFeature
     };
     return JSON.stringify(modelParams);
   }

@@ -24,12 +24,11 @@ export abstract class BaseEstimator {
       throw new TypeError('Input should be 2D tensor');
     }
     const featureCount = x.shape[1];
+    if (!reset && featureCount !== this.nFeature) {
+      throw new TypeError(`X has ${featureCount} features, but is expected to have ${this.nFeature} features as input.`);
+    }
     if (reset || !this.nFeature) {
       this.nFeature = x.shape[1];
-    } else {
-      if (featureCount != this.nFeature) {
-        throw new TypeError(`X has ${featureCount} features, but is expected to have ${this.nFeature} features as input.`);
-      }
     }
   }
 }
