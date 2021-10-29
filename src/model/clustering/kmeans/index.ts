@@ -167,8 +167,8 @@ export class KMeans extends BaseClustering {
 
   /**
    * Get a set of centroids according to input tensor and type of initialize
-   * @param xTensor
-   * @returns
+   * @param xTensor tensor of input data
+   * @returns tensor of centroids
    */
   public getInitCentroids(xTensor: Tensor): Tensor {
     if (this.init === 'kmeans++') {
@@ -189,7 +189,7 @@ export class KMeans extends BaseClustering {
 
   /**
    * Initialize centroids
-   * @param xTensor
+   * @param xTensor tensor of input data
    * @returns centroids seledted from nInit iterations
    */
   public async initCentroids(xTensor: Tensor): Promise<{ selectedCentroids: Tensor, inertia: number }> {
@@ -261,8 +261,8 @@ export class KMeans extends BaseClustering {
 
   /**
    * Check if centers is compatible with X and nClusters
-   * @param xTensor
-   * @param centroids
+   * @param xTensor tensor of x data
+   * @param centroids tensor of centroids
    */
   public validataCentroidsShape(xTensor: Tensor, centroids: Tensor): void {
     if (centroids.shape[0] !== this.nClusters) {
@@ -279,9 +279,9 @@ export class KMeans extends BaseClustering {
 
   /**
    * Get distance from data samples to their assigned cluster centers.
-   * @param xTensor
-   * @param centroids
-   * @returns
+   * @param xTensor tensor of x data
+   * @param centroids tensor of centroids
+   * @returns tensor of distance from input samples and its assigned cluster center
    */
   public getClusDist(xTensor: Tensor, centroids: Tensor): Tensor {
     const axisH = 1;
@@ -296,8 +296,8 @@ export class KMeans extends BaseClustering {
 
   /**
    * Get the cluster index of given samples
-   * @param xTensor
-   * @returns
+   * @param xTensor tensor of input data
+   * @returns tensor of assigned cluster index
    */
   public getClusIndex(xTensor: Tensor, centroids: Tensor): Tensor {
     const newDists = this.getClusDist(xTensor, centroids);
@@ -325,8 +325,7 @@ export class KMeans extends BaseClustering {
 
   /**
    * Fit kmeans model
-   * @param xData
-   * @returns
+   * @param xData input data of shape (nSamples, nFeatures) in type of array or tensor
    */
   public async fit(xData: FeatureInputType): Promise<void> {
     const xTensor = this.validateData(xData, true);
@@ -367,7 +366,7 @@ export class KMeans extends BaseClustering {
   /**
    * Train kmeans model by batch. Here we apply mini-batch kmeans algorithm to
    * update centroids in each iteration.
-   * @param xData
+   * @param xData input data of shape (batchSize, nFeatures) in type of array or tensor
    */
   public async trainOnBatch(xData: FeatureInputType): Promise<void> {
     const xTensor = this.validateData(xData, this.firstTrainOnBatch);
@@ -397,8 +396,8 @@ export class KMeans extends BaseClustering {
 
   /**
    * Predict sample clusters for given input.
-   * @param xData
-   * @returns predicted cluster index
+   * @param xData input data of shape (nSamples, nFeatures) in type of array or tensor
+   * @returns tensor of redicted cluster index
    */
   public async predict(xData: FeatureInputType): Promise<Tensor> {
     const xTensor = this.validateData(xData, false);
@@ -408,8 +407,8 @@ export class KMeans extends BaseClustering {
   /**
    * Get scores for input xData on the kmeans model.\
    * score = -inertia, larger score usually represent better fit.
-   * @param xData
-   * @returns
+   * @param xData input data
+   * @returns tensor of -inertia
    */
   public async score(xData: FeatureInputType): Promise<number> {
     const xTensor = this.validateData(xData, false);

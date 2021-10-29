@@ -15,11 +15,13 @@ export abstract class BaseEstimator {
   public nFeature: number;
 
   /**
-   * Check if input feature match the required feature size.
+   * Check if input feature match the required feature size. If reset is true,
+   * reset nFeature = x.shape[1]
+   *
    * @param x Input feature of shape (nSample, nFeatures).
    * @param reset if true, the `nFeatures` attribute is set to `x.shape[1]`.
    */
-  public checkNFeatures(x: Tensor, reset: boolean): void {
+  public checkAndSetNFeatures(x: Tensor, reset: boolean): void {
     if (x?.shape?.length !== 2) {
       throw new TypeError('Input should be 2D tensor');
     }
@@ -45,7 +47,7 @@ export class BaseClustering extends BaseEstimator{
    */
   public validateData(x: FeatureInputType, reset: boolean): Tensor {
     const xTensor = checkArray(x, 'float32', 2);
-    this.checkNFeatures(xTensor, reset);
+    this.checkAndSetNFeatures(xTensor, reset);
     return xTensor;
   }
 }
