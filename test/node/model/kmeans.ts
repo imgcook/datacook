@@ -29,6 +29,17 @@ const checkClusAccuracy = async (predClus: tf.Tensor) => {
 
 describe('KMeans', () => {
 
+  it('simple test', async ()=> {
+    const xData = [
+      [1, 2], [1, 4], [1, 0],
+      [10, 2], [10, 4], [10, 0]
+    ];
+    const kmeans = new KMeans({ nClusters: 2 });
+    await kmeans.fit(xData);
+    const predClus = await kmeans.predict(xData);
+    predClus.print();
+  })
+
   it('train clust', async () => {
     const kmeans = new KMeans({ nClusters: 3 });
     await kmeans.fit(clusData);
@@ -57,7 +68,7 @@ describe('KMeans', () => {
     const kmeans = new KMeans({ nClusters: 3 });
     await kmeans.fit(clusData);
     const modelJSON = await kmeans.toJson();
-    const kmeans2 = new KMeans({ nClusters: 3 });
+    const kmeans2 = new KMeans({});
     kmeans2.fromJson(modelJSON);
     const predClus = await kmeans2.predict(clusData);
     const accuracy = await checkClusAccuracy(predClus);

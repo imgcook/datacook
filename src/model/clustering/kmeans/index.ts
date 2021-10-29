@@ -95,7 +95,62 @@ export class KMeans extends BaseClustering {
    *
    *  `verbose` : boolean, default=false\
    *     Verbosity mode.
-   */
+   *
+   * Examples
+   * --------
+   *
+   * ### Basic Usage
+   *
+   * ``` javascript
+   * import * as Datacook from 'datacook';
+   * const { KMeans } = DataCook.Model;
+   * const xData = [
+   *  [1, 2], [1, 4], [1, 0],
+   *  [10, 2], [10, 4], [10, 0]
+   * ];
+   * const kmeans = new KMeans({ nClusters: 3 });
+   * await kmeans.fit(clusData);
+   * const predClus = await kmeans.predict(xData);
+   * predClus.print();
+   * // Tensor
+   * // [0, 0, 0, 1, 1, 1]
+   *
+   * // save and load model
+   * const modelJSON = await kmeans.toJson();
+   * const kmeans2 = new KMeans({});
+   * kmeans2.fromJson(modelJSON);
+   * const predClus = await kmeans2.predict(xData);
+   * predClus.print();
+   * // Tensor
+   * // [0, 0, 0, 1, 1, 1]
+   * ```
+   *
+   * ### Train on batch
+   * ```javascript
+   * import * as Datacook from 'datacook';
+   * import * as tf from '@tensorflow/tfjs-core';
+   * const { KMeans } = DataCook.Model;
+   *
+   * // create dataset
+   * const clust1 = tf.add(tf.mul(tf.randomNormal([ 100, 2 ]), tf.tensor([ 2, 2 ])), tf.tensor([ 5, 5 ]));
+   * const clust2 = tf.add(tf.mul(tf.randomNormal([ 100, 2 ]), tf.tensor([ 2, 2 ])), tf.tensor([ 10, 0 ]));
+   * const clust3 = tf.add(tf.mul(tf.randomNormal([ 100, 2 ]), tf.tensor([ 2, 2 ])), tf.tensor([ -10, 0 ]));
+   * const clusData = tf.concat([ clust1, clust2, clust3 ]);
+   * // fit kmeans model
+   * const kmeans = new KMeans({ nClusters: 3 });
+   * const batchSize = 30;
+   * const epochSize = Math.floor(clusData.shape[0] / batchSize);
+   * for (let i = 0; i < 50; i++) {
+   *    const j = Math.floor(i % epochSize);
+   *    const batchX = tf.slice(clusData, [j * batchSize, 0], [batchSize ,2]);
+   *    await kmeans.trainOnBatch(batchX);
+   * }
+   * const predClus = await kmeans.predict(clusData);
+   * const accuracy = await checkClusAccuracy(predClus);
+   * console.log('accuracy:', accuracy);
+   * // accuracy: 0.9666666666666667
+   * ```
+   **/
   constructor(params: KMeansParams) {
     super();
     if (!params.nClusters) {
