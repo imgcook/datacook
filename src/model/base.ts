@@ -1,4 +1,4 @@
-import { Tensor, tensor, RecursiveArray } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, tensor, tidy } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
 import { OneHotEncoder } from '../preprocess';
 import { OneHotDropTypes } from '../preprocess/encoder';
@@ -23,7 +23,7 @@ export abstract class BaseEstimator {
    */
   public checkAndSetNFeatures(x: Tensor, reset: boolean): void {
     if (x?.shape?.length !== 2) {
-      throw new TypeError('Input should be 2D tensor');
+      throw new TypeError('x should be 2D tensor');
     }
     const featureCount = x.shape[1];
     if (!reset && featureCount !== this.nFeature) {
@@ -46,9 +46,11 @@ export class BaseClustering extends BaseEstimator{
    * @returns tensor of input data
    */
   public validateData(x: FeatureInputType, reset: boolean): Tensor {
-    const xTensor = checkArray(x, 'float32', 2);
-    this.checkAndSetNFeatures(xTensor, reset);
-    return xTensor;
+    return tidy(() => {
+      const xTensor = checkArray(x, 'float32', 2);
+      this.checkAndSetNFeatures(xTensor, reset);
+      return xTensor;
+    });
   }
 }
 

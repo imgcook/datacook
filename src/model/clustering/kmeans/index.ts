@@ -1,7 +1,8 @@
 import { BaseClustering, FeatureInputType } from '../../base';
 import { tensorEqual } from '../../../linalg';
-import { Tensor, sub, norm, gather, stack, min, sum, slice, add, tensor, mul,
-  transpose, mean, booleanMaskAsync, equal, argMin, divNoNan, squeeze, zeros, reshape, RecursiveArray, square, neg } from '@tensorflow/tfjs-core';
+import { Tensor, sub, gather, stack, min, sum, add, tensor, mul, tidy, dispose,
+  transpose, mean, booleanMaskAsync, equal, argMin, divNoNan, squeeze, zeros,
+  reshape, RecursiveArray, square, neg, cumsum } from '@tensorflow/tfjs-core';
 import { shuffle } from '../../../generic';
 import { checkArray } from '../../../utils/validation';
 
@@ -151,11 +152,14 @@ export class KMeans extends BaseClustering {
    * // accuracy: 0.9666666666666667
    * ```
    **/
-  constructor(params: KMeansParams) {
+  constructor(params: KMeansParams = {
+    nInit: defaultNInit,
+    nClusters: defaultNClusters,
+    maxIterTimes: defaultMaxIterTimes,
+    tol: defaultTol,
+    init: defaultInit
+  }) {
     super();
-    if (!params.nClusters) {
-      throw new TypeError('nClusters is not specified');
-    }
     this.nInit = params.nInit ? params.nInit : defaultNInit;
     this.nClusters = params.nClusters ? params.nClusters : defaultNClusters;
     this.maxIterTimes = params.maxIterTimes ? params.maxIterTimes : defaultMaxIterTimes;
@@ -171,20 +175,22 @@ export class KMeans extends BaseClustering {
    * @returns tensor of centroids
    */
   public getInitCentroids(xTensor: Tensor): Tensor {
-    if (this.init === 'kmeans++') {
+    return tidy(() => {
+      if (this.init === 'kmeans++') {
+        return this.kmeansPlusPlus(xTensor, this.nClusters);
+      }
+      if (this.init === 'random') {
+        const shuffleIndices = Array.from(Array(xTensor.shape[0]).keys());
+        shuffle(shuffleIndices);
+        return gather(xTensor, shuffleIndices.slice(0, this.nClusters));
+      }
+      if (this.init instanceof Tensor || this.init instanceof Array) {
+        const initTensor = checkArray(this.init, 'float32', 2);
+        this.validataCentroidsShape(xTensor, initTensor);
+        return initTensor;
+      }
       return this.kmeansPlusPlus(xTensor, this.nClusters);
-    }
-    if (this.init === 'random') {
-      const shuffleIndices = Array.from(Array(xTensor.shape[0]).keys());
-      shuffle(shuffleIndices);
-      return gather(xTensor, shuffleIndices.slice(this.nClusters));
-    }
-    if (this.init instanceof Tensor || this.init instanceof Array) {
-      const initTensor = checkArray(this.init, 'float32', 2);
-      this.validataCentroidsShape(xTensor, initTensor);
-      return initTensor;
-    }
-    return this.kmeansPlusPlus(xTensor, this.nClusters);
+    });
   }
 
   /**
@@ -204,12 +210,15 @@ export class KMeans extends BaseClustering {
     let selectedCentroids: Tensor;
     for (let i = 0; i < this.nInit; i++) {
       const centroids = this.getInitCentroids(xTensor);
-      const { newCentroids } = await this.update(xTensor, centroids);
+      const { newCentroids, newClusIndex } = await this.update(xTensor, centroids);
       const inertia = this.inertiaDense(xTensor, newCentroids);
       if (inertia < minInertia) {
         minInertia = inertia;
-        selectedCentroids = newCentroids;
+        dispose(selectedCentroids);
+        selectedCentroids = add(newCentroids, 1);
       }
+      dispose([ centroids, newCentroids, newClusIndex ]);
+
     }
     return { selectedCentroids, inertia: minInertia };
   }
@@ -222,10 +231,12 @@ export class KMeans extends BaseClustering {
    * @returns computed inertia
    */
   public inertiaDense(xTensor: Tensor, centroids: Tensor): number {
-    const axisH = 1;
-    const dists = this.getClusDist(xTensor, centroids);
-    const minDists = min(dists, axisH);
-    return sum(square(minDists)).dataSync()[0];
+    return tidy(() => {
+      const axisH = 1;
+      const dists = this.getClusDist(xTensor, centroids);
+      const minDists = min(dists, axisH);
+      return sum(minDists).dataSync()[0];
+    });
   }
 
   /**
@@ -234,29 +245,30 @@ export class KMeans extends BaseClustering {
    * @param k Number of centroids to initialize.
    */
   public kmeansPlusPlus(xTensor: Tensor, k: number): Tensor {
-    const centroids: Tensor[] = [];
-    const nData = xTensor.shape[0];
-    const axisH = 1;
-    const initRnd = Math.floor(Math.random() * nData);
+    return tidy(() => {
+      const centroids: Tensor[] = [];
+      const nData = xTensor.shape[0];
+      const axisH = 1;
+      // choose first centroid randomly
+      const initRnd = Math.floor(Math.random() * nData);
 
-    centroids.push(squeeze(gather(xTensor, [ initRnd ])));
-    while (centroids.length < k) {
-      const dists = this.getClusDist(xTensor, stack(centroids));
-      const minDists = min(dists, axisH);
-      const sumDists = sum(minDists);
-      const probs = divNoNan(minDists, sumDists);
-      const rnd = Math.random();
-      let cumProb = 0;
-      let idx = 0;
-      for (; idx < nData - 1; idx++) {
-        cumProb += slice(probs, idx, 1).dataSync()[0];
-        if (cumProb > rnd) {
-          break;
+      centroids.push(squeeze(gather(xTensor, [ initRnd ])));
+      while (centroids.length < k) {
+        const dists = this.getClusDist(xTensor, stack(centroids));
+        const minDists = min(dists, axisH);
+        const sumDists = sum(minDists);
+        const rnd = Math.random() * sumDists.dataSync()[0];
+        const cumProb = cumsum(minDists).dataSync();
+        let idx = 0;
+        for (; idx < nData - 1; idx++) {
+          if (cumProb[idx] > rnd) {
+            break;
+          }
         }
+        centroids.push(squeeze(gather(xTensor, [ idx ])));
       }
-      centroids.push(squeeze(gather(xTensor, [ idx ])));
-    }
-    return stack(centroids);
+      return stack(centroids);
+    });
   }
 
   /**
@@ -284,13 +296,15 @@ export class KMeans extends BaseClustering {
    * @returns tensor of distance from input samples and its assigned cluster center
    */
   public getClusDist(xTensor: Tensor, centroids: Tensor): Tensor {
-    const axisH = 1;
-    const newDistsData: Tensor[] = [];
-    const nCluster = centroids.shape[0];
-    for (let i = 0; i < nCluster; i++) {
-      newDistsData.push(norm(sub(xTensor, gather(centroids, i)), 'euclidean', axisH));
-    }
-    return transpose(stack(newDistsData));
+    return tidy(() => {
+      const axisH = 1;
+      const newDistsData: Tensor[] = [];
+      const nCluster = centroids.shape[0];
+      for (let i = 0; i < nCluster; i++) {
+        newDistsData.push(sum(square(sub(xTensor, gather(centroids, i))), axisH));
+      }
+      return transpose(stack(newDistsData));
+    });
   }
 
 
@@ -300,8 +314,10 @@ export class KMeans extends BaseClustering {
    * @returns tensor of assigned cluster index
    */
   public getClusIndex(xTensor: Tensor, centroids: Tensor): Tensor {
-    const newDists = this.getClusDist(xTensor, centroids);
-    return argMin(newDists, 1);
+    return tidy(() => {
+      const newDists = this.getClusDist(xTensor, centroids);
+      return argMin(newDists, 1);
+    });
   }
 
   /**
@@ -318,8 +334,10 @@ export class KMeans extends BaseClustering {
       const mask = equal(newClusIndex, i);
       const centroidI = await booleanMaskAsync(xTensor, mask);
       newCentroidsData.push(mean(centroidI, axisV));
+      dispose([ mask, centroidI ]);
     }
-    const newCentroids = stack(newCentroidsData);
+    const newCentroids = tidy(() => stack(newCentroidsData));
+    newCentroidsData.forEach((d: Tensor) => dispose(d));
     return { newCentroids, newClusIndex };
   }
 
@@ -337,7 +355,6 @@ export class KMeans extends BaseClustering {
     }
     for (let i = 0; i < this.maxIterTimes; i++) {
       const { newCentroids, newClusIndex } = await this.update(xTensor, this.centroids);
-
       if (this.verbose) {
         const inertia = this.inertiaDense(xTensor, this.centroids);
         console.log(`Iteration ${i}, inertia ${inertia}.`);
@@ -348,6 +365,8 @@ export class KMeans extends BaseClustering {
         if (this.verbose) {
           console.log(`Converged at iteration ${i}: strict converge.`);
         }
+        dispose([ oldClusIndex, newClusIndex, newCentroids ]);
+        if (!(xData instanceof Tensor)) dispose(xTensor);
         return;
       }
 
@@ -356,19 +375,28 @@ export class KMeans extends BaseClustering {
         if (this.verbose) {
           console.log(`Converged at iteration ${i}: center shift within tolerance ${this.tol}.`);
         }
+        if (oldClusIndex) {
+          dispose(oldClusIndex);
+        }
+        dispose([ newClusIndex, newCentroids ]);
+        if (!(xData instanceof Tensor)) dispose(xTensor);
         return;
       }
+      dispose([ this.centroids, oldClusIndex ]);
       this.centroids = newCentroids;
       oldClusIndex = newClusIndex;
     }
+    if (!(xData instanceof Tensor)) dispose(xTensor);
   }
 
   /**
    * Train kmeans model by batch. Here we apply mini-batch kmeans algorithm to
-   * update centroids in each iteration.
+   * update centroids in each iteration. The return value is inertia copmuted
+   * for input batch.
    * @param xData input data of shape (batchSize, nFeatures) in type of array or tensor
+   * @returns inertia for input batch data
    */
-  public async trainOnBatch(xData: FeatureInputType): Promise<void> {
+  public async trainOnBatch(xData: FeatureInputType): Promise<number> {
     const xTensor = this.validateData(xData, this.firstTrainOnBatch);
     if (this.firstTrainOnBatch) {
       this.centroids = (await this.initCentroids(xTensor)).selectedCentroids;
@@ -381,17 +409,23 @@ export class KMeans extends BaseClustering {
     const clusCount: number[] = [];
     for (let i = 0; i < this.nClusters; i++) {
       const mask = equal(newClusIndex, i);
-      clusCount.push(sum(mask).dataSync()[0]);
+      clusCount.push(tidy(() => sum(mask).dataSync()[0]));
       const centroidI = await booleanMaskAsync(xTensor, mask);
       batchCentroidsData.push(mean(centroidI, axisV));
+      dispose([ centroidI, mask ]);
     }
-    const batchCentroids = stack(batchCentroidsData);
-    const newClusWeightedSum = add(this.clusWeightedSum, tensor(clusCount));
-    // update centroids
-    this.centroids = add(mul(this.centroids, reshape(this.clusWeightedSum, [ -1, 1 ])), mul(batchCentroids, reshape(clusCount, [ -1, 1 ])));
-    this.centroids = divNoNan(this.centroids, reshape(newClusWeightedSum, [ -1, 1 ]));
-    // update cluster count
-    this.clusWeightedSum = newClusWeightedSum;
+    const batchCentroids = tidy(() => stack(batchCentroidsData));
+    const newClusWeightedSum = tidy(() => add(this.clusWeightedSum, tensor(clusCount)));
+    const centroidsSum = tidy(() => add(mul(this.centroids, reshape(this.clusWeightedSum, [ -1, 1 ])), mul(batchCentroids, reshape(clusCount, [ -1, 1 ]))));
+    const weightedCentroidsSum = tidy(() => divNoNan(centroidsSum, reshape(newClusWeightedSum, [ -1, 1 ])));
+    // update centroids and cluster count
+    dispose([ this.clusWeightedSum, this.centroids ]);
+    this.centroids = tidy(() => add(weightedCentroidsSum, 0));
+    this.clusWeightedSum = tidy(() => add(newClusWeightedSum, 0));
+    dispose([ newClusIndex, batchCentroids, newClusWeightedSum, weightedCentroidsSum, centroidsSum ]);
+    batchCentroidsData.map((d: Tensor) => dispose(d));
+    const inertia = this.inertiaDense(xTensor, this.centroids);
+    return inertia;
   }
 
   /**
@@ -400,8 +434,10 @@ export class KMeans extends BaseClustering {
    * @returns tensor of redicted cluster index
    */
   public async predict(xData: FeatureInputType): Promise<Tensor> {
-    const xTensor = this.validateData(xData, false);
-    return this.getClusIndex(xTensor, this.centroids);
+    return tidy(() => {
+      const xTensor = this.validateData(xData, false);
+      return this.getClusIndex(xTensor, this.centroids);
+    });
   }
 
   /**
@@ -411,9 +447,11 @@ export class KMeans extends BaseClustering {
    * @returns tensor of -inertia
    */
   public async score(xData: FeatureInputType): Promise<number> {
-    const xTensor = this.validateData(xData, false);
-    const interia = this.inertiaDense(xTensor, this.centroids);
-    return neg(interia).dataSync()[0];
+    return tidy(() => {
+      const xTensor = this.validateData(xData, false);
+      const interia = this.inertiaDense(xTensor, this.centroids);
+      return neg(interia).dataSync()[0];
+    });
   }
 
   /**
@@ -435,9 +473,11 @@ export class KMeans extends BaseClustering {
     this.tol = params.tol ? params.tol : defaultTol;
     this.firstTrainOnBatch = true;
     this.init = params.init ? params.init : defaultInit;
+    if (this.centroids) dispose(this.centroids);
     this.centroids = params.centroids ? tensor(params.centroids) : null;
     this.nFeature = params.nFeature;
     return this;
+
   }
 
   /**
