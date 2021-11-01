@@ -84,16 +84,13 @@ export class OneHotEncoder extends EncoderBase{
     const xData = await xTensor.data();
     const nCate = this.categories.shape[0];
     const xInd = xData.map((d: number|string) => this.cateMap[d]);
-    xTensor.dispose();
-    return tidy(() => {
-      if (this.drop === 'binary-only' && nCate === 2) {
-        return tensor(xInd);
-      } else if (this.drop === 'first') {
-        return oneHot(cast(sub(tensor(xInd), 1), 'int32'), nCate - 1);
-      } else {
-        return oneHot(cast(tensor(xInd), 'int32'), nCate);
-      }
-    });
+    if (this.drop === 'binary-only' && nCate === 2) {
+      return tensor(xInd);
+    } else if (this.drop === 'first') {
+      return oneHot(cast(sub(tensor(xInd), 1), 'int32'), nCate - 1);
+    } else {
+      return oneHot(cast(tensor(xInd), 'int32'), nCate);
+    }
   }
   /**
    * Decode one-hot array to original category array
