@@ -1,4 +1,4 @@
-import { Tensor, equal, sum, div, math, Tensor1D, divNoNan, concat, mul, add, cast, tidy } from '@tensorflow/tfjs-core';
+import { Tensor, equal, sum, div, math, Tensor1D, divNoNan, concat, mul, add, cast } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
 import { getDiagElements } from '../linalg/utils';
 import { LabelEncoder } from '../preprocess';
