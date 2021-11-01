@@ -1,4 +1,4 @@
-import { Tensor, sub, mean, divNoNan, sum, pow, sqrt, RecursiveArray } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, sub, mean, divNoNan, sum, pow, sqrt } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
 
 /**
