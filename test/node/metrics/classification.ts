@@ -14,5 +14,5 @@ describe('Classification Report', () => {
     report.precisions.print();
     console.log('recalls');
     report.recalls.print();
-  })
+  });
 });

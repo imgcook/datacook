@@ -7,21 +7,21 @@ import { OneHotEncoder, LabelEncoder } from '../../../src/preprocess';
 
 const x = ['tree', 'apple', 'banana', 'tree', 'apple', 'banana'];
 const xEncode = tf.tensor([
-  [1, 0, 0],
-  [0, 1, 0],
-  [0, 0, 1],
-  [1, 0, 0],
-  [0, 1, 0],
-  [0, 0, 1],
+  [ 1, 0, 0 ],
+  [ 0, 1, 0 ],
+  [ 0, 0, 1 ],
+  [ 1, 0, 0 ],
+  [ 0, 1, 0 ],
+  [ 0, 0, 1 ],
 ]);
-const xLabelEncode = tf.tensor([0, 1, 2, 0, 1, 2]);
+const xLabelEncode = tf.tensor([ 0, 1, 2, 0, 1, 2 ]);
 const xEncodeDrop = tf.tensor([
-  [0, 0],
-  [1, 0],
-  [0, 1],
-  [0, 0],
-  [1, 0],
-  [0, 1],
+  [ 0, 0 ],
+  [ 1, 0 ],
+  [ 0, 1 ],
+  [ 0, 0 ],
+  [ 1, 0 ],
+  [ 0, 1 ],
 ]);
 const bx = ['tree', 'apple', 'tree', 'apple'];
 const bxEncodeDrop = tf.tensor([0, 1, 0, 1]);
@@ -71,5 +71,5 @@ describe('Label Encoder', () => {
     await encoder.init(x);
     const xDecode = await encoder.decode(xLabelEncode);
     assert.deepEqual(x, xDecode.dataSync() as any);
-  })
+  });
 });
