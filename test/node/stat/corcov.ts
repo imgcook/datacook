@@ -1,8 +1,8 @@
-import { correlationMatrix, covarianceMatrix } from "../../../src/stat/corcov";
+import { correlationMatrix, covarianceMatrix } from '../../../src/stat/corcov';
 import '@tensorflow/tfjs-backend-cpu';
-import { tensor } from "@tensorflow/tfjs-core";
-import { assert } from "chai";
-import { tensorEqual } from "../../../src/linalg";
+import { tensor } from '@tensorflow/tfjs-core';
+import { assert } from 'chai';
+import { tensorEqual } from '../../../src/linalg';
 
 const m = [
   [ 12, 43, 23, 23 ],
@@ -27,7 +27,6 @@ const cov_m_assert = tensor([
   [ -10.3, -26.25, 29.2, -83.75 ],
   [ 81.25, 131.25, -83.75, 316.5 ]
 ]);
-​
 
 describe('Covariance and correlation', () => {
   it('get correlation', async () => {

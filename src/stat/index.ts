@@ -5,8 +5,5 @@ export {
 
 export {
   covarianceMatrix,
-  correlationMatrix,
-  corr,
-  cov
+  correlationMatrix
 } from './corcov';
-
