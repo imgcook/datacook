@@ -151,11 +151,14 @@ export class KMeans extends BaseClustering {
    * // accuracy: 0.9666666666666667
    * ```
    **/
-  constructor(params: KMeansParams) {
+  constructor(params: KMeansParams = {
+    nInit: defaultNInit,
+    nClusters: defaultNClusters,
+    maxIterTimes: defaultMaxIterTimes,
+    tol: defaultTol,
+    init: defaultInit
+  }) {
     super();
-    if (!params.nClusters) {
-      throw new TypeError('nClusters is not specified');
-    }
     this.nInit = params.nInit ? params.nInit : defaultNInit;
     this.nClusters = params.nClusters ? params.nClusters : defaultNClusters;
     this.maxIterTimes = params.maxIterTimes ? params.maxIterTimes : defaultMaxIterTimes;
