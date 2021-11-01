@@ -9,7 +9,7 @@ describe('Encodings', function () {
   describe('LabelEncoder', function () {
 
     it('test the label encoding on array', async function () {
-      let data = ['dog', 'cat', 'man', 'dog', 'cat', 'man', 'man', 'cat'];
+      let data = [ 'dog', 'cat', 'man', 'dog', 'cat', 'man', 'man', 'cat' ];
       let encode = new LabelEncoder();
       let fit_data = [
         0, 1, 2, 0,
