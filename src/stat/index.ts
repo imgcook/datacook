@@ -1,5 +1,5 @@
 export {
-  variance,
+  getVariance,
   normalize
 } from './data';
 

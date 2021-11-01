@@ -2,7 +2,7 @@ import { Tensor, sub, mean, transpose, matMul, divNoNan, RecursiveArray } from '
 import { normalize } from './data';
 import { checkArray } from '../utils/validation';
 
-export const covarianceMatrix = (xData: Tensor | RecursiveArray<number>): Tensor => {
+export const getCovarianceMatrix = (xData: Tensor | RecursiveArray<number>): Tensor => {
   const axisV = 0;
   const xTensor = checkArray(xData, 'float32', 2);
   const nSamples = xTensor.shape[0];
@@ -10,7 +10,7 @@ export const covarianceMatrix = (xData: Tensor | RecursiveArray<number>): Tensor
   return divNoNan(matMul(transpose(xCentered), xCentered), nSamples - 1);
 };
 
-export const correlationMatrix = (xData: Tensor | RecursiveArray<number>): Tensor => {
+export const getCorrelationMatrix = (xData: Tensor | RecursiveArray<number>): Tensor => {
   const xNormalized = normalize(xData);
-  return covarianceMatrix(xNormalized);
+  return getCovarianceMatrix(xNormalized);
 };

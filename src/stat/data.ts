@@ -7,7 +7,7 @@ import { checkArray } from '../utils/validation';
  * @param xData input data
  * @returns tensor of data variance
  */
-export const variance = (xData: Tensor | RecursiveArray<number>): Tensor => {
+export const getVariance = (xData: Tensor | RecursiveArray<number>): Tensor => {
   const axisV = 0;
   const xTensor = checkArray(xData, 'float32');
   const nSamples = xTensor.shape[0];
@@ -25,6 +25,6 @@ export const normalize = (xData: Tensor | RecursiveArray<number>): Tensor => {
   const axisV = 0;
   const xTensor = checkArray(xData, 'float32');
   const xCentered = sub(xTensor, mean(xTensor, axisV));
-  const xStd = sqrt(variance(xTensor));
+  const xStd = sqrt(getVariance(xTensor));
   return divNoNan(xCentered, xStd);
 };
