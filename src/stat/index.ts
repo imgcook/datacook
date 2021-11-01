@@ -4,6 +4,6 @@ export {
 } from './data';
 
 export {
-  covarianceMatrix,
-  correlationMatrix
+  getCovarianceMatrix,
+  getCorrelationMatrix
 } from './corcov';
