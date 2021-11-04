@@ -1,6 +1,7 @@
 import { linalg, Tensor, matMul, abs, sub, max, tensor, mul, eye, slice, stack, squeeze, neg, transpose } from '@tensorflow/tfjs-core';
 import { linSolveQR } from './linsolve';
-import { tensorNormalize, tensorEqual } from './utils';
+import { tensorNormalize, tensorEqual, fillNaN } from './utils';
+
 /**
  * Compute the eigenvalues of a matrix using the QR algorithm.
  * This is a renormalized version of power iteration that converges to a full
@@ -19,7 +20,9 @@ import { tensorNormalize, tensorEqual } from './utils';
  * @param maxIter max iteration time, default to 200
  */
 export const solveEigenValues = async (matrix: Tensor, tol = 1e-4, maxIter = 200): Promise<[ Tensor, Tensor ]> => {
-  let [ q, r ] = linalg.qr(matrix);
+  let [ qTensor, rTensor ] = linalg.qr(matrix);
+  let  q = fillNaN(qTensor, 0);
+  let r = fillNaN(rTensor, 0);
   let x = matrix;
   let prevX: Tensor;
   let prevTr: Tensor;
@@ -30,7 +33,9 @@ export const solveEigenValues = async (matrix: Tensor, tol = 1e-4, maxIter = 200
   for (let i = 0; i < maxIter; i++) {
     prevX = x;
     x = matMul(r, q);
-    [ q, r ] = linalg.qr(x);
+    [ qTensor, rTensor ] = linalg.qr(x);
+    q = fillNaN(qTensor, 0);
+    r = fillNaN(rTensor, 0);
     qn = matMul(qn, q);
     xTr = linalg.bandPart(x, 0, 0);
     prevTr = linalg.bandPart(prevX, 0, 0);
@@ -38,6 +43,7 @@ export const solveEigenValues = async (matrix: Tensor, tol = 1e-4, maxIter = 200
     if (maxDis < tol) {
       break;
     }
+
   }
   x = matMul(r, q);
   const eigenValues = [];
