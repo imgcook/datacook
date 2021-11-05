@@ -1,4 +1,4 @@
-import { Tensor, RecursiveArray, matMul, mean, sub, div, sum, slice, divNoNan, sqrt } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, matMul, mean, sub, div, sum, slice, divNoNan, sqrt, dispose, tidy } from '@tensorflow/tfjs-core';
 import { eigenSolve } from '../linalg';
 import { getCovarianceMatrix, getCorrelationMatrix } from '../stat/corcov';
 import { checkArray } from '../utils/validation';
@@ -65,13 +65,18 @@ export class PCA extends BaseEstimater {
       this.nComponents = Math.min(...xTensor.shape) - 1;
     }
     await this.fitFull(xTensor, this.nComponents, this.method);
+    if (!(xData instanceof Tensor)) {
+      dispose(xTensor);
+    }
   }
 
   private getCorcovMatrix(xTensor: Tensor, method: PCAMethodType): Tensor {
-    if (method === 'correlation') {
-      return getCorrelationMatrix(xTensor);
-    }
-    return getCovarianceMatrix(xTensor);
+    return tidy(() => {
+      if (method === 'correlation') {
+        return getCorrelationMatrix(xTensor);
+      }
+      return getCovarianceMatrix(xTensor);
+    });
   }
 
   /**
@@ -82,12 +87,23 @@ export class PCA extends BaseEstimater {
     const corcovMatrix = this.getCorcovMatrix(xTensor, method);
     const [ eigenValues, eigenVectors ] = await eigenSolve(corcovMatrix, 1e-4, 200, true);
     const nFeatures = eigenValues.shape[0];
+    if (this.mean) dispose(this.mean);
+    if (this.variance) dispose(this.variance);
+    if (this.eigenValues) dispose(this.eigenValues);
+    if (this.eigenVectors) dispose(this.eigenVectors);
+    if (this.explainedVariance) dispose(this.explainedVariance);
+    if (this.explainedVarianceRatio) dispose(this.explainedVarianceRatio);
+
+
     this.mean = mean(xTensor, 0);
-    this.variance = getVariance(xTensor);
+    this.variance = tidy(() => getVariance(xTensor));
     this.eigenValues = slice(eigenValues, 0, nComponents);
     this.eigenVectors = slice(eigenVectors, [ 0, 0 ], [ nFeatures, nComponents ]);
     this.explainedVariance = this.eigenValues;
-    this.explainedVarianceRatio = div(this.eigenValues, sum(eigenValues));
+    this.explainedVarianceRatio = tidy(() => div(this.eigenValues, sum(eigenValues)));
+
+    // dispose unused tensors
+    dispose([ corcovMatrix, eigenVectors, eigenValues ]);
   }
 
   /**
@@ -96,12 +112,14 @@ export class PCA extends BaseEstimater {
    * @returns the result after dimension reduction
    */
   public async transform(xData: Tensor | RecursiveArray<number>): Promise<Tensor> {
-    const xTensor = checkArray(xData, 'float32', 2);
-    const xCentered = sub(xTensor, this.mean);
-    if (this.method == 'covariance'){
-      return matMul(xCentered, this.eigenVectors);
-    } else {
-      return matMul( divNoNan(xCentered, sqrt(this.variance)), this.eigenVectors );
-    }
+    return tidy(() => {
+      const xTensor = checkArray(xData, 'float32', 2);
+      const xCentered = sub(xTensor, this.mean);
+      if (this.method == 'covariance'){
+        return matMul(xCentered, this.eigenVectors);
+      } else {
+        return matMul(divNoNan(xCentered, sqrt(this.variance)), this.eigenVectors);
+      }
+    });
   }
 }

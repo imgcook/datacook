@@ -1,9 +1,7 @@
 
 import { PCA } from '../../../src/model/pca';
-import '@tensorflow/tfjs-backend-cpu';
 import * as tf from '@tensorflow/tfjs-core';
 import { assert } from 'chai';
-import 'mocha';
 import { tensorEqual } from '../../../src/linalg';
 
 const irisData = tf.tensor2d([
@@ -159,7 +157,7 @@ const irisData = tf.tensor2d([
   [ 5.9, 3., 5.1, 1.8 ]
 ]);
 
-const mdData = tf.randomNormal([ 600000, 40 ]);
+const mdData = tf.randomNormal([ 100000, 8 ]);
 
 /**
  * calculated in sklearn
@@ -226,7 +224,7 @@ describe('Principle Component Analysis', () => {
   });
 
   it('multi-dimension data', async () => {
-    const pca = new PCA({ nComponents: 10, method: 'correlation' });
+    const pca = new PCA({ nComponents: 3, method: 'correlation' });
     await pca.fit(mdData);
     pca.eigenValues.print();
   });
