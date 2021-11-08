@@ -1,15 +1,15 @@
-import { tensor1d, memory } from '@tensorflow/tfjs-core';
+import { TensorContainer, tensor1d, tidy, memory, dispose, scalar, add } from '@tensorflow/tfjs-core';
 import { assert } from 'chai';
 import { tidyAsync } from '../../../src/utils/memory';
 
 describe('utils', function () {
   it('creates a tidy and check if Promise is supported.', async () => {
     await tidyAsync(() => {
-      return new Promise<number>((resolve) => setTimeout(resolve.bind(null, 1), 500));
+      return new Promise<number>((resolve) => setTimeout(resolve.bind(null, 1), 100));
     });
   });
 
-  it('adds an async ops to a created tidy and check its memory management.', async () => {
+  it('adds an async ops to a created tidy and check its memory management', async () => {
     const tensorBase = memory().numTensors;
     const bytesBase = memory().numBytes;
     console.log('the before memory info is', tensorBase, bytesBase);
@@ -23,6 +23,48 @@ describe('utils', function () {
     });
     assert.equal(memory().numTensors, tensorBase);
     assert.equal(memory().numBytes, bytesBase);
+  });
+
+  it('adds an async ops with returned value', async () => {
+    const tensorBase = memory().numTensors;
+    const t1 = await tidyAsync(async () => {
+      await tensor1d([1, 2]).data();
+      await tensor1d([3, 4]).data();
+      return tensor1d([0]);
+    });
+    assert.equal(memory().numTensors, tensorBase + 1);
+    dispose(t1);
+    assert.equal(memory().numTensors, tensorBase);
+
+    const t2 = await tidyAsync(async () => {
+      const one = scalar(1);
+      const two = scalar(2);
+      const three = add(two, one);
+      assert.equal(memory().numTensors, tensorBase + 3);
+      return three;
+    });
+    assert.equal(memory().numTensors, tensorBase + 1);
+    dispose(t2);
+  });
+
+  it('adds an async & sync ops to check memory mangement', async () => {
+    const tensorBase = memory().numTensors;
+    const future = tidyAsync(async () => {
+      const one = scalar(1);
+      return new Promise<TensorContainer>((resolve) => {
+        setTimeout(() => {
+          assert.equal(memory().numTensors, tensorBase + 1);
+          resolve(one);
+        }, 100);
+      });
+    });
+    tidy(() => {
+      const two = scalar(2);
+      assert.equal(memory().numTensors, tensorBase + 2);
+    });
+    const tensor = await future;
+    dispose(tensor);
+    assert.equal(memory().numTensors, tensorBase);
   });
 
   it('adds an async ops with exceptions and check its memory management', async () => {
