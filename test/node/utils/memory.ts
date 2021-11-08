@@ -1,10 +1,10 @@
-import { tidyAsync } from '../../../src/utils/memory';
 import { tensor1d, memory } from '@tensorflow/tfjs-core';
 import { assert } from 'chai';
+import { tidyAsync } from '../../../src/utils/memory';
 
 describe('utils', function () {
-  it('creates a tidy and check if Promise is supported.', () => {
-    tidyAsync(() => {
+  it('creates a tidy and check if Promise is supported.', async () => {
+    await tidyAsync(() => {
       return new Promise<number>((resolve) => setTimeout(resolve.bind(null, 1), 500));
     });
   });
@@ -39,6 +39,22 @@ describe('utils', function () {
       assert.equal(err.message, 'this is an exception.');
     }
     assert.equal(memory().numTensors, tensorBase);
+  });
+
+  it('adds multiple calls to tidy, and got an error when first not ended', async () => {
+    tidyAsync(async () => {
+      return new Promise<number>((resolve) => setTimeout(resolve.bind(null, 1), 500)); 
+    });
+
+    let caughtError = false;
+    try {
+      await tidyAsync(async () => tensor1d([0]));
+    } catch (err) {
+      assert.equal(err.message,
+        'tidy must have only 1 running instance, please create a new tidy after others end.');
+      caughtError = true;
+    }
+    assert.equal(caughtError, true);
   });
 });
 
