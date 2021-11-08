@@ -11,7 +11,7 @@ const engine = ENV.global._tfengine;
  *
  * See https://github.com/tensorflow/tfjs/commit/5acd02003c3a00256f495ced52a0c1c85bde52fc.
  */
-export async function tidyAsync<T extends TensorContainer>(fn: () => Promise<T>) {
+export async function tidyAsync<T extends TensorContainer>(fn: () => Promise<T>): Promise<T> {
   engine.startScope();
   let result: T;
   const end = () => engine.endScope(result);
