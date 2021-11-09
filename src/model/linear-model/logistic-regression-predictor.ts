@@ -1,4 +1,4 @@
-import { RecursiveArray, Tensor, matMul, tensor, add, stack, sigmoid } from "@tensorflow/tfjs-core";
+import { RecursiveArray, Tensor, matMul, tensor, add, sigmoid, softmax } from "@tensorflow/tfjs-core";
 import { checkShape } from "../../linalg/utils";
 import { checkArray } from "../../utils/validation";
 import { BaseClassifier } from "../base";
@@ -16,12 +16,11 @@ export class LogisticRegressionPredictor extends BaseClassifier {
    * @param xData Input feaures
    * @returns predicted classes
    */
-  public async predict(xData: Tensor | RecursiveArray<number>) : Promise<Tensor | Tensor[]> {
-    const scores = await this.predictProba(xData);
-    const predClasses = await this.getPredClass(scores);
-    return predClasses;
+  public async predict(xData: Tensor | RecursiveArray<number>) : Promise<Tensor> {
+    const x = checkArray(xData, 'float32');
+    const scores = add(matMul(x, tensor(this.modelWeights[0])), this.modelWeights[1]);
+    return this.getPredClass(scores);
   }
-
   /**
    * Predict probabilities using logistic regression model.
    * @param xData Input features
@@ -32,12 +31,8 @@ export class LogisticRegressionPredictor extends BaseClassifier {
     if (!checkShape(x, [ -1, this.featureSize ])) {
       throw TypeError('Feature size does not match');
     }
-    const scores = sigmoid(add(matMul(x, tensor(this.modelWeights[0])), this.modelWeights[1]));
-    if (scores instanceof Array){
-      return stack(scores);
-    } else {
-      return scores;
-    }
+    const scores = add(matMul(x, tensor(this.modelWeights[0])), this.modelWeights[1]);
+    return this.isBinaryClassification() ? sigmoid(scores) : softmax(scores);
   }
 
   /**

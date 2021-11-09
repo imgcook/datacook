@@ -1,4 +1,4 @@
-import { Tensor, RecursiveArray, losses, squeeze, tensor } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, losses, squeeze, tensor, stack } from '@tensorflow/tfjs-core';
 import { layers, sequential, Sequential } from '@tensorflow/tfjs-layers';
 import { BaseEstimater } from '../base';
 import { checkArray } from '../../utils/validation';
@@ -100,17 +100,16 @@ export class LinearRegression extends BaseEstimater {
    * @param xData Tensor like of shape (n_samples, n_features), input feature
    * @param yData Tensor like of shape (n_sample, ), input target values
    * @returns classifier itself
-  */
+   */
   public async trainOnBatch(xData: Tensor | RecursiveArray<number>, yData: Tensor | RecursiveArray<number>): Promise<LinearRegression> {
     const { x, y } = this.validateData(xData, yData);
     const nFeature = x.shape[1];
+    if (this.model && nFeature !== this.featureSize) {
+      throw new TypeError('feature size does not match previous training set');
+    }
     if (!this.model) {
       this.initLinearModel(nFeature, this.fitIntercept);
       this.featureSize = nFeature;
-    } else {
-      if (nFeature != this.featureSize) {
-        throw new Error('feature size does not match previous training set');
-      }
     }
     await this.model.trainOnBatch(x, y);
     return this;
@@ -141,11 +140,14 @@ export class LinearRegression extends BaseEstimater {
     return this;
   }
 
-  public predict(xData: Tensor | RecursiveArray<number>): Tensor | Tensor[] {
+  public async predict(xData: Tensor | RecursiveArray<number>): Promise<Tensor> {
     const x = checkArray(xData, 'float32');
     const predY = this.model.predict(x);
-    if (predY instanceof Tensor) return squeeze(predY);
-    return predY;
+    if (predY instanceof Tensor) {
+      return squeeze(predY);
+    } else {
+      return squeeze(stack(predY));
+    }
   }
 
   public initModelFromWeights(inputShape: number, useBias: boolean, weights: (Float32Array | Int32Array | Uint8Array)[]): void {
@@ -161,19 +163,15 @@ export class LinearRegression extends BaseEstimater {
    * @returns Linear regression coefficients with structure
    * {'coefficient': Tensor, 'intercept': Tensor}
    */
-  public getCoef(): { 'coefficients': Tensor, 'intercept': Tensor} {
+  public getCoef(): { coefficients: Tensor, intercept: Tensor } {
     return {
-      'coefficients': squeeze(this.model.getWeights()[0]),
-      'intercept': this.fitIntercept ? this.model.getWeights()[1] : tensor(0)
+      coefficients: squeeze(this.model.getWeights()[0]),
+      intercept: this.fitIntercept ? this.model.getWeights()[1] : tensor(0)
     };
   }
 
-  public async getModelWeightsArray(): Promise<RecursiveArray<number>> {
-    const weights = [];
-    for (const w of this.model.getWeights()) {
-      weights.push(await w.array());
-    }
-    return weights;
+  public getModelWeightsArray(): Promise<RecursiveArray<number>> {
+    return Promise.all(this.model.getWeights().map((w: Tensor) => w.array()));
   }
 
   /**
@@ -183,17 +181,17 @@ export class LinearRegression extends BaseEstimater {
    */
   public async fromJson(modelJson: string): Promise<LinearRegression> {
     const modelParams = JSON.parse(modelJson);
-    if (modelParams.name !== 'LinearRegression'){
-      throw new RangeError(`${modelParams.name} is not Linear Regression`);
+    if (modelParams.name !== 'LinearRegression') {
+      throw new TypeError(`${modelParams.name} is not Linear Regression`);
     }
     const { fitIntercept, optimizerType, optimizerProps,
       modelWeights, featureSize } = modelParams;
-    this.fitIntercept = (fitIntercept as boolean);
+    this.fitIntercept = !!fitIntercept;
     this.featureSize = featureSize;
-    if (optimizerType as OptimizerType && optimizerProps as OptimizerProps) {
+    if (optimizerType && optimizerProps) {
+      this.optimizer = getOptimizer(optimizerType, optimizerProps);
       this.optimizerType = optimizerType;
       this.optimizerProps = optimizerProps;
-      this.optimizer = getOptimizer(optimizerType, optimizerProps);
     }
     if (modelWeights?.length) {
       this.initModelFromWeights(featureSize, fitIntercept, modelWeights);
@@ -208,7 +206,7 @@ export class LinearRegression extends BaseEstimater {
   public async toJson(): Promise<string> {
     const modelParams = {
       name: 'LinearRegression',
-      fitIntercept: await this.fitIntercept,
+      fitIntercept: this.fitIntercept,
       optimizerType: this.optimizerType,
       optimizerProps: this.optimizerProps,
       modelWeights: await this.getModelWeightsArray(),

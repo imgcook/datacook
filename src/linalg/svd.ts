@@ -11,7 +11,7 @@ import { matMul, Tensor, transpose, sqrt } from '@tensorflow/tfjs-core';
  * @param maxIter max iteration times, default to 200
  * @returns [ u, d, v ], u: left singular vector, d: singluar values, v: right singular vector
  */
-export const svd = async(matrix: Tensor, tol = 1e-4, maxIter = 200): Promise<[ Tensor, Tensor, Tensor ]> => {
+export const svd = async (matrix: Tensor, tol = 1e-4, maxIter = 200): Promise<[ Tensor, Tensor, Tensor ]> => {
   const m1 = matMul(matrix, transpose(matrix));
   const m2 = matMul(transpose(matrix), matrix);
   const [ m, n ] = matrix.shape;

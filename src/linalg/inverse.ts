@@ -9,18 +9,16 @@ import { isSquareMatrix } from './utils';
  * @param matrix target matrix
  * @returns inverse of the target matrix
  */
-export const inverse = async(matrix: Tensor): Promise<Tensor> => {
-  if (isSquareMatrix) {
-    const [ eigenValues, eigenVectors ] = await eigenSolve(matrix);
-    const minEigen = min(abs(eigenValues));
-    const invertable = Boolean((await greater(minEigen, 1e-4).data())[0]);
-    if (!invertable) {
-      throw new TypeError('Singlular matrix error');
-    } else {
-      const inverseEigenValues = divNoNan(1, eigenValues);
-      return matMul(matMul(eigenVectors, diag(inverseEigenValues)), transpose(eigenVectors));
-    }
-  } else {
+export const inverse = async (matrix: Tensor): Promise<Tensor> => {
+  if (!isSquareMatrix(matrix)) {
+    throw new TypeError('Not square matrix');
+  }
+  const [ eigenValues, eigenVectors ] = await eigenSolve(matrix);
+  const minEigen = min(abs(eigenValues));
+  const invertable = Boolean((await greater(minEigen, 1e-4).data())[0]);
+  if (!invertable) {
     throw new TypeError('Singular matrix error');
   }
+  const inverseEigenValues = divNoNan(1, eigenValues);
+  return matMul(matMul(eigenVectors, diag(inverseEigenValues)), transpose(eigenVectors));
 };

@@ -38,17 +38,11 @@ export const checkShape = (matrix: Tensor, shape: number[]): boolean => {
 };
 
 /**
- * Check that if a tensor a square matrix
+ * Check that if a tensor is a square matrix
  * @param matrix target matrix
  */
 export const isSquareMatrix = (matrix: Tensor): boolean => {
-  if (checkDimension(matrix, 2)) {
-    return false;
-  }
-  if (matrix.shape[0] === matrix.shape[1]) {
-    return true;
-  }
-  return false;
+  return checkDimension(matrix, 2) && matrix.shape[0] === matrix.shape[1];
 };
 
 /**
@@ -62,11 +56,10 @@ export const shapeEqual = (tensor1: Tensor, tensor2: Tensor): boolean => {
   const shape2 = tensor2.shape;
   if (shape1.length != shape2.length) {
     return false;
-  } else {
-    for (let i = 0; i < shape1.length; i++) {
-      if (shape1[i] !== shape2[i]) {
-        return false;
-      }
+  }
+  for (let i = 0; i < shape1.length; i++) {
+    if (shape1[i] !== shape2[i]) {
+      return false;
     }
   }
   return true;
@@ -103,3 +96,19 @@ export const fillDiag = (values: Tensor | number[], m: number, n: number): Tenso
   }
   return tensor(diagData);
 };
+
+/**
+ * 
+ * @param matrix Tensor
+ */
+export const getDiagVector = (matrix: Tensor): Tensor => {
+  if (!checkDimension(matrix, 2)) {
+    throw new TypeError("Should provide tensor with 2-dimension");
+  }
+  const k = Math.min(...matrix.shape);
+  let diagData = [];
+  for (let i = 0; i < k; i++) {
+    diagData.push(slice(matrix, [ i, i ], [ 1, 1 ]).dataSync()[0]);
+  }
+  return tensor(diagData);
+}

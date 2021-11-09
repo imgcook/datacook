@@ -73,18 +73,17 @@ export class OneHotEncoder {
   public async encode(x: Tensor | number[] | string[]): Promise<Tensor> {
     if (!this.categories) {
       throw TypeError('Please init encoder using init()');
+    }
+    const xTensor = checkArray(x, 'any', 1);
+    const xData = await xTensor.dataSync();
+    const nCate = this.categories.shape[0];
+    const xInd = xData.map((d: number|string) => this.cateMap[d]);
+    if (this.drop === 'binary-only' && nCate === 2) {
+      return tensor(xInd);
+    } else if (this.drop === 'first') {
+      return oneHot(cast(sub(tensor(xInd), 1), 'int32'), nCate - 1);
     } else {
-      const xTensor = checkArray(x, 'any', 1);
-      const xData = await xTensor.dataSync();
-      const nCate = this.categories.shape[0];
-      const xInd = xData.map((d: number|string) => this.cateMap[d]);
-      if (this.drop === 'binary-only' && nCate === 2) {
-        return tensor(xInd);
-      } else if (this.drop === 'first') {
-        return oneHot(cast(sub(tensor(xInd), 1), 'int32'), nCate - 1);
-      } else {
-        return oneHot(cast(tensor(xInd), 'int32'), nCate);
-      }
+      return oneHot(cast(tensor(xInd), 'int32'), nCate);
     }
   }
   /**
@@ -107,20 +106,21 @@ export class OneHotEncoder {
     if (this.drop === 'binary-only' && nCate === 2) {
       cateInd.forEach((ind: number) => {
         if (ind != 0 && ind != 1) {
-          throw Error('Index out of range');
+          throw RangeError('Index out of range');
         }
-        return cateTensors.push(slice(this.categories, ind, 1));
+        cateTensors.push(slice(this.categories, ind, 1));
       });
     } else if (this.drop === 'first') {
       cateInd.forEach((ind: number, i: number) => {
         if (Number(slice(x, [ i, ind ], [ 1, 1 ]).dataSync()) === 0) {
-          return cateTensors.push(slice(this.categories, 0, 1));
+          cateTensors.push(slice(this.categories, 0, 1));
+        } else {
+          cateTensors.push(slice(this.categories, ind + 1, 1));
         }
-        return cateTensors.push(slice(this.categories, ind + 1, 1));
       });
     } else {
       cateInd.forEach((ind: number) => {
-        return cateTensors.push(slice(this.categories, ind, 1));
+        cateTensors.push(slice(this.categories, ind, 1));
       });
     }
     return reshape(stack(cateTensors), [ -1 ]);

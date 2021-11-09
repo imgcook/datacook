@@ -24,8 +24,7 @@ export class BaseClassifier {
   }
   // get label one-hot expression
   public async getLabelOneHot(y: Tensor): Promise<Tensor> {
-    const yOnehot = await this.classOneHotEncoder.encode(y);
-    return yOnehot;
+    return await this.classOneHotEncoder.encode(y);
   }
 
   public async initClasses(y: Tensor | number[] | string[], drop: OneHotDropTypes = 'none'): Promise<void> {
@@ -34,17 +33,15 @@ export class BaseClassifier {
   }
 
   public classes(): Tensor {
-    return this.classOneHotEncoder.categories;
+    return this.classOneHotEncoder?.categories;
   }
 
   public isBinaryClassification(): boolean {
-    const nClass = this.classes().shape[0];
-    return nClass == 2;
+    return this.classes().shape[0] === 2;
   }
 
   public async getPredClass(score: Tensor): Promise<Tensor> {
-    const predClass = await this.classOneHotEncoder.decode(score);
-    return predClass;
+    return await this.classOneHotEncoder.decode(score);
   }
 
   public validateData(x: Tensor | RecursiveArray<number>, y: Tensor | RecursiveArray<number>, xDimension = 2, yDimension = 1): { x: Tensor, y: Tensor } {
@@ -57,7 +54,7 @@ export class BaseClassifier {
         'the size of training set and training labels must be the same.'
       );
     }
-    return { 'x': xTensor, 'y': yTensor };
+    return { x: xTensor, y: yTensor };
   }
 }
 
@@ -74,6 +71,6 @@ export class BaseEstimater {
         'the size of the training set and the training labels must be the same.'
       );
     }
-    return { 'x': xTensor, 'y': y_tensor };
+    return { x: xTensor, y: y_tensor };
   }
 }

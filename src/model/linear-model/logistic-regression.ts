@@ -1,5 +1,5 @@
-import { Tensor, RecursiveArray, losses, squeeze, tensor, stack } from '@tensorflow/tfjs-core';
-import { layers, sequential, Sequential, regularizers, callbacks } from '@tensorflow/tfjs-layers';
+import { Tensor, RecursiveArray, losses, squeeze, tensor, stack, sigmoid, softmax } from '@tensorflow/tfjs-core';
+import { layers, sequential, Sequential, regularizers, callbacks, initializers } from '@tensorflow/tfjs-layers';
 import { Optimizer } from '@tensorflow/tfjs-core';
 
 import { checkArray } from '../../utils/validation';
@@ -12,7 +12,7 @@ export type LogisticPenalty = 'l1' | 'l2' | 'none';
  */
 export interface LogisticRegressionParams {
   /**
-   * {'l1', 'l2', 'none'}, default = 'l2'
+   * {'l1', 'l2', 'none'}, default = 'none'
    * Specify the norm used in the penalization.
    */
   penalty?: LogisticPenalty,
@@ -44,10 +44,9 @@ export interface LogisticRegressionTrainParams {
   batchSize?: number,
   epochs?: number,
 }
-
 /**
  * Logistic regression classifier
- * */
+ */
 export class LogisticRegression extends BaseClassifier {
   private fitIntercept: boolean;
   private penalty: LogisticPenalty;
@@ -65,12 +64,13 @@ export class LogisticRegression extends BaseClassifier {
    * Options in `params`
    * ---------
    *
-   * `penalty`: {'l1', 'l2', 'none'}, default to 'l2', Specify the norm used in the penalization.
+   * `penalty`: {'l1', 'l2', 'none'}, default to 'none', Specify the norm used in the penalization.
    *
    * `fitIntercept`: Whether to calculate the intercept for this model. If set to False,
    *    no intercept will be used in calculations.
    *
-   * `c`: Regularization strength; must be a positive float. Larger values specify stronger regularization. Default to 1.
+   * `c`: Regularization strength; must be a positive float. Larger values specify stronger regularization.
+   * Default to 1.
    *
    * `optimizerType`: optimizer types for training. All of the following optimizers types supported in tensorflow.js
    *  (https://js.tensorflow.org/api/latest/#Training-Optimizers) can be applied. Default to 'adam':
@@ -88,7 +88,7 @@ export class LogisticRegression extends BaseClassifier {
    *  to initialize adam optimizer.
    */
   constructor(params: LogisticRegressionParams = {
-    penalty: 'l2',
+    penalty: 'none',
     fitIntercept: true,
     c: 1,
     optimizerType: 'adam',
@@ -96,7 +96,7 @@ export class LogisticRegression extends BaseClassifier {
   }) {
     super();
     this.fitIntercept = params.fitIntercept !== false;
-    this.penalty = params.penalty ? params.penalty : 'l2';
+    this.penalty = params.penalty ? params.penalty : 'none';
     this.c = params.c ? params.c : 1;
     this.optimizerType = params.optimizerType ? params.optimizerType : 'adam';
     this.optimizerProps = params.optimizerProps ? params.optimizerProps : { learningRate: 0.1 };
@@ -111,11 +111,13 @@ export class LogisticRegression extends BaseClassifier {
       inputShape: [ inputShape ],
       units: outputShape,
       useBias,
-      activation: 'sigmoid',
-      kernelRegularizer: penalty === 'l2' ? regularizers.l2({ l2: c }) : penalty === 'l1' ? regularizers.l1({ l1: c }) : null }));
+      kernelInitializer: initializers.zeros(),
+      biasInitializer: initializers.zeros(),
+      kernelRegularizer: penalty === 'l2' ? regularizers.l2({ l2: c }) : penalty === 'l1' ? regularizers.l1({ l1: c }) : null
+    }));
     model.compile({
       optimizer: this.optimizer,
-      loss: losses.sigmoidCrossEntropy
+      loss: this.isBinaryClassification() ? losses.sigmoidCrossEntropy : losses.softmaxCrossEntropy
     });
     if (modelWeights.length > 0) {
       model.setWeights(modelWeights);
@@ -131,19 +133,17 @@ export class LogisticRegression extends BaseClassifier {
   public async trainOnBatch(xData: Tensor | RecursiveArray<number>, yData: Tensor | RecursiveArray<number>): Promise<LogisticRegression> {
     const { x, y } = this.validateData(xData, yData);
     const nFeature = x.shape[1];
+    if (this.model && nFeature != this.featureSize) {
+      throw new Error('feature size does not match previous training set');
+    }
     if (!this.model) {
-      await this.initClasses(y, 'binary-only');
+      if (!this.classes() || !this.classes().shape[0]) await this.initClasses(y, 'binary-only');
       const outputShape = this.isBinaryClassification() ? 1 : this.classes().shape[0];
       this.initModel(nFeature, outputShape, this.fitIntercept);
       this.featureSize = nFeature;
       this.outputSize = outputShape;
-    } else {
-      if (nFeature !== this.featureSize) {
-        throw new Error('feature size does not match previous training set');
-      }
     }
-    const yOneHot = await this.getLabelOneHot(y);
-    await this.model.trainOnBatch(x, yOneHot);
+    await this.model.trainOnBatch(x, await this.getLabelOneHot(y));
     return this;
   }
 
@@ -195,14 +195,14 @@ export class LogisticRegression extends BaseClassifier {
    * @param xData Input features
    * @returns Predicted classes
    */
-  public async predict(xData: Tensor | RecursiveArray<number>) : Promise<Tensor | Tensor[]> {
+  public async predict(xData: Tensor | RecursiveArray<number>): Promise<Tensor> {
     const x = checkArray(xData, 'float32');
     const scores = this.model.predict(x);
     if (scores instanceof Tensor) {
-      const predClasses = await this.getPredClass(scores);
-      return predClasses;
+      return this.getPredClass(scores);
+    } else {
+      return this.getPredClass(stack(scores));
     }
-    return scores;
   }
 
   /**
@@ -210,50 +210,54 @@ export class LogisticRegression extends BaseClassifier {
    * @param xData Input features
    * @returns Predicted probabilities
    */
-  public async predictProba(xData: Tensor | RecursiveArray<number>) : Promise<Tensor> {
+  public async predictProba(xData: Tensor | RecursiveArray<number>): Promise<Tensor> {
     const x = checkArray(xData, 'float32');
     const scores = this.model.predict(x);
     if (scores instanceof Array){
-      return stack(scores);
+      return this.isBinaryClassification() ? stack(scores) : softmax(stack(scores));
     } else {
-      return scores;
+      return this.isBinaryClassification() ? sigmoid(scores) : softmax(scores);
     }
   }
 
-  public getCoef(): { coefficients: Tensor, intercept: Tensor} {
+  public getCoef(): { coefficients: Tensor, intercept: Tensor } {
     return {
       coefficients: squeeze(this.model.getWeights()[0]),
       intercept: this.fitIntercept ? this.model.getWeights()[1] : tensor(0)
     };
   }
 
-  public async getModelWeightsArray(): Promise<RecursiveArray<number>> {
-    const weights = [];
-    for (const w of this.model.getWeights()) {
-      weights.push(await w.array());
-    }
-    return weights;
+  public getModelWeightsArray(): Promise<RecursiveArray<number>> {
+    return Promise.all(this.model.getWeights().map((w: Tensor) => w.array()));
   }
 
   public initModelFromWeights(inputShape: number, outputShape: number, useBias: boolean, weights: (Float32Array | Int32Array | Uint8Array)[]): void {
-    const weightsTensors = [];
-    for (const w of weights) {
-      weightsTensors.push(tensor(w));
-    }
+    const weightsTensors = weights.map((w) => tensor(w));
     this.initModel(inputShape, outputShape, useBias, weightsTensors);
   }
 
+  /**
+   * Load model paramters from json string object
+   * @param modelJson model json saved as string object
+   * @returns model itself
+   */
   public async fromJson(modelJson: string): Promise<LogisticRegression> {
     const modelParams = JSON.parse(modelJson);
-    if (modelParams.name !== 'LogisticRegression'){
-      throw new RangeError(`${modelParams.name} is not Logistic Regression`);
+    if (modelParams.name !== 'LogisticRegression') {
+      throw new TypeError(`${modelParams.name} is not Logistic Regression`);
     }
     const { classes, fitIntercept, penalty, c, optimizerType, optimizerProps,
       modelWeights, featureSize, outputSize } = modelParams;
-    classes && this.initClasses(classes, 'binary-only');
+    if (classes) {
+      this.initClasses(classes, 'binary-only');
+    }
     this.fitIntercept = (fitIntercept as boolean);
-    penalty && (this.penalty = penalty);
-    c && (this.c = c);
+    if (penalty) {
+      this.penalty = penalty;
+    }
+    if (c) {
+      this.c = c;
+    }
     if (optimizerType as OptimizerType && optimizerProps as OptimizerProps) {
       this.optimizerType = optimizerType;
       this.optimizerProps = optimizerProps;
@@ -264,12 +268,15 @@ export class LogisticRegression extends BaseClassifier {
     }
     return this;
   }
-
+  /**
+   * Dump model parameters to json string.
+   * @returns Stringfied model parameters
+   */
   public async toJson(): Promise<string> {
     const modelParams = {
       name: 'LogisticRegression',
       classes: await this.classes()?.array(),
-      fitIntercept: await this.fitIntercept,
+      fitIntercept: this.fitIntercept,
       penalty: this.penalty,
       c: this.c,
       optimizerType: this.optimizerType,
