@@ -1,4 +1,5 @@
-import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, norm, div, max, sub, abs, lessEqual, slice, tensor, isNaN, where, tidy } from '@tensorflow/tfjs-core';
+import { checkArray } from '../utils/validation';
 
 /**
  * Normalize tensor by dividing its norm
@@ -95,4 +96,19 @@ export const fillDiag = (values: Tensor | number[], m: number, n: number): Tenso
     }
   }
   return tensor(diagData);
+};
+
+/**
+ * Fill the nan data with given value
+ * TODO: support multi-dimensional data
+ * @param xData input data
+ * @param fillV value to replace NaN, should be number
+ * @return replaced data
+ */
+export const fillNaN = (xData: Tensor | RecursiveArray<number>, fillV = 0): Tensor => {
+  return tidy(() => {
+    const xTensor = checkArray(xData, 'float32', 2);
+    const cond = isNaN(xTensor);
+    return where(cond, fillV, xTensor);
+  });
 };
