@@ -1,4 +1,4 @@
-import { Tensor, RecursiveArray, tensor, tidy } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, tensor, tidy, dispose, Tensor2D } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
 import { OneHotEncoder } from '../preprocess';
 import { OneHotDropTypes } from '../preprocess/encoder';
@@ -33,9 +33,35 @@ export abstract class BaseEstimator {
       this.nFeature = x.shape[1];
     }
   }
+  /**
+   * Clean all tensor properties for memory release.
+   */
+  public clean(): void {
+    for (const key in this) {
+      const param = this[key];
+      if (param instanceof Tensor) {
+        dispose(param);
+      }
+    }
+  }
+  /**
+   * Reset given parameter. If type of parameter is tensor, previous value
+   * will be disposed.
+   * @param paramKey parameter name
+   * @param val value to be set
+   */
+  public cleanAndSetParam(paramKey: Extract<keyof this, string>, val: this[Extract<keyof this, string>]): void {
+    if (paramKey in this) {
+      const param = this[paramKey];
+      if (param instanceof Tensor) {
+        dispose(param);
+      }
+    }
+    this[paramKey] = val;
+  }
 }
 
-export class BaseClustering extends BaseEstimator{
+export class BaseClustering extends BaseEstimator {
   constructor() {
     super();
     this.estimatorType = 'clustering';
@@ -43,11 +69,12 @@ export class BaseClustering extends BaseEstimator{
   /**
    * Validate the input of clustering task
    * @param x input data
+   * @param reset if reset the feature size
    * @returns tensor of input data
    */
   public validateData(x: FeatureInputType, reset: boolean): Tensor {
     return tidy(() => {
-      const xTensor = checkArray(x, 'float32', 2);
+      const xTensor = checkArray(x, 'float32', 2) as Tensor2D;
       this.checkAndSetNFeatures(xTensor, reset);
       return xTensor;
     });
@@ -63,7 +90,7 @@ export class BaseClassifier {
     const xCount = x.shape[0];
     const yCount = y.shape[0];
     if (xCount == 0 || yCount == 0) {
-      throw new Error('inputs should not have length of zero');
+      throw new Error('Inputs should not have length of zero');
     }
     // TODO(sugarspectre): Accuaracy score computation
     const score = tensor([ 0 ]);
@@ -98,7 +125,7 @@ export class BaseClassifier {
     const yCount = yTensor.shape[0];
     if (xCount != yCount) {
       throw new RangeError(
-        'the size of training set and training labels must be the same.'
+        'The size of training set and training labels must be the same.'
       );
     }
     return { x: xTensor, y: yTensor };
@@ -115,7 +142,7 @@ export class BaseEstimater {
     const yCount = y_tensor.shape[0];
     if (xCount != yCount) {
       throw new RangeError(
-        'the size of the training set and the training labels must be the same.'
+        'The size of the training set and the training labels must be the same.'
       );
     }
     return { x: xTensor, y: y_tensor };

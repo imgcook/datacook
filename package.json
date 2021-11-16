@@ -11,8 +11,8 @@
   },
   "scripts": {
     "test": "npm run test:node",
-    "test:node": "nyc mocha --timeout 60000 -r ts-node/register ./test/node/**/*.ts",
-    "test:simple": "mocha --timeout 60000 -r ts-node/register",
+    "test:node": "nyc mocha --timeout 60000 -r ts-node/register ./test/node/**/*.ts --require test/setup.ts",
+    "test:simple": "mocha --timeout 60000 -r ts-node/register --require test/setup.ts",
     "test:browser": "karma start --single-run --browsers ChromeHeadless karma.conf.js",
     "build": "npm run clean && npm run build:node && npm run build:wasm",
     "build:node": "tsc -b tsconfig.json",
