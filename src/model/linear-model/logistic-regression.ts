@@ -8,7 +8,7 @@ import { OptimizerProps, OptimizerType, getOptimizer } from '../../utils/optimiz
 
 export type LogisticPenalty = 'l1' | 'l2' | 'none';
 /**
- * Parameters for linear regression
+ * Parameters for linear regression:
  */
 export interface LogisticRegressionParams {
   /**

@@ -18,12 +18,12 @@ export abstract class BaseEstimator {
    * Check if input feature match the required feature size. If reset is true,
    * reset nFeature = x.shape[1]
    *
-   * @param x input feature of shape (nSample, nFeatures).
+   * @param x Input feature of shape (nSample, nFeatures).
    * @param reset if true, the `nFeatures` attribute is set to `x.shape[1]`.
    */
-  public checkAndSetNFeatures(x: Tensor2D, reset: boolean): void {
+  public checkAndSetNFeatures(x: Tensor, reset: boolean): void {
     if (x?.shape?.length !== 2) {
-      throw new TypeError('Input should be 2D tensor');
+      throw new TypeError('x should be 2D tensor');
     }
     const featureCount = x.shape[1];
     if (!reset && featureCount !== this.nFeature) {
