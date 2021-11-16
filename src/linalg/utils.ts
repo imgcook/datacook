@@ -73,10 +73,12 @@ export const shapeEqual = (tensor1: Tensor, tensor2: Tensor): boolean => {
  * @param
  */
 export const tensorEqual = (tensor1: Tensor, tensor2: Tensor, tol = 0): boolean => {
-  if (!shapeEqual(tensor1, tensor2)) {
-    throw new Error('tensor1 and tensor2 not of same shape');
-  }
-  return Boolean(lessEqual(max(abs(sub(tensor1, tensor2))), tol).dataSync()[0]);
+  return tidy(() => {
+    if (!shapeEqual(tensor1, tensor2)) {
+      throw new TypeError('tensor1 and tensor2 not of same shape');
+    }
+    return Boolean(lessEqual(max(abs(sub(tensor1, tensor2))), tol).dataSync()[0]);
+  });
 };
 
 /**
