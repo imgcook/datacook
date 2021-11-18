@@ -9,11 +9,11 @@ import { isSquareMatrix } from './utils';
  * @param matrix target matrix
  * @returns inverse of the target matrix
  */
-export const inverse = async (matrix: Tensor): Promise<Tensor> => {
+export const inverse = async (matrix: Tensor, tol = 1e-4, maxIter = 200): Promise<Tensor> => {
   if (!isSquareMatrix(matrix)) {
     throw new TypeError('Not square matrix');
   }
-  const [ eigenValues, eigenVectors ] = await eigenSolve(matrix);
+  const [ eigenValues, eigenVectors ] = await eigenSolve(matrix, tol, maxIter);
   const minEigen = min(abs(eigenValues));
   const invertable = Boolean((await greater(minEigen, 1e-4).data())[0]);
   if (!invertable) {
