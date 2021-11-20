@@ -1,5 +1,5 @@
-import { LinearRegressionAnalysis } from '../../../src/model/stat/linear-regression-analysis';
 import * as tf from '@tensorflow/tfjs-core';
+import { stepwise } from '../../../src/model/stat/stepwise';
 import { assert } from 'chai';
 
 const nData = 100;
@@ -21,17 +21,15 @@ const treesVolumn = [ 10.3, 10.3, 10.2, 16.4, 18.8, 19.7, 15.6, 18.2, 22.6,
 
 describe('Linear Regression', () => {
 
-  it('train simple dataset', async () => {
-    const lm = new LinearRegressionAnalysis({});
-    await lm.fit(cases, y);
-    const summary = lm.summary();
-    console.log(summary);
-  });
+//   it('train simple dataset', async () => {
+//     const lm = await stepwise(cases, y);
+//     const summary = lm.summary();
+//     console.log(summary);
+//   });
 
   it('train on tree dataset', async () => {
-    const lm = new LinearRegressionAnalysis();
     const treeFeatureTensor = tf.transpose(tf.tensor2d([ treesHeight, treesVolumn ]));
-    await lm.fit(treeFeatureTensor, treesGrith);
+    const lm = await stepwise(treeFeatureTensor, treesGrith);
     lm.printSummary();
   });
 });

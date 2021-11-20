@@ -2,7 +2,7 @@ import { Tensor1D, tidy, sum, square, sub, mean, divNoNan, Tensor } from '@tenso
 import { checkArray } from '../utils/validation';
 import { shapeEqual } from '../linalg';
 
-export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[]) => {
+export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[]): { yTrueTensor: Tensor, yPredTensor: Tensor } => {
   return tidy(() => {
     const yTrueTensor = checkArray(yTrue, 'any', 1) as Tensor1D;
     const yPredTensor = checkArray(yPred, 'any', 1) as Tensor1D;
@@ -10,7 +10,7 @@ export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[
       throw new Error('Shape of yTrue should match shape of yPred');
     }
     return { yTrueTensor, yPredTensor };
-  }); 
+  });
 };
 
 /**
@@ -20,7 +20,7 @@ export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[
  * @param yPred prediced labels
  * @returns r-square value
  */
-export const getRSquare = (yTrue: Tensor1D | number[], yPred: Tensor1D | number[]) => {
+export const getRSquare = (yTrue: Tensor | number[], yPred: Tensor | number[]): number => {
   return tidy(() => {
     const { yTrueTensor, yPredTensor } = checkPairInput(yTrue, yPred);
     const numerator = sum(square(sub(yTrueTensor, yPredTensor)));
@@ -76,5 +76,25 @@ export const getAdjustedRSquare = (yTrue: Tensor | number[], yPred: Tensor | num
     const rSquare = getRSquare(yTrueTensor, yPredTensor);
     const nData = yTrueTensor.shape[0];
     return 1 - ((1 - rSquare) * (nData - 1)) / (nData - k - 1);
+  });
+};
+
+/**
+ * Calculate AIC of linear model
+ * AIC(M) = -2 * log L(M) + 2 * p(M)
+ * where L(M) is the likelihood of model M
+ * p(M) is the number of indepent regressors in the model
+ * @param yTrue true output
+ * @param yPred predicted ouput
+ * @param k number of independent regressors
+ * @returns aic
+ */
+export const getAicLM = (yTrue: Tensor | number[], yPred: Tensor | number[], k: number): number => {
+  return tidy(() => {
+    const { yTrueTensor, yPredTensor } = checkPairInput(yTrue, yPred);
+    const nData = yTrueTensor.shape[0];
+    const sse = sum(square(sub(yTrueTensor, yPredTensor))).dataSync()[0];
+    const aic = nData * (Math.log(2 * Math.PI) + Math.log(sse) - 2 * Math.log(nData)) + nData + 2 * (k + 1);
+    return aic;
   });
 };
