@@ -49,17 +49,3 @@ const yPred = lm.predict(X);
 yPred.print();
 // [10, 6, 6, 12]
 ```
-
-We could use [webpack-bundle-analyzer][] to analysis the Web dependencies:
-
-```shell
-$ npx webpack --profile --json > stat.json
-$ npx webpack-bundle-analyzer stat.json
-```
-
-## License
-
-Apache 2.0
-
-[datacook]: https://github.com/imgcook/datacook
-[webpack-bundle-analyzer]: https://www.npmjs.com/package/webpack-bundle-analyzer

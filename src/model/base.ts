@@ -1,6 +1,6 @@
 import { Tensor, RecursiveArray, tensor, tidy, dispose, Tensor2D } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
-import { OneHotEncoder } from '../preprocess';
+import { OneHotEncoder } from '../preprocess/encoder';
 import { OneHotDropTypes } from '../preprocess/encoder';
 
 export type FeatureInputType = Tensor | RecursiveArray<number>;
@@ -13,7 +13,9 @@ export type ClassMap = {
 export abstract class BaseEstimator {
   public estimatorType: string;
   public nFeature: number;
-
+  constructor() {
+    this.nFeature = 0;
+  }
   /**
    * Check if input feature match the required feature size. If reset is true,
    * reset nFeature = x.shape[1]

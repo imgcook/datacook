@@ -15,6 +15,12 @@ export const getVariance = (xData: Tensor | RecursiveArray<number>): Tensor => {
   return divNoNan(sum(pow(xCentered, 2), axisV), nSamples - 1);
 };
 
+export const getMean = (xData: Tensor | RecursiveArray<number>): Tensor => {
+  const axisV = 0;
+  const xTensor = checkArray(xData, 'float32');
+  return mean(xTensor, axisV);
+};
+
 /**
  * Normalize input data.\
  * normalized_x = (X - mean(X)) / sqrt(var(X))
