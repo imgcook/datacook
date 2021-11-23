@@ -19,6 +19,12 @@ function toSamples(
   });
 }
 
+/**
+ * Make dataset from csv.
+ * @param records The csv records.
+ * @param labelKeys The label column name or index list.
+ * @returns Csv dataset.
+ */
 export const makeDatasetFromCsv = (
   records: Array<Record<string, any>>,
   labelKeys?: Array<string>

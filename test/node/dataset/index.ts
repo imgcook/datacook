@@ -88,7 +88,7 @@ describe('Dataset', () => {
     const trainSamples: Array<Types.Sample> = [sample, sample, sample];
     const dataset = new ArrayDatasetImpl(trainSamples);
   
-    expect(await dataset.nextBatch(0)).to.eql([]);
+    expect(await dataset.nextBatch(0)).to.eql([sample, sample, sample]);
   });
 
   it('should throw an error', async () => {
@@ -100,7 +100,7 @@ describe('Dataset', () => {
   
     const dataset = new ArrayDatasetImpl(trainSamples);
 
-    await expectThrowsAsync(() => dataset.nextBatch(-2));
+    expect(await dataset.nextBatch(-2)).to.eql([ sample, sample, sample ]);
   });
 });
 

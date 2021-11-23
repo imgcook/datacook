@@ -9,6 +9,9 @@ export { Image } from './image';
 export * as Rand from './rand';
 export * as Model from './model';
 export * as Metrics from './metrics';
+export * as Linalg from './linalg';
+export * as Preprocess from './preprocess';
+export * as Stat from './stat';
 
 export const Text = {
   Counter,

@@ -1,8 +1,8 @@
 import { Tensor, split as splitOp } from '@tensorflow/tfjs-core';
-import 'seedrandom';
+import seedrandom from 'seedrandom';
 
 function seed(seed: string): void {
-  (Math as any).seedrandom(seed);
+  seedrandom(seed, { global: true });
 }
 
 function shuffle(inputs: Array<any>): void {
