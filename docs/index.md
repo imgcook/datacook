@@ -1,37 +1,59 @@
-## Welcome to GitHub Pages
+---
+# Feel free to add content and custom Front Matter to this file.
+# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
-You can use the [editor on GitHub](https://github.com/imgcook/datacook/edit/docs/docs/index.md) to maintain and preview the content for your website in Markdown files.
+layout: default
+permalink: /
+title: Home
+nav_order: 1
+---
+# DataCook
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Machine learning and data science library for Javascript / Typescript.
+{: .fs-6 .fw-300 }
 
-### Markdown
+[Get started now](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [View it on GitHub](https://github.com/imgcook/datacook){: .btn .fs-5 .mb-4 .mb-md-0 }
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+---
 
-```markdown
-Syntax highlighted code block
+## Getting started
 
-# Header 1
-## Header 2
-### Header 3
+### Dependencies
 
-- Bulleted
-- List
+DataCook is built for javascript environment and can run in both [node.js](https://nodejs.org/) platform and browser. DataCook relies on [tensorflow.js](https://www.tensorflow.org/js) for basic numeric computation.
 
-1. Numbered
-2. List
+### Quick installation
 
-**Bold** and _Italic_ and `Code` text
+DataCook can be installed by npm:
 
-[Link](url) and ![Image](src)
+```bash
+npm install @pipcook/datacook
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+or by yarn
 
-### Jekyll Themes
+```javascript
+yarn add @pipcook/datacook
+```
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/imgcook/datacook/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+### Quick start: Train a simple linear-regression model
 
-### Support or Contact
+```javascript
+import {LinearRegression} from '@pipcook/datacook';
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+const X = [
+  [4, 5],
+  [2, 3],
+  [1, 4],
+  [3, 8],
+];
+const y = [10, 5.5, 6.5, 12];
+// create model
+const lm = new LinearRegression();
+// train linear model using feature set X and label set y
+await lm.fit(X, y);
+// get prediction
+const yPred = lm.predict(X);
+yPred.print();
+// [10, 6, 6, 12]
+```
