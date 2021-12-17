@@ -1,11 +1,7 @@
 ---
 layout: default
-title: Models
+title: Classes
 has_children: true
-nav_order: 2
+nav_order: 8
 ---
-# Models
-
-
- 
-
+# Classes

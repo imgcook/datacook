@@ -16,7 +16,7 @@
 title: DataCook
 description: Machine learning and data science library for Javascript/Typescript
 #baseurl: "/datacook" # the subpath of your site, e.g. /blog
-url: "https://imgcook.github.io/datacook/" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://imgcook.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 
 permalink: pretty
 exclude: ["node_modules/", "*.gemspec", "*.gem", "Gemfile", "Gemfile.lock", "package.json", "package-lock.json",  "script/", "LICENSE.txt", "lib/", "bin/", "README.md", "Rakefile"

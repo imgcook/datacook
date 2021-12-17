@@ -1,10 +1,10 @@
 ---
 layout: default
-title: Statistics
+title: Math
 has_children: true
-nav_order: 4
+nav_order: 6
 ---
-# Statistics
+# Math
 
 
  
