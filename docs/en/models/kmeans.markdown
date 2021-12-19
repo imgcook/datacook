@@ -2,6 +2,7 @@
 layout: default
 title: KMeans
 parent: Models
+lang: en
 ---
 # Kmeans
 

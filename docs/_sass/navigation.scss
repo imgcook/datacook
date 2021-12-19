@@ -167,13 +167,17 @@
     padding: 0;
     margin: 0;
     list-style: none;
+    
   }
 
   .aux-nav-list-item {
-    display: inline-block;
+    display: flex;
     height: 100%;
     padding: 0;
     margin: 0;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
   }
 
   @include mq(md) {
