@@ -8,7 +8,6 @@ danfojs/data
 .idea/
 dist/
 tsconfig.tsbuildinfo
-index.html
 yarn-error
 yarn.lock
 *.log

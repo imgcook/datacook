@@ -29,7 +29,7 @@ const { LogisticRegression } = DataCook.Model;
 ## Constructor
 
 ```typescript
-const lr = new LogisticRegression({})
+const lr = new LogisticRegression({});
 ```
 
 ### Option parameters
@@ -38,7 +38,7 @@ const lr = new LogisticRegression({})
 | --------- | ---- | ----------- |
 | penalty | 'l1' \| 'l2' \| 'none' | penalty used in the penalization. **default = 'none'** |
 | fitIntercept | boolean | Whether to calculate the intercept for this model. If set to False, no intercept will be used in calculations. **default = false** |
-| c | number | Regularization strength; must be a positive float. Larger values specify stronger regularization. ** default = 1 **. |
+| c | number | Regularization strength; must be a positive float. Larger values specify stronger regularization. **default = 1**. |<!--  -->
 | optimizerType |  'sgd' \| 'momentum' \| 'adagrad' \| 'adadelta' \| 'adam' \| 'adamax' \| 'rmsprop' | optimizer types for training. All of the following [optimizers types](https://js.tensorflow.org/api/latest/#Training-Optimizers) supported in tensorflow.js can be applied. **Default to 'adam'** |
 | optimizerProps | OptimizerProps | parameters used to init corresponding optimizer, you can refer to [documentations in tensorflow.js](https://js.tensorflow.org/api/latest/#Training-Optimizers) to find the supported initailization paratemters for a given type of optimizer. For example, `{ learningRate: 0.1, beta1: 0.1, beta2: 0.2, epsilon: 0.1 }` could be used to initialize adam optimizer.|  
 
@@ -141,20 +141,6 @@ async fromJson(modelJson: string)
 | modelJson | string | model json string |
 
 
-### fromJson
-
-Load model paramters from json string object
-
-```typescript
-async fromJson(modelJson: string)
-```
-
-#### Parameters
-
-| parameter | type | description |
-| --------- | ---- | ----------- |
-| xData | Tensor \| RecursiveArray<number> | Input features|
-
 ### toJson
 
 Dump model parameters to json string.
@@ -168,7 +154,7 @@ async toJson(): Promise<string>
 string of model json
 
 
-### Examples
+## Examples
 
 ```typescript
 
