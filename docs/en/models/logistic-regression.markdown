@@ -3,9 +3,21 @@ layout: default
 title: Logistic Regression
 parent: Models
 lang: en
+usemathjax: true
 ---
 
 # Logistic Regression
+
+In logistic regression model, we assume a linear relationship between predictor varaibles and log-odds of the event that $$Y = 1$$.
+
+
+$$
+l = \log \frac{p}{1-p} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ....
+$$
+
+The objective of logistic model is to find $$\beta_0, \beta_1, \beta_2...$$ above to best fit this assumption. 
+
+In datacook, we implement logistic regression by stochatic gradient descent (SGD). 
 
 ## Import
 
@@ -158,6 +170,8 @@ string of model json
 
 ### Examples
 
+```typescript
 
+```
 
 
