@@ -1,7 +1,8 @@
 ---
 layout: default
-title: Linear Regression Analysis
+title: Factor Analysis
 parent: Models
 lang: en
 ---
 
+# Factor Analysis
