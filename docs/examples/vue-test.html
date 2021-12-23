@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.4.0/vue.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <div
+        v-on:click="list.push({title:arguments[0], checked: false})"
+      ></div>
+      <div
+        v-for="(l, i) in list"
+        :key="i"
+        :title="l.title"
+      >{{ l }}</div>
+      <p ref="dom">{{counter}}</p>
+    </div>
+    <script type="text/javascript">
+      new Vue({
+        el: "#app",
+        created: function() {
+        //   setInterval(() => {
+        //     this.counter++;
+        //   }, 1000);
+        fetch('../assets/dataset/spam.csv').then((res) => res.text())
+            .then((res) => {
+                this.list = [
+            { title: "A", checked: true },
+            { title: "B", checked: true },
+            { title: "C", checked: true },
+            { title: "D", checked: true }
+          ];
+            });
+        },
+        updated: function() {
+          console.log(+this.$refs["dom"].textContent === this.counter); // Logs true every second
+        },
+        data: {
+          counter: 0,
+          newTitle: "",
+          list: [
+            { title: "A", checked: true },
+            { title: "B", checked: true },
+            { title: "C", checked: true }
+          ]
+        }
+      });
+    </script>
+  </body>
+</html>

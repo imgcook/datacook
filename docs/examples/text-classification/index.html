@@ -1,0 +1,70 @@
+<html>
+  <head>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <link href="./index.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <div id="app">
+      <div class="page-wrapper">
+        <section class="messages wrapper">
+          <h1>Messages <span class="current-mailbox">/ Inbox</span></h1>
+          <!-- <div class="actions">
+            <span class="compose"><a href="#">New</a></span>
+            <a href="#">Reply</a>
+            <a href="#">Archive</a>
+            <a href="#">Move</a>
+            <a href="#">Mark</a>
+            <a href="#">Delete</a>
+          </div> -->
+          <div class="button -blue" v-on:click="collectSpam">
+            Spam Collection Using Naive Bayes
+          </div>
+          <ul class="message-list">
+            
+            <li class="message unread" v-for="message in curList">
+              <a class="message-data subject">
+                {{ message }}
+              </a>
+              <!-- <a class="message-data people" href="#">John Smith</a>
+              <a class="message-data subject" href="#">Hey, how’s the project coming along?</a>
+              <time class="message-data date" datetime="2014-03-16T15:00+07:00">Today, 3 PM</time> -->
+            </li>
+            <!-- <li class="message unread">
+              <a class="message-data people" href="#">Fancy Bikes</a>
+              <a class="message-data subject" href="#">Your bike has been shipped!</a>
+              <time class="message-data date" datetime="2014-03-16T14:15+07:00">Today, 2:15 PM</time>
+            </li>
+            <li class="message">
+              <a class="message-data people" href="#">Lisa</a>
+              <a class="message-data subject" href="#">Hike Tomorrow?</a>
+              <time class="message-data date" datetime="2014-03-16T10:00+07:00">Today, 10 AM</time>
+            </li> -->
+          </ul>
+        </section>
+        <section class="mailboxes wrapper">
+          <h1>Mailboxes</h1>
+          <ul class="mailbox-list default">
+            <li v-on:click="switchTab('inbox')" v-bind:class="curTab == 'inbox' ? 'mailbox selected' : 'mailbox'"><a href="#">Inbox <span class="unread-count">{{ inboxList.length }}</span></a></li>
+            <li><a class="mailbox" href="#">Sent</a></li>
+            <li><a class="mailbox" href="#">Drafts</a></li>
+            <li v-on:click="switchTab('trash')" v-bind:class="curTab == 'trash' ? 'mailbox selected' : 'mailbox'"><a href="#">Trash <span v-if="trashList.length" class="unread-count">{{ trashList.length }}</span></a></li>
+            <li><a class="mailbox" href="#">Archive</a></li>
+          </ul>
+          <h2>Tags</h2>
+          <ul class="mailbox-list custom">
+            <li><a class="mailbox" href="#">Work</a></li>
+            <li><a class="mailbox" href="#">Outdoors</a></li>
+            <li><a class="mailbox" href="#">Personal</a></li>
+          </ul>
+        </section>
+      </div>
+      <footer class="page-footer">
+        <div class="footer-content">
+          <p>This is an example of Naive Bayes in spam email collection</p>
+        </div>
+      </footer>
+    </div>
+  </body>
+  <script type="text/javascript" src="../datacook.js"></script>
+  <script type="text/javascript" src="./index.js"></script>
+</html>

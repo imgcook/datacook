@@ -138,3 +138,50 @@ async toJson(): Promise<string>
 #### Returns
 
 string of model json
+
+## Examples
+
+Following is an example about training an naive bayes model for spam email detection task.
+
+[Click here for live demo of this model](../../../examples/text-classification/index.html){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 }
+
+```typescript
+import * as DataCook from '@pipcook/datacook';
+/** if in browser, don't include 'node-fetch' and 'fs' **/
+import fetch from 'node-fetch';
+import * as fs from 'fs';
+
+const { MultinomialNB } = DataCook.Model.NaiveBayes;
+const { OneHotEncoder } = DataCook.Encoder;
+const { CountVectorizer } = DataCook.Text;
+const { accuracyScore } = DataCook.Metrics;
+
+console.log(OneHotEncoder);
+
+const res = await fetch('http://127.0.0.1:4000/datacook/assets/dataset/spam.csv');
+const text = await res.text();
+const data = text.split('\n').map((d) => d.split(','));
+
+const stopwords = 'i\nme\nmy\nmyself\nwe\nour\nours\nourselves\nyou\nyour\nyours\nyourself\nyourselves\nhe\nhim\nhis\nhimself\nshe\nher\nhers\nherself\nit\nits\nitself\nthey\nthem\ntheir\ntheirs\nthemselves\nwhat\nwhich\nwho\nwhom\nthis\nthat\nthese\nthose\nam\nis\nare\nwas\nwere\nbe\nbeen\nbeing\nhave\nhas\nhad\nhaving\ndo\ndoes\ndid\ndoing\na\nan\nthe\nand\nbut\nif\nor\nbecause\nas\nuntil\nwhile\nof\nat\nby\nfor\nwith\nabout\nagainst\nbetween\ninto\nthrough\nduring\nbefore\nafter\nabove\nbelow\nto\nfrom\nup\ndown\nin\nout\non\noff\nover\nunder\nagain\nfurther\nthen\nonce\nhere\nthere\nwhen\nwhere\nwhy\nhow\nall\nany\nboth\neach\nfew\nmore\nmost\nother\nsome\nsuch\nno\nnor\nnot\nonly\nown\nsame\nso\nthan\ntoo\nvery\ns\nt\ncan\nwill\njust\ndon\nshould\nnow';
+const contents = data.map(d => d[1])
+const labels = data.map(d => d[0]);
+
+const countVectorizer = new CountVectorizer(contents, stopwords.split('\n'));
+console.log(countVectorizer.wordOrder.length);
+const textVec = countVectorizer.transform(contents);
+
+const mnb = new MultinomialNB();
+await mnb.train(textVec, labels);
+const yPred = await mnb.predict(textVec);
+
+
+console.log('accuracy score');
+console.log(accuracyScore(yPred, labels));
+
+
+/** save model file, if in browser, don't include following two lines **/
+await fs.writeFile('./model.json', mnb.toJson(), ()=>{});
+await fs.writeFile('./vectorizer.json', countVectorizer.toJson(), ()=>{});it('\n').map((d) => d.split(','));
+
+```
+
