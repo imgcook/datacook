@@ -4,9 +4,9 @@ var app = new Vue({
     curTab: 'inbox',
     messageList: ['a', 'b', 'c'],
     labels: [],
-    count: 1,
     model: null,
-    vectorizer: null
+    vectorizer: null,
+    classified: false,
   },
   computed: {
     inboxList: function() {
@@ -29,8 +29,6 @@ var app = new Vue({
     }
   },
   mounted() {
-    this.messageList = ['b', 'c']
-    // let app = this;
     fetch('../../assets/dataset/spam.csv').then((res) => res.text())
       .then((res) => {
         const data = res.split('\n').map(d => d.split(',')[1]);
@@ -62,6 +60,18 @@ var app = new Vue({
         const predYArray = predY.arraySync();
         console.log(JSON.stringify(predYArray));
         this.labels = predYArray;
+        this.classified = true;
+      }
+    },
+    reset: function() {
+      this.labels = [];
+      this.classified = false;
+    },
+    handleClick: async function() {
+      if (this.classified) {
+        this.reset();
+      } else {
+        await this.collectSpam();
       }
     },
     switchTab: function(tab) {

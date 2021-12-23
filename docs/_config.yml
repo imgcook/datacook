@@ -66,7 +66,9 @@ heading_anchors: true
 
 # Aux links for the upper right navigation
 aux_links:
-  "DataCook on GitHub":
+  "Live Demos":
+    - "/datacook/examples"
+  "GitHub":
     - "//github.com/imgcook/datacook"
 
 # Makes Aux links open in a new tab. Default is false

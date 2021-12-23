@@ -1,0 +1,19 @@
+.card {
+  border-radius: 10px;
+  width:400px;
+  padding: 10px;
+  box-shadow: 1px 2px 20px rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: .2s all;
+}
+.card:hover {
+  box-shadow: 10px 15px 30px rgba(0,0,0,0.1);
+}
+.card img {
+  border-radius: 10px;
+}
+.card .title {
+  font-weight: 500;
+  font-size: 1.2em;
+  margin: 1s0px 0;
+}

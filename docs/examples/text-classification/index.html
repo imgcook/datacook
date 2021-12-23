@@ -8,16 +8,10 @@
       <div class="page-wrapper">
         <section class="messages wrapper">
           <h1>Messages <span class="current-mailbox">/ Inbox</span></h1>
-          <!-- <div class="actions">
-            <span class="compose"><a href="#">New</a></span>
-            <a href="#">Reply</a>
-            <a href="#">Archive</a>
-            <a href="#">Move</a>
-            <a href="#">Mark</a>
-            <a href="#">Delete</a>
-          </div> -->
-          <div class="button -blue" v-on:click="collectSpam">
-            Spam Collection Using Naive Bayes
+          <div class="action">
+            <div class="button -blue" v-on:click="handleClick">
+              {{ !classified ? 'Spam Collection Using Naive Bayes' : 'reset' }}
+            </div>
           </div>
           <ul class="message-list">
             
@@ -25,20 +19,7 @@
               <a class="message-data subject">
                 {{ message }}
               </a>
-              <!-- <a class="message-data people" href="#">John Smith</a>
-              <a class="message-data subject" href="#">Hey, how’s the project coming along?</a>
-              <time class="message-data date" datetime="2014-03-16T15:00+07:00">Today, 3 PM</time> -->
             </li>
-            <!-- <li class="message unread">
-              <a class="message-data people" href="#">Fancy Bikes</a>
-              <a class="message-data subject" href="#">Your bike has been shipped!</a>
-              <time class="message-data date" datetime="2014-03-16T14:15+07:00">Today, 2:15 PM</time>
-            </li>
-            <li class="message">
-              <a class="message-data people" href="#">Lisa</a>
-              <a class="message-data subject" href="#">Hike Tomorrow?</a>
-              <time class="message-data date" datetime="2014-03-16T10:00+07:00">Today, 10 AM</time>
-            </li> -->
           </ul>
         </section>
         <section class="mailboxes wrapper">
@@ -60,8 +41,19 @@
       </div>
       <footer class="page-footer">
         <div class="footer-content">
-          <p>This is an example of Naive Bayes in spam email collection</p>
+          <p>This is an example of Naive Bayes in spam email collection. We use a trained model for prediction, related training code could be found 
+            <a href="/datacook/en/models/naive-bayes/#examples" target="_blank">here</a>.
+          </p>
+          <p>
+            Once you click the <b>"Spam Collection Using Naive Bayes"</b> button, 
+           prediction will be applied for each message item, in which "spam" labeled items will be removed to <b>"Trash"</b> box
+          </p>
+          <br/>
+          <a class="button -ghost" href="/datacook/en/models/naive-bayes" target="_blank">
+            View documentation for Naive Bayes
+          </a>
         </div>
+        
       </footer>
     </div>
   </body>

@@ -58,8 +58,16 @@ body {
 }
 
 .page-footer {
-  background-color:#1f1f1f;
+  background-color:rgba(0,0,0,0.8);
   color:#cccccc;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.page-footer a {
+  color: var(--color-ocean);
 }
 
 .footer-content {
@@ -208,12 +216,13 @@ a {
   border-color: #eeeeee;
 }
 
+.action {
+    margin: 1.5em;
+}
 
 .button {
     display: flex;
     overflow: hidden;
-    
-    margin: 1.5em;
     padding: 12px 12px;
     max-width: 250px;
     cursor: pointer;
@@ -224,11 +233,9 @@ a {
     text-decoration: none !important;
     text-transform: none;
     text-transform: capitalize;
-  
     color: #fff;
     border: 0 none;
     border-radius: var(--borderRadius);
-  
     font-size: 13px;
     font-weight: 500;
     line-height: 1.3;
@@ -241,7 +248,7 @@ a {
     align-items: center;
     flex: 0 0 160px;
     
-    box-shadow: 2px 5px 10px var(--color-smoke);
+    
 
   }
 
@@ -264,6 +271,19 @@ a {
   .button.-blue {
     color: var(--color-snow);
     background: var(--color-ocean);
+    box-shadow: 2px 5px 10px var(--color-smoke);
+  }
+  a.button {
+    color: #fff;
+  }
+
+  .button.-ghost {
+      border: 1px solid rgba(255,255,255,0.8);
+  }
+
+  .button.-ghost:hover {
+    color: var(--color-ocean);
+    border: 1px solid var(--color-ocean);
   }
 
   
