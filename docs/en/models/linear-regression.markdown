@@ -7,9 +7,23 @@ lang: en
 
 # Linear Regression
 
-LinearRegression fits a linear model with coefficients w = (w1, …, wp) 
-to minimize the residual sum of squares between the observed targets in
-the dataset, and the targets predicted by the linear approximation.
+Linear regression is a classical **supervised learning** algorithm used when target / dependence variable is **continuous real number**. Linear regression fits a linear relationship between dependent variable $y$ and one or more independent variable $X$.
+
+$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 +... + \beta_m x_m +\epsilon
+$$
+
+where $\epsilon$ is the random residual term.
+
+Linear regression model is fitted by minimizing the Mean squared error (MSE) between predicted value $\hat y$ and real target $y$:
+
+$$
+\min_\beta \sum_{i=1}^n ||\hat y_i - y_i||^2
+$$
+
+In this implementation of **LinearRegression**, we use stochastic gradient descent (SGD) to minimize MSE. SGD is quite adaptable for most of the cases, whenever your data or feature size is large or small, however it may not be efficient sometimes.
+
+If you want to get statistical inference results for linear regression or more efficient fitting (especially for moderate data and feature size), please refer to [LinearRegressionAnalysis](../linear-regression-analysis) model, in which **Ordinary Least Square (OLS)** method is applied.
 
 ## Import
 
@@ -28,10 +42,10 @@ lm = new LinearRegression({ optimizerType: 'adam' });
 
 | parameter | type | description |
 | --------- | ---- | ----------- |
-|   fitIntercept   |  boolean  |     Whether to calculate the intercept for this model. If set to False, no intercept will be used in calculations        |
-| normalize | boolean | This parameter is ignored when fit_intercept is set to False. If True, the regressors X will be normalized before regression by subtracting the mean and dividing by the l2-norm. |
-| optimizerType |  'sgd' \| 'momentum' \| 'adagrad' \| 'adadelta' \| 'adam' \| 'adamax' \| 'rmsprop' | optimizer types for training. All of the following [optimizers types](https://js.tensorflow.org/api/latest/#Training-Optimizers) supported in tensorflow.js can be applied. **Default to 'adam'** |
-| optimizerProps | OptimizerProps | parameters used to init corresponding optimizer, you can refer to [documentations in tensorflow.js](https://js.tensorflow.org/api/latest/#Training-Optimizers) to find the supported initailization paratemters for a given type of optimizer. For example, `{ learningRate: 0.1, beta1: 0.1, beta2: 0.2, epsilon: 0.1 }` could be used to initialize adam optimizer.|  
+|   fitIntercept `optional`   |  boolean  |     Whether to calculate the intercept for this model. If set to False, no intercept will be used in calculations        |
+| normalize  `optional`| boolean | This parameter is ignored when fit_intercept is set to False. If True, the regressors X will be normalized before regression by subtracting the mean and dividing by the l2-norm. |
+| optimizerType  `optional`|  'sgd' \| 'momentum' \| 'adagrad' \| 'adadelta' \| 'adam' \| 'adamax' \| 'rmsprop' | optimizer types for training. All of the following [optimizers types](https://js.tensorflow.org/api/latest/#Training-Optimizers) supported in tensorflow.js can be applied. **Default to 'adam'** |
+| optimizerProps  `optional`| OptimizerProps | parameters used to init corresponding optimizer, you can refer to [documentations in tensorflow.js](https://js.tensorflow.org/api/latest/#Training-Optimizers) to find the supported initailization paratemters for a given type of optimizer. For example, `{ learningRate: 0.1, beta1: 0.1, beta2: 0.2, epsilon: 0.1 }` could be used to initialize adam optimizer.|  
 
 
 ## Methods
@@ -52,7 +66,29 @@ async fit(xData: Tensor | RecursiveArray<number>,
 | :-------- | :-----------------: | :------------------------------------------------------------------ |
 | xData     | Tensor \| RecursiveArray<number> | input data of shape (nSamples,nFeatures) in type of array or tensor |
 | yData     | Tensor \| RecursiveArray<number> | Tensor like of shape (n_sample, ), input target values |
-| params   | LinearRegerssionTrainParams | `batchSize`: batch size: **default = 32**, `maxIterTimes`: max iteration times, **default = 20000** |
+| params `optional` | LinearRegerssionTrainParams | `batchSize`: batch size: **default = 32**, `maxIterTimes`: max iteration times, **default = 20000** |
+
+
+#### Returns
+
+[LinearRegression](#LinearRegression)
+
+### trainOnBatch
+
+Train your model on batch. If your dataset is large, it could be a better choice than [fit](#fit) directly. 
+
+
+#### Parameters
+
+| Parameter |        type        | description                                                         |
+| :-------- | :-----------------: | :------------------------------------------------------------------ |
+| xData     | Tensor \| RecursiveArray<number> | input data of shape (nSamples,nFeatures) in type of array or tensor |
+| yData     | Tensor \| RecursiveArray<number> | Tensor like of shape (n_sample, ), input target values |
+
+
+#### Returns
+
+[LinearRegression](#LinearRegression)
 
 ### predict
 
@@ -124,5 +160,17 @@ async toJson(): Promise<string>
 #### Returns
 
 Stringfied model parameters
+
+## Examples
+
+```javascript
+
+```
+
+<script>
+  const { LinearRegression } = datacook.Models;
+
+  //console.log(datacook);
+</script>
 
 
