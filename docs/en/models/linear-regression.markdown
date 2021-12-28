@@ -164,13 +164,102 @@ Stringfied model parameters
 ## Examples
 
 ```javascript
+import * as datacook from 'datacook';
+import { Chart } from '@antv/g2';
 
+const { LinearRegression } = datacook.Model;
+const lm = async () => {
+const res = await fetch('/datacook/assets/dataset/height_weight.csv');
+const content = await res.text();
+const data = content.split('\n').map((d) => {
+  const splits = d.split(',');
+  const x = parseFloat(splits[0]);
+  const y = parseFloat(splits[1]);
+  return { x, y };
+}).slice(1);
+const xData = data.map((d) => [ d.x ]);
+const yData = data.map((d) => d.y);
+
+// model train and predict
+const lm = new LinearRegression();
+await lm.fit(xData, yData, {batchSize: 8, epochs: 200});
+const yPredict = (await lm.predict(xData)).arraySync();
+const predictData = xData.map((d, i) => { return {x: d, y: yPredict[i]} });
+
+// visualization
+const chart = new G2.Chart({
+  container: 'lm-chart',
+  autoFit: true,
+  height: 500,
+  syncViewPadding: true,
+});
+const view1 = chart.createView(data);
+view1.data(data);
+view1.point().position('x*y');
+
+const view2 = chart.createView(data);
+view2.data(predictData);
+view2.line().position('x*y');
+
+chart.render();
 ```
 
-<script>
-  const { LinearRegression } = datacook.Models;
+<div id="lm-chart">
+</div>
 
-  //console.log(datacook);
+<script>
+  const { LinearRegression } = datacook.Model;
+  const lm = async () => {
+    const res = await fetch('/datacook/assets/dataset/height_weight.csv');
+    const content = await res.text();
+    const data = content.split('\n').map((d) => {
+      const splits = d.split(',');
+      const height = parseFloat(splits[0]);
+      const weight = parseFloat(splits[1]);
+      return { height, weight };
+    }).slice(1);
+
+    const xData = data.map((d) => [ d.height ]);
+    const yData = data.map((d) => d.weight);
+    const lm = new LinearRegression({ optimizerType: 'sgd', learningRate: 10 });
+
+    await lm.fit(xData, yData, {batchSize: 10, epochs: 100});
+
+    const yPredict = (await lm.predict(xData)).arraySync();
+    const predictData = xData.map((d, i) => { return {height: d, weight: yPredict[i]} });
+    const coefs = lm.getCoef();
+    coefs.coefficients.print();
+    coefs.intercept.print();
+    const chart = new G2.Chart({
+      container: 'lm-chart',
+      autoFit: true,
+      height: 500,
+      syncViewPadding: true,
+    });
+
+    chart.scale({
+      height: {
+        sync: true,
+        nice: true,
+      },
+      weight: {
+        sync: true,
+        nice: true,
+      },
+    });
+
+    const view1 = chart.createView(data);
+    view1.data(data);
+    view1.point().position('height*weight');
+
+    const view2 = chart.createView(data);
+    view2.data(predictData);
+    view2.line().position('height*weight');
+
+    chart.render();
+
+  };
+  lm();
 </script>
 
 
