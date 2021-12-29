@@ -61,5 +61,5 @@ export const incbeta = (a: number, b: number, x: number): number => {
     }
   }
   /* Needed more loops, did not converge. */
-  return 1.0 / 0.0;
+  return NaN;
 };
