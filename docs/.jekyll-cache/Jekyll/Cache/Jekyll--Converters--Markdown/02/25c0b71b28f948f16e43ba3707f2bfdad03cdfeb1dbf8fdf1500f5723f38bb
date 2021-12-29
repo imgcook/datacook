@@ -1,0 +1,219 @@
+I"�><h1 id="kmeans">Kmeans</h1>
+
+<h2 id="import">Import</h2>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">Datacook</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">datacook</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">KMeans</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">DataCook</span><span class="p">.</span><span class="nx">Model</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="constructor">Constructor</h2>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">kmeans</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">KMeans</span><span class="p">({</span> <span class="nx">nCluster</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="nx">init</span> <span class="o">=</span> <span class="dl">'</span><span class="s1">kmeans++</span><span class="dl">'</span> <span class="p">});</span>
+</code></pre></div></div>
+
+<h3 id="option-parameters">Option parameters</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>parameter</th>
+      <th>type</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>nCluster</td>
+      <td>number</td>
+      <td>The number of clusters to form as well as the number of centroids,<strong>default=8</strong></td>
+    </tr>
+    <tr>
+      <td>init</td>
+      <td>“random”| “kmeans++”</td>
+      <td>Centroids initialize method<br />- ‘kmeans++’: <br />select initial cluster centroids using kmeans++<br />- ‘random’: <br />randomly select initial centroids<br /><strong>default=”kmeans++”</strong></td>
+    </tr>
+    <tr>
+      <td>nInit</td>
+      <td>number</td>
+      <td>Number of time the algorithm will be run with different initialization,<strong>default=10</strong></td>
+    </tr>
+    <tr>
+      <td>maxIterTimes</td>
+      <td>number</td>
+      <td>Maximum number of iterations of the k-means algorithm for a single run.<strong>default=1000</strong></td>
+    </tr>
+    <tr>
+      <td><code class="language-plaintext highlighter-rouge">tol</code></td>
+      <td>number</td>
+      <td>Relative tolerance with regards to Frobenius norm of the difference in the cluster centers of two consecutive iterations to declare convergence.<strong>default=1e-5</strong></td>
+    </tr>
+    <tr>
+      <td>verbose</td>
+      <td>boolean</td>
+      <td>verbosity mode,<strong>default=false</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="methods">Methods</h2>
+
+<h3 id="async-fitxdata">async fit(xData)</h3>
+
+<p>Fit kmeans model</p>
+
+<h4 id="parameters">Parameters</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Parameter</th>
+      <th style="text-align: center">type</th>
+      <th style="text-align: left">description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">xData</td>
+      <td style="text-align: center">Tensor| number[][]</td>
+      <td style="text-align: left">input data of shape (nSamples,nFeatures) in type of array or tensor</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="returns">Returns</h4>
+
+<p>tf.Tensor</p>
+
+<h3 id="async-predictxdata">async predict(xData)</h3>
+
+<p>Predict sample clusters for given input.</p>
+
+<h4 id="parameters-1">Parameters</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>parameter</th>
+      <th>type</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>xData</td>
+      <td>Tensor| number[][]</td>
+      <td>input data of shape (nSamples, nFeatures) in type of array or tensor</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="returns-1">Returns</h4>
+
+<p>tf.Tensor</p>
+
+<h3 id="async-scorexdata">async score(xData)</h3>
+
+<p>Get scores for input xData on the kmeans model. score = -inertia, larger score usually represent better fit.</p>
+
+<h4 id="parameters-2">Parameters</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>parameter</th>
+      <th>type</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>xData</td>
+      <td>Tensor| number[][]</td>
+      <td>input data of shape (nSamples, nFeatures) in type of array or tensor</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="returns-2">Returns</h4>
+<p>tensor of -inertia</p>
+
+<h3 id="async-trainonbatchxdata-featureinputtype">async trainOnBatch(xData: FeatureInputType)</h3>
+
+<p>Train kmeans model by batch. Here we apply mini-batch kmeans algorithm to
+update centroids in each iteration. The return value is inertia copmuted for input batch.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>parameter</th>
+      <th>type</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>xData</td>
+      <td>Tensor| number[][]</td>
+      <td>input data of shape (nSamples, nFeatures) in type of array or tensor</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="returns-3">Returns</h4>
+
+<p>inertia for input batch data</p>
+
+<h2 id="examples">Examples</h2>
+
+<h3 id="basic-usage">Basic Usage</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">Datacook</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">datacook</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">KMeans</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">DataCook</span><span class="p">.</span><span class="nx">Model</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">xData</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="p">];</span>
+<span class="kd">const</span> <span class="nx">kmeans</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">KMeans</span><span class="p">({</span> <span class="na">nClusters</span><span class="p">:</span> <span class="mi">3</span> <span class="p">});</span>
+<span class="k">await</span> <span class="nx">kmeans</span><span class="p">.</span><span class="nx">fit</span><span class="p">(</span><span class="nx">xData</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">predClus</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">kmeans</span><span class="p">.</span><span class="nx">predict</span><span class="p">(</span><span class="nx">xData</span><span class="p">);</span>
+<span class="nx">predClus</span><span class="p">.</span><span class="nx">print</span><span class="p">();</span>
+<span class="c1">// Tensor</span>
+<span class="c1">// [0, 0, 0, 1, 1, 1]</span>
+
+<span class="c1">// save and load model</span>
+<span class="kd">const</span> <span class="nx">modelJSON</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">kmeans</span><span class="p">.</span><span class="nx">toJson</span><span class="p">();</span>
+<span class="kd">const</span> <span class="nx">kmeans2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">KMeans</span><span class="p">({});</span>
+<span class="nx">kmeans2</span><span class="p">.</span><span class="nx">fromJson</span><span class="p">(</span><span class="nx">modelJSON</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">predClus</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">kmeans2</span><span class="p">.</span><span class="nx">predict</span><span class="p">(</span><span class="nx">xData</span><span class="p">);</span>
+
+<span class="nx">predClus</span><span class="p">.</span><span class="nx">print</span><span class="p">();</span>
+<span class="c1">// Tensor</span>
+<span class="c1">// [0, 0, 0, 1, 1, 1]</span>
+
+</code></pre></div></div>
+
+<h3 id="train-on-batch">Train on batch</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">Datacook</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">datacook</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">tf</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@tensorflow/tfjs-core</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">KMeans</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">DataCook</span><span class="p">.</span><span class="nx">Model</span><span class="p">;</span>
+
+<span class="c1">// create dataset</span>
+<span class="kd">const</span> <span class="nx">clust1</span> <span class="o">=</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">mul</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">randomNormal</span><span class="p">([</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span> <span class="p">]),</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">tensor</span><span class="p">([</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="p">])),</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">tensor</span><span class="p">([</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span> <span class="p">]));</span>
+<span class="kd">const</span> <span class="nx">clust2</span> <span class="o">=</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">mul</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">randomNormal</span><span class="p">([</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span> <span class="p">]),</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">tensor</span><span class="p">([</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="p">])),</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">tensor</span><span class="p">([</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">0</span> <span class="p">]));</span>
+<span class="kd">const</span> <span class="nx">clust3</span> <span class="o">=</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">mul</span><span class="p">(</span><span class="nx">tf</span><span class="p">.</span><span class="nx">randomNormal</span><span class="p">([</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">2</span> <span class="p">]),</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">tensor</span><span class="p">([</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span> <span class="p">])),</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">tensor</span><span class="p">([</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">0</span> <span class="p">]));</span>
+<span class="kd">const</span> <span class="nx">clusData</span> <span class="o">=</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">concat</span><span class="p">([</span> <span class="nx">clust1</span><span class="p">,</span> <span class="nx">clust2</span><span class="p">,</span> <span class="nx">clust3</span> <span class="p">]);</span>
+<span class="c1">// fit kmeans model</span>
+<span class="kd">const</span> <span class="nx">kmeans</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">KMeans</span><span class="p">({</span> <span class="na">nClusters</span><span class="p">:</span> <span class="mi">3</span> <span class="p">});</span>
+<span class="kd">const</span> <span class="nx">batchSize</span> <span class="o">=</span> <span class="mi">30</span><span class="p">;</span>
+<span class="kd">const</span> <span class="nx">epochSize</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">clusData</span><span class="p">.</span><span class="nx">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="nx">batchSize</span><span class="p">);</span>
+<span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">50</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+   <span class="kd">const</span> <span class="nx">j</span> <span class="o">=</span> <span class="nb">Math</span><span class="p">.</span><span class="nx">floor</span><span class="p">(</span><span class="nx">i</span> <span class="o">%</span> <span class="nx">epochSize</span><span class="p">);</span>
+   <span class="kd">const</span> <span class="nx">batchX</span> <span class="o">=</span> <span class="nx">tf</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">clusData</span><span class="p">,</span> <span class="p">[</span><span class="nx">j</span> <span class="o">*</span> <span class="nx">batchSize</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="nx">batchSize</span> <span class="p">,</span><span class="mi">2</span><span class="p">]);</span>
+   <span class="k">await</span> <span class="nx">kmeans</span><span class="p">.</span><span class="nx">trainOnBatch</span><span class="p">(</span><span class="nx">batchX</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="kd">const</span> <span class="nx">predClus</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">kmeans</span><span class="p">.</span><span class="nx">predict</span><span class="p">(</span><span class="nx">clusData</span><span class="p">);</span>
+<span class="kd">const</span> <span class="nx">accuracy</span> <span class="o">=</span> <span class="k">await</span> <span class="nx">checkClusAccuracy</span><span class="p">(</span><span class="nx">predClus</span><span class="p">);</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">'</span><span class="s1">accuracy:</span><span class="dl">'</span><span class="p">,</span> <span class="nx">accuracy</span><span class="p">);</span>
+</code></pre></div></div>
+:ET

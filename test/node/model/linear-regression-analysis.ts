@@ -1,12 +1,13 @@
 import { LinearRegressionAnalysis } from '../../../src/model/stat/linear-regression-analysis';
 import * as tf from '@tensorflow/tfjs-core';
 import { assert } from 'chai';
+import { dispose, memory } from '@tensorflow/tfjs-core';
 
 const nData = 100;
-const cases = tf.mul(tf.randomNormal([ nData, 5 ]),[ 1, 10, 100, 2, 3 ]);
-const weight = tf.tensor([ 2, 3, 1, -4, 6 ]);
-const noise = tf.mul(tf.randomNormal([ nData ]), 2);
-const y = tf.add(tf.add(tf.sum(tf.mul(cases, weight), 1), 10), noise);
+const cases = tf.tidy(() => tf.mul(tf.randomNormal([ nData, 5 ]),[ 1, 10, 100, 2, 3 ]));
+const weight = tf.tidy(() => tf.tensor([ 2, 3, 1, -4, 6 ]));
+const noise = tf.tidy(() => tf.mul(tf.randomNormal([ nData ]), 2));
+const y = tf.tidy(() => tf.add(tf.add(tf.sum(tf.mul(cases, weight), 1), 10), noise));
 
 const treesGrith = [ 8.3, 8.6, 8.8, 10.5, 10.7, 10.8, 11.0, 11.0, 11.1, 
   11.2, 11.3, 11.4, 11.4, 11.7, 12.0, 12.9, 12.9, 13.3, 13.7, 13.8, 14.0, 14.2, 14.5,
@@ -26,17 +27,20 @@ describe('Linear Regression', () => {
     await lm.fit(cases, y); 
     const summary = lm.summary();
     console.log(summary);
+    lm.clean();
     
   });
 
   it('train on tree dataset', async () => {
     const lm = new LinearRegressionAnalysis();
-    const treeFeatureTensor = tf.transpose(tf.tensor2d([ treesHeight, treesVolumn ]));
+    const treeFeatureTensor = tf.tidy(() => tf.transpose(tf.tensor2d([ treesHeight, treesVolumn ])));
     await lm.fit(treeFeatureTensor, treesGrith);
     const summary = lm.summary();
-    console.table(summary.coefficientSummary);
+    console.table(summary.coefficients);
     console.log('r-square:', summary.rSquare);
     console.log('Adjusted r-square:', summary.adjustedRSquare);
     console.log('Residual Standard Error', summary.residualStandardError);
-  })
+    lm.clean();
+  });
+
 });

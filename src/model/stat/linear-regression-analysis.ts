@@ -1,10 +1,7 @@
-import { Tensor, RecursiveArray, losses, squeeze, tensor, stack, transpose, matMul, slice, concat, ones, Tensor1D, reshape } from '@tensorflow/tfjs-core';
-import { layers, sequential, Sequential } from '@tensorflow/tfjs-layers';
-import { BaseEstimater } from '../base';
-import { checkArray } from '../../utils/validation';
+import { Tensor, RecursiveArray, squeeze, transpose, matMul, slice, concat, ones, Tensor1D, memory, reshape, tidy, dispose } from '@tensorflow/tfjs-core';
+import { BaseEstimater, BaseRegressor } from '../base';
 import { inverse } from '../../linalg';
 import { getResidualVariance, getRSquare, getAdjustedRSquare } from '../../metrics/regression'; 
-import { readFileSync } from 'fs';
 import { cdf } from '../../stat/t';
 
 /**
@@ -21,11 +18,6 @@ export interface LinearRegressionParams {
   normalize?: boolean
 }
 
-export interface LinearRegerssionTrainParams {
-  tol?: number,
-  batchSize?: number,
-  epochs?: number,
-}
 
 export type SignificanceCode = '***' | '**' | '*' | '.' | ' ';
 
@@ -64,7 +56,7 @@ export const getSignificanceCode = (pValue: number): SignificanceCode => {
  * to minimize the residual sum of squares between the observed targets in
  * the dataset, and the targets predicted by the linear approximation.
  */
-export class LinearRegressionAnalysis extends BaseEstimater {
+export class LinearRegressionAnalysis extends BaseRegressor {
   public fitIntercept: boolean;
   public normalize: boolean;
   private featureSize: number;
@@ -115,17 +107,15 @@ export class LinearRegressionAnalysis extends BaseEstimater {
    * @returns classifier itself
    */
   public async fit(xData: Tensor | RecursiveArray<number>,
-    yData: Tensor | RecursiveArray<number>,
-    params: LinearRegerssionTrainParams = { batchSize: 32, epochs: -1 }): Promise<LinearRegressionAnalysis> {
-  
+    yData: Tensor | RecursiveArray<number>): Promise<LinearRegressionAnalysis> {
     const { x, y } = this.validateData(xData, yData);
     const nFeature = x.shape[1];
     const nData = x.shape[0];
-    const xTensor = concat([ ones([ nData, 1 ]), x ], 1);
+    const xTensor = tidy(() => concat([ ones([ nData, 1 ]), x ], 1));
     const yTensor = y as Tensor1D;
-    const varianceBase = await inverse(matMul(transpose(xTensor), xTensor));
-    const coefs = squeeze(matMul(matMul(varianceBase, transpose(xTensor)), reshape(yTensor, [ -1, 1 ])));
-    const predY = squeeze(matMul(xTensor, reshape(coefs, [ -1, 1 ]))) as Tensor1D;
+    const varianceBase = await inverse(tidy(() => matMul(transpose(xTensor), xTensor)), 1e-4, 200, true);
+    const coefs = tidy(() => squeeze(matMul(matMul(varianceBase, transpose(xTensor)), reshape(yTensor, [ -1, 1 ]))));
+    const predY = tidy(() => squeeze(matMul(xTensor, reshape(coefs, [ -1, 1 ]))) as Tensor1D);
     const residualVariance = getResidualVariance(yTensor, predY, nFeature + 1);
     this.varianceBase = varianceBase;
     this.coefficients = coefs;
@@ -134,6 +124,7 @@ export class LinearRegressionAnalysis extends BaseEstimater {
     this.nData = nData;
     this.rSquare = getRSquare(yTensor, predY);
     this.adjustedRSquare = getAdjustedRSquare(yTensor, predY, nFeature);
+    dispose([ xTensor, yTensor, predY ]);
     return this;
   }
 
@@ -156,8 +147,8 @@ export class LinearRegressionAnalysis extends BaseEstimater {
     const df = this.nData - this.featureSize - 1;
     const coefficients: Array<CoefficientSummary> = [];
     for (let i = 0; i < this.featureSize + 1; i++) {
-      const estimate = slice(this.coefficients, i, 1).dataSync()[0];
-      const traceI = slice(this.varianceBase, [ i, i ], [ 1, 1 ]).dataSync()[0];
+      const estimate = tidy(() => slice(this.coefficients, i, 1).dataSync()[0]);
+      const traceI = tidy(() => slice(this.varianceBase, [ i, i ], [ 1, 1 ]).dataSync()[0]);
       const standardError = Math.sqrt(this.residualVariance * traceI);
       const tValue = estimate / standardError;
       const cdfT = cdf(tValue, df);
