@@ -221,9 +221,9 @@ chart.render();
 
     const xData = data.map((d) => [ d.height ]);
     const yData = data.map((d) => d.weight);
-    const lm = new LinearRegression({ optimizerType: 'sgd', learningRate: 10 });
+    const lm = new LinearRegression();
 
-    await lm.fit(xData, yData, {batchSize: 10, epochs: 100});
+    await lm.fit(xData, yData);
 
     const yPredict = (await lm.predict(xData)).arraySync();
     const predictData = xData.map((d, i) => { return {height: d, weight: yPredict[i]} });
