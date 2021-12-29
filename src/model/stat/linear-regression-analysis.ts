@@ -1,5 +1,5 @@
 import { Tensor, RecursiveArray, squeeze, transpose, matMul, slice, concat, ones, Tensor1D, memory, reshape, tidy, dispose } from '@tensorflow/tfjs-core';
-import { BaseEstimater, BaseRegressor } from '../base';
+import { BaseRegressor } from '../base';
 import { inverse } from '../../linalg';
 import { getResidualVariance, getRSquare, getAdjustedRSquare } from '../../metrics/regression'; 
 import { cdf } from '../../stat/t';

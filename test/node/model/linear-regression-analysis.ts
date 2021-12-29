@@ -1,7 +1,5 @@
 import { LinearRegressionAnalysis } from '../../../src/model/stat/linear-regression-analysis';
 import * as tf from '@tensorflow/tfjs-core';
-import { assert } from 'chai';
-import { dispose, memory } from '@tensorflow/tfjs-core';
 
 const nData = 100;
 const cases = tf.tidy(() => tf.mul(tf.randomNormal([ nData, 5 ]),[ 1, 10, 100, 2, 3 ]));
