@@ -73,7 +73,7 @@ export default class CountVectorizer {
    */
   public transform(textArray: TextInput[]): number[][] {
 
-    if (this.wordOrder?.length) {
+    if (!this.wordOrder?.length) {
       throw new Error('Dictionary is empty, use init function to init dictionary first');
     }
 
