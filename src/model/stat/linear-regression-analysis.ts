@@ -125,6 +125,12 @@ export class LinearRegressionAnalysis extends BaseRegressor {
     this.rSquare = getRSquare(yTensor, predY);
     this.adjustedRSquare = getAdjustedRSquare(yTensor, predY, nFeature);
     dispose([ xTensor, yTensor, predY ]);
+    if (!(xData instanceof Tensor)) {
+      dispose(x);
+    }
+    if (!(yData instanceof Tensor)) {
+      dispose(y);
+    }
     return this;
   }
 

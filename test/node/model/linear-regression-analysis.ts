@@ -1,5 +1,6 @@
 import { LinearRegressionAnalysis } from '../../../src/model/stat/linear-regression-analysis';
 import * as tf from '@tensorflow/tfjs-core';
+import { dispose, memory } from '@tensorflow/tfjs-core';
 
 const nData = 100;
 const cases = tf.tidy(() => tf.mul(tf.randomNormal([ nData, 5 ]),[ 1, 10, 100, 2, 3 ]));
@@ -24,9 +25,9 @@ describe('Linear Regression', () => {
     const lm = new LinearRegressionAnalysis({});
     await lm.fit(cases, y); 
     const summary = lm.summary();
-    console.log(summary);
+    console.table(summary.coefficients);
     lm.clean();
-    
+    dispose([cases, weight, noise, y]);
   });
 
   it('train on tree dataset', async () => {
@@ -39,6 +40,6 @@ describe('Linear Regression', () => {
     console.log('Adjusted r-square:', summary.adjustedRSquare);
     console.log('Residual Standard Error', summary.residualStandardError);
     lm.clean();
-  });
-
+    dispose(treeFeatureTensor);
+  });  
 });
