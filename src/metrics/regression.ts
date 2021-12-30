@@ -2,7 +2,7 @@ import { Tensor1D, tidy, sum, square, sub, mean, divNoNan, Tensor } from '@tenso
 import { checkArray } from '../utils/validation';
 import { shapeEqual } from '../linalg';
 
-export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[]) => {
+export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[]): { yTrueTensor: Tensor, yPredTensor: Tensor } => {
   return tidy(() => {
     const yTrueTensor = checkArray(yTrue, 'any', 1) as Tensor1D;
     const yPredTensor = checkArray(yPred, 'any', 1) as Tensor1D;
@@ -10,7 +10,7 @@ export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[
       throw new Error('Shape of yTrue should match shape of yPred');
     }
     return { yTrueTensor, yPredTensor };
-  }); 
+  });
 };
 
 /**
@@ -20,7 +20,7 @@ export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[
  * @param yPred prediced labels
  * @returns r-square value
  */
-export const getRSquare = (yTrue: Tensor1D | number[], yPred: Tensor1D | number[]) => {
+export const getRSquare = (yTrue: Tensor1D | number[], yPred: Tensor1D | number[]): number => {
   return tidy(() => {
     const { yTrueTensor, yPredTensor } = checkPairInput(yTrue, yPred);
     const numerator = sum(square(sub(yTrueTensor, yPredTensor)));

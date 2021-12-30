@@ -17,11 +17,7 @@ export const cdf = (x: number, df: number): number => {
     /**
      * use the fact that when df close to infinity,
      * t distribution approximates to standard normal distribution
-<<<<<<< HEAD
-     *  */ 
-=======
      **/
->>>>>>> ee5144fdea4675d2f98e809bb71db970622eb7f0
     return cdfNormal(x);
   }
 };

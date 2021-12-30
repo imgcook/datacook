@@ -13,5 +13,5 @@ export const errorFunction = (x: number): number => {
     + a4 * Math.pow(t, 4)
     + a5 * Math.pow(t, 5)) * Math.pow(Math.E, -Math.pow(x, 2));
   // using the fact of odd function, erf x = -erf(-x)
-  return (x >= 0) ? erf : -erf;                                                         
+  return (x >= 0) ? erf : -erf;
 };

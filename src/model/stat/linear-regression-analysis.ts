@@ -1,7 +1,7 @@
-import { Tensor, RecursiveArray, squeeze, transpose, matMul, slice, concat, ones, Tensor1D, memory, reshape, tidy, dispose } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, squeeze, transpose, matMul, slice, concat, ones, Tensor1D, reshape, tidy, dispose } from '@tensorflow/tfjs-core';
 import { BaseRegressor } from '../base';
 import { inverse } from '../../linalg';
-import { getResidualVariance, getRSquare, getAdjustedRSquare } from '../../metrics/regression'; 
+import { getResidualVariance, getRSquare, getAdjustedRSquare } from '../../metrics/regression';
 import { cdf } from '../../stat/t';
 
 /**
@@ -144,12 +144,12 @@ export class LinearRegressionAnalysis extends BaseRegressor {
   }
 
   public summary(): {
-    coefficients: Array<CoefficientSummary>, 
+    coefficients: Array<CoefficientSummary>,
     rSquare: number,
     adjustedRSquare: number,
     residualStandardError: number,
     residualDegreeOfFreedom: number
-  } {
+    } {
     const df = this.nData - this.featureSize - 1;
     const coefficients: Array<CoefficientSummary> = [];
     for (let i = 0; i < this.featureSize + 1; i++) {
@@ -169,6 +169,6 @@ export class LinearRegressionAnalysis extends BaseRegressor {
       adjustedRSquare: this.adjustedRSquare,
       residualStandardError: Math.sqrt(this.residualVariance),
       residualDegreeOfFreedom: this.nData - this.featureSize - 1
-    }
+    };
   }
 }

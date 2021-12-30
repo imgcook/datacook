@@ -1,4 +1,4 @@
-import { Tensor, greater, min, abs, matMul, diag, transpose, divNoNan, tidy, dispose, memory } from '@tensorflow/tfjs-core';
+import { Tensor, greater, min, abs, matMul, diag, transpose, divNoNan, tidy, dispose } from '@tensorflow/tfjs-core';
 import { eigenSolve } from './eigen';
 import { isSquareMatrix } from './utils';
 
