@@ -2,7 +2,7 @@ import { Tensor1D, tidy, sum, square, sub, mean, divNoNan, Tensor } from '@tenso
 import { checkArray } from '../utils/validation';
 import { shapeEqual } from '../linalg';
 
-export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[]): { yTrueTensor: Tensor, yPredTensor: Tensor } => {
+export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[]): { yTrueTensor: Tensor1D, yPredTensor: Tensor1D } => {
   return tidy(() => {
     const yTrueTensor = checkArray(yTrue, 'any', 1) as Tensor1D;
     const yPredTensor = checkArray(yPred, 'any', 1) as Tensor1D;
