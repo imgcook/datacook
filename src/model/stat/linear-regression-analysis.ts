@@ -79,20 +79,6 @@ export class LinearRegressionAnalysis extends BaseRegressor {
    * `normalize`: This parameter is ignored when fit_intercept is set to False. If True,
    * the regressors X will be normalized before regression by subtracting the mean and dividing by the l2-norm.
    *
-   * `optimizerType`: optimizer types for training. All of the following optimizers types supported in tensorflow.js
-   *  (https://js.tensorflow.org/api/latest/#Training-Optimizers) can be applied. Default to 'adam':
-   *  - 'sgd': stochastic optimizer
-   *  - 'momentum': momentum optimizer
-   *  - 'adagrad': adagrad optimizer
-   *  - 'adadelta': adadelta optimizer
-   *  - 'adam': adam optimizer
-   *  - 'adamax': adamax optimizer
-   *  - 'rmsprop': rmsprop optimizer
-   *
-   * `optimizerProps`: parameters used to init corresponding optimizer, you can refer to documentations in tensorflow.js
-   *  (https://js.tensorflow.org/api/latest/#Training-Optimizers) to find the supported initailization paratemters for a
-   *  given type of optimizer. For example, `{ learningRate: 0.1, beta1: 0.1, beta2: 0.2, epsilon: 0.1 }` could be used
-   *  to initialize adam optimizer.
    */
   constructor(params: LinearRegressionParams = {}) {
     super();
@@ -100,10 +86,9 @@ export class LinearRegressionAnalysis extends BaseRegressor {
     this.normalize = params.normalize;
   }
 
-  /** Fit linear regression model according to X, y. Here we use adam algorithm (a popular gradient-based optimization algorithm) for paramter estimation.
+  /** Fit linear regression model according to X, y. Here we use ordinary least square model for paramter estimation.
    * @param xData Tensor like of shape (n_samples, n_features), input feature
    * @param yData Tensor like of shape (n_sample, ), input target values
-   * @param params batchSize: batch size: default to 32, maxIterTimes: max iteration times, default to 20000
    * @returns classifier itself
    */
   public async fit(xData: Tensor | RecursiveArray<number>,
@@ -134,6 +119,9 @@ export class LinearRegressionAnalysis extends BaseRegressor {
     return this;
   }
 
+  /**
+   * Print summary of model
+   */
   public printSummary(): void {
     const summary = this.summary();
     console.log('coefficients:');
@@ -143,6 +131,10 @@ export class LinearRegressionAnalysis extends BaseRegressor {
     console.log('Residual Standard Error', summary.residualStandardError);
   }
 
+  /**
+   * Get summary of linear regression results.
+   * @returns
+   */
   public summary(): {
     coefficients: Array<CoefficientSummary>,
     rSquare: number,
