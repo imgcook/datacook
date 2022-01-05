@@ -41,7 +41,7 @@ export abstract class Criterion {
    * @param start The first sample to use in the mask
    * @param end The last sample to use in the mask
    */
-  constructor(y: number[], samples: number[], weightedNSamples: number, start: number, end: number) {
+  public init(y: number[], samples: number[], weightedNSamples: number, start: number, end: number): void {
     this.weightedNSamples = weightedNSamples;
     this.samples = samples;
     this.y = y;
