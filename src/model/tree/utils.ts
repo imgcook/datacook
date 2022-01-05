@@ -8,7 +8,7 @@ export const sort = () => {
  * @param n 
  */
 export const median3 = (values: number[], start: number, end: number): number => {
-  const n = end - start + 1;
+  const n = end - start;
   let a = values[start];
   let b = values[start + Math.floor(n / 2)];
   let c = values[end];
@@ -35,7 +35,7 @@ export const introSort = (values: number[], indicies: number[], start: number, e
   let i = 0;
   let l = 0;
   let r = 0;
-  let n = end - start + 1;
+  let n = end - start;
   while (n > 1) {
     /**
      * max depth limit exceeded ("gone quadratic")
@@ -104,7 +104,7 @@ export const siftDown = (values: number[], indices: number[], start: number, end
 };
 
 export const heapSort = (values: number[], indices: number[], startInd: number, endInd: number) => {
-  const n = endInd - startInd + 1;
+  const n = endInd - startInd;
   let start = startInd + (n - 2) / 2;
   let end = endInd;
   // heapify
@@ -115,7 +115,7 @@ export const heapSort = (values: number[], indices: number[], startInd: number, 
     }
     start -= 1;
   }
-  end = endInd - 1
+  end = endInd - 1;
   while (end > start) {
     swap(values, indices, start, end);
     siftDown(values, indices, start , end);
