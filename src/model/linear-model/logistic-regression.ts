@@ -7,6 +7,7 @@ import { BaseClassifier } from '../base';
 import { OptimizerProps, OptimizerType, getOptimizer } from '../../utils/optimizer-types';
 
 export type LogisticPenalty = 'l1' | 'l2' | 'none';
+
 /**
  * Parameters for linear regression:
  */
@@ -44,6 +45,7 @@ export interface LogisticRegressionTrainParams {
   batchSize?: number,
   epochs?: number,
 }
+
 /**
  * Logistic regression classifier
  */

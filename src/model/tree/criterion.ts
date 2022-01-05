@@ -25,12 +25,30 @@ export abstract class Criterion {
   public sumTotal: number[];
   public samples: number[];
   public y: number[];
+
   /**
    * calculating the impurity of the node
    */
   abstract nodeImpurity (): number;
   abstract childrenImpurity (): { impurityLeft: number, impurityRight: number };
   abstract update (newPos: number): void;
+  
+  /**
+   * Initialize the criterion.
+   * @param y The target stored as a buffer for memory efficiency
+   * @param samples The weight of each sample
+   * @param weightedNSamples The total weight of all samples
+   * @param start The first sample to use in the mask
+   * @param end The last sample to use in the mask
+   */
+  constructor(y: number[], samples: number[], weightedNSamples: number, start: number, end: number) {
+    this.weightedNSamples = weightedNSamples;
+    this.samples = samples;
+    this.y = y;
+    this.start = start;
+    this.end = end;
+    this.weightedNNodeSamples = 0;
+  }
   /**
    * Compute a proxy of the impurity reduction.
 

@@ -1,44 +1,68 @@
-const path = require("path");
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-const createConfig = (target) => {
+'use strict';
+
+const path = require('path');
+const webpack = require('webpack');
+
+function configure(target) {
   return {
-    mode: "production",
-    devtool: "source-map",
+    devtool: 'source-map',
     context: path.resolve(__dirname),
-    entry: {
-      // TODO: recover index entry
-      logisticPredictor: './dist/model/linear-model/logistic-regression-predictor.js',
-      logisticRegression: './dist/model/linear-model/logistic-regression.js'
+    entry() {
+      return ([
+        'index',
+        'model/linear-model/logistic-regression',
+        'model/linear-model/logistic-regression-predictor',
+      ]).reduce(function appendEntrySource(entry, name) {
+        const importPath = path.join(__dirname, 'src', `${name}.ts`);
+        entry[name] = importPath;
+        return entry;
+      }, {});
     },
-    target: target,
+    target,
     output: {
-      path: path.resolve(__dirname, "dist"),
-      filename: '[name].bundle.js',
-      library: "datacook"
+      clean: true,
+      path: path.resolve(__dirname, 'dist', target),
+      filename: '[name].js',
+      library: {
+        name: 'datacook',
+        type: 'assign-properties',
+      },
     },
     plugins: [
-      new BundleAnalyzerPlugin()
+      new webpack.ProvidePlugin({
+        Buffer: ['buffer', 'Buffer'],
+        process: 'process/browser',
+      }),
     ],
     module: {
       rules: [
         {
-          use: {
-            loader: "babel-loader",
-            options: { presets: [ "@babel/preset-env" ] }
-          },
-          test: /\.(js|jsx)$/,
-          exclude: /node_modules/
+          use: 'ts-loader',
+          test: /\.ts$/,
+          exclude: [
+            /node_modules/,
+          ],
         }
       ]
     },
     resolve: {
+      extensions: ['.ts', '.js'],
       fallback: {
-        fs: false
-      }
-    }
+        path: require.resolve('path-browserify'),
+        zlib: require.resolve('browserify-zlib'),
+        http: require.resolve('stream-http'),
+        https: require.resolve('https-browserify'),
+        stream: require.resolve('stream-browserify'),
+        buffer: require.resolve('buffer'),
+        fs: false,
+      },
+    },
+    experiments: {
+      asyncWebAssembly: true,
+    },
   };
-};
+}
 
 module.exports = [
-  createConfig("web")
+  configure('web'),
 ];

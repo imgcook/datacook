@@ -165,7 +165,6 @@ export class MultinomialNB extends BaseClassifier {
     this.alpha = modelParams.alpha ? modelParams.alpha : this.alpha;
     this.classCount = modelParams.classCount ? modelParams.classCount : this.classCount;
     this.featureCount = modelParams.featureCount ? modelParams.featureCount : this.featureCount;
-    modelParams.classes && this.updateClassMap();
   }
 
   public toJson(): string {
