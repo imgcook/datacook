@@ -1,5 +1,18 @@
-export const sort = () => {
-  
+/**
+ * Sort n-element arrays pointed to by Xf and samples, simultaneously,
+ * @param values 
+ * @param indicies 
+ * @param start 
+ * @param end 
+ * @returns 
+ */
+export const sort = (values: number[], indicies: number[], start: number, end: number) => {
+  if (start === end) {
+    return;
+  }
+  const n = end - start;
+  const maxDepth = 2 * Math.log(n);
+  introSort(values, indicies, start, end, maxDepth);
 };
 
 /**
@@ -30,6 +43,15 @@ export const median3 = (values: number[], start: number, end: number): number =>
   return b;
 };
 
+/**
+ * intro sort
+ * @param values 
+ * @param indicies 
+ * @param start 
+ * @param end 
+ * @param maxDepth 
+ * @returns 
+ */
 export const introSort = (values: number[], indicies: number[], start: number, end: number, maxDepth: number): void => {
   let pivot: number;
   let i = 0;
@@ -103,6 +125,13 @@ export const siftDown = (values: number[], indices: number[], start: number, end
   }
 };
 
+/**
+ * heap sort
+ * @param values 
+ * @param indices 
+ * @param startInd 
+ * @param endInd 
+ */
 export const heapSort = (values: number[], indices: number[], startInd: number, endInd: number) => {
   const n = endInd - startInd;
   let start = startInd + (n - 2) / 2;
