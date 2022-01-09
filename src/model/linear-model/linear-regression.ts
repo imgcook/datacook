@@ -1,5 +1,5 @@
-import { Tensor, RecursiveArray, losses, squeeze, tensor, stack } from '@tensorflow/tfjs-core';
-import { layers, sequential, Sequential } from '@tensorflow/tfjs-layers';
+import { Tensor, RecursiveArray, losses, squeeze, tensor, stack, tidy } from '@tensorflow/tfjs-core';
+import { layers, sequential, Sequential, initializers, callbacks } from '@tensorflow/tfjs-layers';
 import { BaseEstimater } from '../base';
 import { checkArray } from '../../utils/validation';
 import { Optimizer } from '@tensorflow/tfjs-core';
@@ -30,7 +30,7 @@ export interface LinearRegressionParams {
 export interface LinearRegerssionTrainParams {
   tol?: number,
   batchSize?: number,
-  epochs?: number,
+  epochs?: number
 }
 
 /**
@@ -86,7 +86,14 @@ export class LinearRegression extends BaseEstimater {
 
   private initLinearModel(inputShape: number, useBias = true, weightsTensors: Tensor[] = []): void {
     const model = sequential();
-    model.add(layers.dense({ inputShape: [ inputShape ], units: 1, useBias }));
+    model.add(layers.dense({ 
+      inputShape: [ inputShape ], 
+      units: 1, 
+      useBias, 
+      kernelInitializer: initializers.zeros(),
+      biasInitializer: initializers.zeros(),
+      kernelRegularizer: null
+    }));
     model.compile({
       optimizer: this.optimizer,
       loss: losses.meanSquaredError,
@@ -116,38 +123,45 @@ export class LinearRegression extends BaseEstimater {
   }
 
   /** Fit linear regression model according to X, y. Here we use adam algorithm (a popular gradient-based optimization algorithm) for paramter estimation.
+   * If `epochs` in parameter is not set, optimizer will iterate 10000 times at most (iteration will stop if converge).
    * @param xData Tensor like of shape (n_samples, n_features), input feature
    * @param yData Tensor like of shape (n_sample, ), input target values
-   * @param params batchSize: batch size: default to 32, maxIterTimes: max iteration times, default to 20000
+   * @param params batchSize: batch size: default to 32, epochs: epochs for training, default to Math.ceil(10000 / ( nData / batchSize ))
    * @returns classifier itself
    */
   public async fit(xData: Tensor | RecursiveArray<number>,
     yData: Tensor | RecursiveArray<number>,
-    params: LinearRegerssionTrainParams = { batchSize: 32, epochs: -1 }): Promise<LinearRegression> {
+    params: LinearRegerssionTrainParams = { batchSize: 32, tol: 0 }): Promise<LinearRegression> {
 
     const { x, y } = this.validateData(xData, yData);
     const nFeature = x.shape[1];
     const nData = x.shape[0];
     const batchSize = nData > params.batchSize ? params.batchSize : nData;
-    const epochs = params.epochs > 0 ? params.epochs : null;
+    const maxIterTimes = 10000;
+    const defaultEpochs = Math.ceil(maxIterTimes / (nData / batchSize));
+    const epochs = params.epochs > 0 ? params.epochs : defaultEpochs;
+    const tol = params.tol ? params.tol : 0;
     this.initLinearModel(nFeature, this.fitIntercept);
     this.featureSize = nFeature;
     await this.model.fit(x, y, {
       batchSize,
       epochs,
-      shuffle: true
+      shuffle: true,
+      callbacks: callbacks.earlyStopping({ monitor: 'loss', minDelta: tol })
     });
     return this;
   }
 
   public async predict(xData: Tensor | RecursiveArray<number>): Promise<Tensor> {
-    const x = checkArray(xData, 'float32');
-    const predY = this.model.predict(x);
-    if (predY instanceof Tensor) {
-      return squeeze(predY);
-    } else {
-      return squeeze(stack(predY));
-    }
+    return tidy(() => {
+      const x = checkArray(xData, 'float32');
+      const predY = this.model.predict(x);
+      if (predY instanceof Tensor) {
+        return squeeze(predY);
+      } else {
+        return squeeze(stack(predY));
+      }
+    });
   }
 
   public initModelFromWeights(inputShape: number, useBias: boolean, weights: (Float32Array | Int32Array | Uint8Array)[]): void {
