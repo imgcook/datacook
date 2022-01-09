@@ -86,10 +86,10 @@ export class LinearRegression extends BaseEstimater {
 
   private initLinearModel(inputShape: number, useBias = true, weightsTensors: Tensor[] = []): void {
     const model = sequential();
-    model.add(layers.dense({ 
-      inputShape: [ inputShape ], 
-      units: 1, 
-      useBias, 
+    model.add(layers.dense({
+      inputShape: [ inputShape ],
+      units: 1,
+      useBias,
       kernelInitializer: initializers.zeros(),
       biasInitializer: initializers.zeros(),
       kernelRegularizer: null
