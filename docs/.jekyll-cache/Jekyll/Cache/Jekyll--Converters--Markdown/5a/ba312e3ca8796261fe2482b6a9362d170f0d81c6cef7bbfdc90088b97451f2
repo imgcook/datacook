@@ -1,0 +1,253 @@
+I"N&<h1 id="logistic-regression">Logistic Regression</h1>
+
+<p>In logistic regression model, we assume a linear relationship between predictor varaibles and log-odds of the event that \(Y = 1\).</p>
+
+\[l = \log \frac{p}{1-p} = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ....\]
+
+<p>The objective of logistic model is to find \(\beta_0, \beta_1, \beta_2...\) above to best fit this assumption.</p>
+
+<p>In datacook, we implement logistic regression by stochatic gradient descent (SGD).</p>
+
+<h2 id="import">Import</h2>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">Datacook</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">datacook</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">LogisticRegression</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">DataCook</span><span class="p">.</span><span class="nx">Model</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="constructor">Constructor</h2>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">lr</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">LogisticRegression</span><span class="p">({});</span>
+</code></pre></div></div>
+
+<h3 id="option-parameters">Option parameters</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>parameter</th>
+      <th>type</th>
+      <th>description</th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>penalty</td>
+      <td>‘l1’ | ‘l2’ | ‘none’</td>
+      <td>penalty used in the penalization. <strong>default = ‘none’</strong></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>fitIntercept</td>
+      <td>boolean</td>
+      <td>Whether to calculate the intercept for this model. If set to False, no intercept will be used in calculations. <strong>default = false</strong></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>c</td>
+      <td>number</td>
+      <td>Regularization strength; must be a positive float. Larger values specify stronger regularization. <strong>default = 1</strong>.</td>
+      <td><!--  --></td>
+    </tr>
+    <tr>
+      <td>optimizerType</td>
+      <td>‘sgd’ | ‘momentum’ | ‘adagrad’ | ‘adadelta’ | ‘adam’ | ‘adamax’ | ‘rmsprop’</td>
+      <td>optimizer types for training. All of the following <a href="https://js.tensorflow.org/api/latest/#Training-Optimizers">optimizers types</a> supported in tensorflow.js can be applied. <strong>Default to ‘adam’</strong></td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>optimizerProps</td>
+      <td>OptimizerProps</td>
+      <td>parameters used to init corresponding optimizer, you can refer to <a href="https://js.tensorflow.org/api/latest/#Training-Optimizers">documentations in tensorflow.js</a> to find the supported initailization paratemters for a given type of optimizer. For example, <code class="language-plaintext highlighter-rouge">{ learningRate: 0.1, beta1: 0.1, beta2: 0.2, epsilon: 0.1 }</code> could be used to initialize adam optimizer.</td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="methods">Methods</h2>
+
+<h3 id="fit">fit</h3>
+
+<p>Fit logistic regression model according to X, y.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="nx">fit</span><span class="p">(</span><span class="nx">xData</span><span class="p">:</span> <span class="nx">Tensor</span> <span class="o">|</span> <span class="nx">RecursiveArray</span><span class="o">&lt;</span><span class="kr">number</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">yData</span><span class="p">:</span> <span class="nx">Tensor</span> <span class="o">|</span> <span class="nx">RecursiveArray</span><span class="o">&lt;</span><span class="kr">number</span><span class="o">&gt;</span><span class="p">,</span>
+    <span class="nx">params</span><span class="p">?:</span> <span class="nx">LogisticRegressionTrainParams</span>
+</code></pre></div></div>
+
+<h4 id="parameters">Parameters</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>parameter</th>
+      <th>type</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>xData</td>
+      <td>Tensor | RecursiveArray<number></number></td>
+      <td>Tensor like of shape (n_samples, n_features), input feature</td>
+    </tr>
+    <tr>
+      <td>yData</td>
+      <td>Tensor | RecursiveArray<number></number></td>
+      <td>Tensor like of shape (n_sample, ), input target values</td>
+    </tr>
+    <tr>
+      <td>params</td>
+      <td>LogisticRegressionTrainParams</td>
+      <td>training parameters, batchSize: batch size: default to 32, maxIterTimes: max iteration times, default to 20000</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="predict">predict</h3>
+
+<p>Make predictions using logistic regression model.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="nx">predict</span><span class="p">(</span><span class="nx">xData</span><span class="p">:</span> <span class="nx">Tensor</span> <span class="o">|</span> <span class="nx">RecursiveArray</span><span class="o">&lt;</span><span class="kr">number</span><span class="o">&gt;</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Tensor</span><span class="o">&gt;</span>
+</code></pre></div></div>
+
+<h4 id="parameters-1">Parameters</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>parameter</th>
+      <th>type</th>
+      <th>description</th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>xData</td>
+      <td>Tensor</td>
+      <td>RecursiveArray<number></number></td>
+      <td>Input features</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="returns">Returns</h4>
+
+<p>Predicted classes</p>
+
+<h3 id="trainonbatch">trainOnBatch</h3>
+
+<p>Training logistic regression model by batch</p>
+
+<h4 id="parameters-2">Parameters</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>parameter</th>
+      <th>type</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>xData</td>
+      <td>Tensor | RecursiveArray<number></number></td>
+      <td>Tensor like of shape (n_samples, n_features), input feature</td>
+    </tr>
+    <tr>
+      <td>yData</td>
+      <td>Tensor | RecursiveArray<number></number></td>
+      <td>Tensor like of shape (n_sample, ), input target values</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="returns-1">Returns</h4>
+
+<p>LogisticRegression</p>
+
+<h3 id="predictproba">predictProba</h3>
+
+<p>Predict probabilities using logistic regression model.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="nx">predictProba</span><span class="p">(</span><span class="nx">xData</span><span class="p">:</span> <span class="nx">Tensor</span> <span class="o">|</span> <span class="nx">RecursiveArray</span><span class="o">&lt;</span><span class="kr">number</span><span class="o">&gt;</span><span class="p">):</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="nx">Tensor</span><span class="o">&gt;</span>
+</code></pre></div></div>
+
+<h4 id="parameters-3">Parameters</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>parameter</th>
+      <th>type</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>xData</td>
+      <td>Tensor | RecursiveArray<number></number></td>
+      <td>Input features</td>
+    </tr>
+  </tbody>
+</table>
+
+<h4 id="returns-2">Returns</h4>
+
+<p>Predicted probabilities</p>
+
+<h3 id="getcoef">getCoef</h3>
+
+<p>Get coefficients of logistic model</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">getCoef</span><span class="p">():</span> <span class="p">{</span> <span class="nl">coefficients</span><span class="p">:</span> <span class="nx">Tensor</span><span class="p">,</span> <span class="nx">intercept</span><span class="p">:</span> <span class="nx">Tensor</span> <span class="p">}</span>
+</code></pre></div></div>
+<h4 id="returns-3">Returns</h4>
+
+<p>{ coefficients: Tensor, intercept: Tensor }</p>
+
+<h3 id="fromjson">fromJson</h3>
+
+<p>Load model paramters from json string object</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="nx">fromJson</span><span class="p">(</span><span class="nx">modelJson</span><span class="p">:</span> <span class="kr">string</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h4 id="parameters-4">Parameters</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th>parameter</th>
+      <th>type</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>modelJson</td>
+      <td>string</td>
+      <td>model json string</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="tojson">toJson</h3>
+
+<p>Dump model parameters to json string.</p>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">async</span> <span class="nx">toJson</span><span class="p">():</span> <span class="nb">Promise</span><span class="o">&lt;</span><span class="kr">string</span><span class="o">&gt;</span>
+</code></pre></div></div>
+
+<h4 id="returns-4">Returns</h4>
+
+<p>string of model json</p>
+
+<h2 id="examples">Examples</h2>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+</code></pre></div></div>
+
+:ET

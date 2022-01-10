@@ -1,5 +1,5 @@
-import { Tensor, equal, sum, div, math, Tensor1D, divNoNan, concat, mul, add, cast } from '@tensorflow/tfjs-core';
-import { checkArray } from '../utils/validation';
+import { Tensor, Tensor1D, equal, sum, div, math, divNoNan, concat, mul, add, cast } from '@tensorflow/tfjs-core';
+import { checkSameLength } from '../utils/validation';
 import { getDiagElements } from '../linalg/utils';
 import { LabelEncoder } from '../preprocess';
 
@@ -17,21 +17,6 @@ export type ClassificationReport = {
 
 export type ClassificationAverageTypes = 'macro' | 'weighted'
 
-/**
- * Check that if yTrue and yPred are of same length
- * @param yTrue true labels
- * @param yPred predicted labels
- */
-export const checkSameLength = (yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | number[]): [ Tensor1D, Tensor1D, number ] => {
-  const yTrueTensor = checkArray(yTrue, 'any', 1);
-  const yPredTensor = checkArray(yPred, 'any', 1);
-  const yTrueCount = yTrueTensor.shape[0];
-  const yPredCount = yPredTensor.shape[0];
-  if (yTrueCount != yPredCount) {
-    throw new Error('Shape of yTrue should match shape of yPred');
-  }
-  return [ yTrueTensor as Tensor1D, yPredTensor as Tensor1D, yTrueCount ];
-};
 
 export const accuracyScore = (yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | number[]): number => {
   const [ yTrueTensor, yPredTensor, nLabels ] = checkSameLength(yTrue, yPred);
@@ -40,13 +25,43 @@ export const accuracyScore = (yTrue: Tensor | string[] | number[], yPred: Tensor
   return score;
 };
 
+export const getConfusionMatrix = async (yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | number[], average: ClassificationAverageTypes = 'weighted'): Tensor => {
+  const [ yTrueTensor, yPredTensor ] = checkSameLength(yTrue, yPred);
+  const labelEncoder = new LabelEncoder();
+  await labelEncoder.init(concat([ yTrueTensor, yPredTensor ]));
+  const yTrueEncode = await labelEncoder.encode(yTrueTensor);
+  const yPredEncode = await labelEncoder.encode(yPredTensor);
+  const numClasses = labelEncoder.categories.shape[0];
+  const confusionMatrix = cast(math.confusionMatrix(yTrueEncode as Tensor1D, yPredEncode as Tensor1D, numClasses), 'float32');
+  return confusionMatrix;
+};
+
+export const precisionScore = async (yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | number[], average: ClassificationAverageTypes = 'weighted'): number => {
+  const [ yTrueTensor, yPredTensor ] = checkSameLength(yTrue, yPred);
+  const labelEncoder = new LabelEncoder();
+  await labelEncoder.init(concat([ yTrueTensor, yPredTensor ]));
+  const yTrueEncode = await labelEncoder.encode(yTrueTensor);
+  const yPredEncode = await labelEncoder.encode(yPredTensor);
+  const numClasses = labelEncoder.categories.shape[0];
+  const confusionMatrix = cast(math.confusionMatrix(yTrueEncode as Tensor1D, yPredEncode as Tensor1D, numClasses), 'float32');
+  const confusionDiag = getDiagElements(confusionMatrix);
+  const precisions = divNoNan(confusionDiag, sum(confusionMatrix, 0));
+  const weights = divNoNan(sum(confusionMatrix, 0), sum(confusionMatrix));
+  const averagePrecision = average == 'weighted' ? mul(precisions, weights).dataSync()[0] : divNoNan(sum(precisions), numClasses).dataSync()[0];
+  return averagePrecision;
+  //return precisions;
+};
+
+export const recallScore = async (yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | number[], average: ClassificationAverageTypes = 'weighted'): number => {
+
+};
 /**
  * Generate classification report
  * @param yTrue true labels
  * @param yPred predicted labels
  * @returns classification report object, the struct of report will be like following
  */
-export const classificationReport = async(yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | number[], average: ClassificationAverageTypes = 'weighted'): Promise<ClassificationReport> => {
+export const classificationReport = async (yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | number[], average: ClassificationAverageTypes = 'weighted'): Promise<ClassificationReport> => {
   const [ yTrueTensor, yPredTensor ] = checkSameLength(yTrue, yPred);
   const labelEncoder = new LabelEncoder();
   await labelEncoder.init(concat([ yTrueTensor, yPredTensor ]));

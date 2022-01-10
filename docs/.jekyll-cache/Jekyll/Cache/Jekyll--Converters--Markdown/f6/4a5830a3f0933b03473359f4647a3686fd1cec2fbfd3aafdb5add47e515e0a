@@ -1,0 +1,47 @@
+I"d<h1 id="datacook">DataCook</h1>
+
+<p class="fs-6 fw-300">为 Javascript / Typescript 打造的机器学习和数据科学标准库.</p>
+
+<p><a href="#getting-started" class="btn btn-primary fs-5 mb-4 mb-md-0 mr-2">Get started now</a> <a href="https://github.com/imgcook/datacook" class="btn fs-5 mb-4 mb-md-0">View it on GitHub</a></p>
+
+<hr />
+
+<h2 id="getting-started">Getting started</h2>
+
+<h3 id="依赖">依赖</h3>
+
+<p>DataCook is built for javascript environment and can run in both <a href="https://nodejs.org/">node.js</a> platform and browser. DataCook relies on <a href="https://www.tensorflow.org/js">tensorflow.js</a> for basic numeric computation.</p>
+
+<h3 id="quick-installation">Quick installation</h3>
+
+<p>DataCook can be installed by npm:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install</span> @pipcook/datacook
+</code></pre></div></div>
+
+<p>or by yarn</p>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">yarn</span> <span class="nx">add</span> <span class="p">@</span><span class="nd">pipcook</span><span class="sr">/datacoo</span><span class="err">k
+</span></code></pre></div></div>
+
+<h3 id="quick-start-train-a-simple-linear-regression-model">Quick start: Train a simple linear-regression model</h3>
+
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span><span class="nx">LinearRegression</span><span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@pipcook/datacook</span><span class="dl">'</span><span class="p">;</span>
+
+<span class="kd">const</span> <span class="nx">X</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+  <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span>
+<span class="p">];</span>
+<span class="kd">const</span> <span class="nx">y</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">,</span> <span class="mf">6.5</span><span class="p">,</span> <span class="mi">12</span><span class="p">];</span>
+<span class="c1">// create model</span>
+<span class="kd">const</span> <span class="nx">lm</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">LinearRegression</span><span class="p">();</span>
+<span class="c1">// train linear model using feature set X and label set y</span>
+<span class="k">await</span> <span class="nx">lm</span><span class="p">.</span><span class="nx">fit</span><span class="p">(</span><span class="nx">X</span><span class="p">,</span> <span class="nx">y</span><span class="p">);</span>
+<span class="c1">// get prediction</span>
+<span class="kd">const</span> <span class="nx">yPred</span> <span class="o">=</span> <span class="nx">lm</span><span class="p">.</span><span class="nx">predict</span><span class="p">(</span><span class="nx">X</span><span class="p">);</span>
+<span class="nx">yPred</span><span class="p">.</span><span class="nx">print</span><span class="p">();</span>
+<span class="c1">// [10, 6, 6, 12]</span>
+</code></pre></div></div>
+:ET

@@ -1,0 +1,44 @@
+I"W<h1 id="pca-principle-component-analysis">PCA (Principle Component Analysis)</h1>
+
+<p>Principle component analysis (PCA) is</p>
+
+<h2 id="import">Import</h2>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">Datacook</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">datacook</span><span class="dl">'</span><span class="p">;</span>
+<span class="kd">const</span> <span class="p">{</span> <span class="nx">PCA</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">DataCook</span><span class="p">.</span><span class="nx">Model</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h2 id="constructor">Constructor</h2>
+
+<div class="language-typescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">const</span> <span class="nx">pca</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">PCA</span><span class="p">({</span> <span class="na">nComponent</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="na">method</span><span class="p">:</span> <span class="dl">'</span><span class="s1">correlation</span><span class="dl">'</span> <span class="p">});</span>
+</code></pre></div></div>
+
+<h3 id="option-parameters">Option Parameters</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>parameter</th>
+      <th>type</th>
+      <th>description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>nComponent</td>
+      <td>number</td>
+      <td>the estimated number of components. If not specified, it equals the lesser value of nFeatures and nSamples</td>
+    </tr>
+    <tr>
+      <td>method</td>
+      <td>‘covariance’|’correlation’</td>
+      <td>Method used for decomposition. <strong>default=’covariance’</strong>.  ‘covariance’: use covariance matrix for decomposition. ‘correlation’: use correlation matrix for decomposition.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="methods">Methods</h2>
+
+<h3 id="fit">fit</h3>
+
+:ET

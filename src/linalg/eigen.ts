@@ -1,6 +1,8 @@
-import { linalg, Tensor, matMul, abs, sub, max, tensor, mul, eye, slice, stack, squeeze, neg, transpose } from '@tensorflow/tfjs-core';
+import { linalg, Tensor, matMul, abs, sub, max, tensor, tidy,
+  mul, eye, slice, stack, squeeze, neg, transpose } from '@tensorflow/tfjs-core';
 import { linSolveQR } from './linsolve';
-import { tensorNormalize, tensorEqual } from './utils';
+import { tensorNormalize, tensorEqual, fillNaN } from './utils';
+
 /**
  * Compute the eigenvalues of a matrix using the QR algorithm.
  * This is a renormalized version of power iteration that converges to a full
@@ -18,33 +20,38 @@ import { tensorNormalize, tensorEqual } from './utils';
  * @param tol tolerence, default to 1e-4
  * @param maxIter max iteration time, default to 200
  */
-export const solveEigenValues = async (matrix: Tensor, tol = 1e-4, maxIter = 200): Promise<Tensor> => {
-  let [ q, r ] = linalg.qr(matrix);
-  let x = matrix;
-  let prevX: Tensor;
-  let prevTr: Tensor;
-  const n = matrix.shape[0];
-  let xTr = linalg.bandPart(x, 0, 0);
-  let qn = q;
-
-  for (let i = 0; i < maxIter; i++) {
-    prevX = x;
-    x = matMul(r, q);
-    [ q, r ] = linalg.qr(x);
-    qn = matMul(qn, q);
-    xTr = linalg.bandPart(x, 0, 0);
-    prevTr = linalg.bandPart(prevX, 0, 0);
-    const maxDis = await max(abs(sub(prevTr, xTr))).array();
-    if (maxDis < tol) {
-      break;
+export const solveEigenValues = (matrix: Tensor, tol = 1e-4, maxIter = 200): [ Tensor, Tensor ] => {
+  return tidy(() => {
+    let [ qTensor, rTensor ] = linalg.qr(matrix);
+    let q = fillNaN(qTensor, 0);
+    let r = fillNaN(rTensor, 0);
+    let x = matrix;
+    let prevX: Tensor;
+    let prevTr: Tensor;
+    const n = matrix.shape[0];
+    let xTr = linalg.bandPart(x, 0, 0);
+    let qn = q;
+    for (let i = 0; i < maxIter; i++) {
+      prevX = x;
+      x = matMul(r, q);
+      [ qTensor, rTensor ] = linalg.qr(x);
+      q = fillNaN(qTensor, 0);
+      r = fillNaN(rTensor, 0);
+      qn = matMul(qn, q);
+      xTr = linalg.bandPart(x, 0, 0);
+      prevTr = linalg.bandPart(prevX, 0, 0);
+      const maxDis = max(abs(sub(prevTr, xTr))).arraySync();
+      if (maxDis < tol) {
+        break;
+      }
     }
-  }
-  x = matMul(r, q);
-  const eigenValues = [];
-  for (let i = 0; i < n; i++) {
-    eigenValues.push(slice(x, [ i, i ], [ 1, 1 ]));
-  }
-  return squeeze(stack(eigenValues));
+    x = matMul(r, q);
+    const eigenValues = [];
+    for (let i = 0; i < n; i++) {
+      eigenValues.push(slice(x, [ i, i ], [ 1, 1 ]));
+    }
+    return [ squeeze(stack(eigenValues)), qn ];
+  });
 };
 
 /**
@@ -121,8 +128,11 @@ export const solveEigenVectors = async (matrix: Tensor, eigenValues: Tensor, tol
  * @param tol stop tolerence, default to 1e-4
  * @param maxIter max iteration times, default to 200
  */
-export const eigenSolve = async (matrix: Tensor, tol = 1e-4, maxIter = 200): Promise<[Tensor, Tensor]> => {
-  const eigenValues = await solveEigenValues(matrix, tol, maxIter);
+export const eigenSolve = async (matrix: Tensor, tol = 1e-4, maxIter = 200, symmetric = false): Promise<[Tensor, Tensor]> => {
+  const [ eigenValues, q ] = solveEigenValues(matrix, tol, maxIter);
+  if (symmetric) {
+    return [ eigenValues, q ];
+  }
   const eigenVectors = await solveEigenVectors(matrix, eigenValues, tol, maxIter);
   return [ eigenValues, eigenVectors ];
 };

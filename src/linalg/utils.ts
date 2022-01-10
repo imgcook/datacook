@@ -1,6 +1,21 @@
-import { Tensor, norm, div, max, sub, abs, lessEqual, slice, tensor, squeeze, stack } from '@tensorflow/tfjs-core';
+import {
+  Tensor,
+  RecursiveArray,
+  norm,
+  div,
+  max,
+  sub,
+  abs,
+  lessEqual,
+  slice,
+  tensor,
+  isNaN,
+  where,
+  tidy,
+  squeeze,
+  stack
+} from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
-
 /**
  * Normalize tensor by dividing its norm
  * @param vector tensor to be normalized
@@ -73,10 +88,12 @@ export const shapeEqual = (tensor1: Tensor, tensor2: Tensor): boolean => {
  * @param
  */
 export const tensorEqual = (tensor1: Tensor, tensor2: Tensor, tol = 0): boolean => {
-  if (!shapeEqual(tensor1, tensor2)) {
-    throw new Error('tensor1 and tensor2 not of same shape');
-  }
-  return Boolean(lessEqual(max(abs(sub(tensor1, tensor2))), tol).dataSync()[0]);
+  return tidy(() => {
+    if (!shapeEqual(tensor1, tensor2)) {
+      throw new TypeError('tensor1 and tensor2 not of same shape');
+    }
+    return Boolean(lessEqual(max(abs(sub(tensor1, tensor2))), tol).dataSync()[0]);
+  });
 };
 
 /**
@@ -112,4 +129,19 @@ export const getDiagElements = (matrix: Tensor | number[]): Tensor => {
     diagElements.push(slice(matrixTensor, [ i, i ], [ 1, 1 ]));
   }
   return squeeze(stack(diagElements));
+};
+
+/*
+ * Fill the nan data with given value
+ * TODO: support multi-dimensional data
+ * @param xData input data
+ * @param fillV value to replace NaN, should be number
+ * @return replaced data
+ */
+export const fillNaN = (xData: Tensor | RecursiveArray<number>, fillV = 0): Tensor => {
+  return tidy(() => {
+    const xTensor = checkArray(xData, 'float32', 2);
+    const cond = isNaN(xTensor);
+    return where(cond, fillV, xTensor);
+  });
 };
