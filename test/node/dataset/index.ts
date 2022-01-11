@@ -4,18 +4,17 @@ import 'mocha';
 import { seed } from '../../../src/generic';
 
 const expectThrowsAsync = async (method: any, errorMessage?: string) => {
-  let error = null
+  let error = null;
   try {
-    await method()
+    await method();
+  } catch (err) {
+    error = err;
   }
-  catch (err) {
-    error = err
-  }
-  expect(error).to.be.an('Error')
+  expect(error).to.be.an('Error');
   if (errorMessage) {
-    expect(error.message).to.equal(errorMessage)
+    expect(error.message).to.equal(errorMessage);
   }
-}
+};
 
 describe('Dataset', () => {
   it('should make a dataset', async () => {
@@ -66,29 +65,29 @@ describe('Dataset', () => {
       return {
         data: num,
         label: num
-      }
+      };
     };
-    const trainSamples: Array<Types.Sample> = [sampleMaker(0), sampleMaker(1), sampleMaker(2)];
-  
+    const trainSamples: Array<Types.Sample> = [ sampleMaker(0), sampleMaker(1), sampleMaker(2) ];
+
     const dataset = new ArrayDatasetImpl(trainSamples);
 
     seed('test');
     dataset.shuffle();
 
-    const trainData = (await dataset.nextBatch(3)).map(it => it.data);
+    const trainData = (await dataset.nextBatch(3)).map((it) => it.data);
 
-    expect(trainData).to.eql([1, 0, 2]);
+    expect(trainData).to.eql([ 1, 0, 2 ]);
   });
 
   it('should read a zero batch', async () => {
     const sample: Types.Sample<number> = {
       data: 1,
       label: 1
-    }
-    const trainSamples: Array<Types.Sample> = [sample, sample, sample];
+    };
+    const trainSamples: Array<Types.Sample> = [ sample, sample, sample ];
     const dataset = new ArrayDatasetImpl(trainSamples);
-  
-    expect(await dataset.nextBatch(0)).to.eql([sample, sample, sample]);
+
+    expect(await dataset.nextBatch(0)).to.eql([ sample, sample, sample ]);
   });
 
   it('should throw an error', async () => {
@@ -97,7 +96,7 @@ describe('Dataset', () => {
       label: 1
     };
     const trainSamples: Array<Types.Sample> = [ sample, sample, sample ];
-  
+
     const dataset = new ArrayDatasetImpl(trainSamples);
 
     expect(await dataset.nextBatch(-2)).to.eql([ sample, sample, sample ]);

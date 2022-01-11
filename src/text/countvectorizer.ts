@@ -73,8 +73,8 @@ export default class CountVectorizer {
    */
   public transform(textArray: TextInput[]): number[][] {
 
-    if (this.wordOrder?.length) {
-      throw new Error('Dictionary is empty, use init function to init dictionary first');
+    if (!this.wordOrder || !Object.keys(this.wordOrder).length) {
+      throw new TypeError('Dictionary is empty, use init function to init dictionary first');
     }
 
     const counterVectorizer: number[][] = textArray.map((value: TextInput) => {
