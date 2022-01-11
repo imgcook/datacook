@@ -8,7 +8,7 @@ const matrix = tf.tensor2d([
   [ 1, 2, 5, 10 ],
   [ 2, 6, 7, 5 ],
   [ 5, 7, 9, 6 ],
-  [ 10, 5, 6, 7]
+  [ 10, 5, 6, 7 ]
 ]);
 
 const singularMatrix = tf.tensor2d([
@@ -19,7 +19,7 @@ const singularMatrix = tf.tensor2d([
 ]);
 
 describe('Matrix Solver', () => {
-    
+
   it('get inverse matrix', async () => {
     const invM = await inverse(matrix);
     const iM = tf.matMul(matrix, invM);

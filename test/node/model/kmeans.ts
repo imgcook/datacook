@@ -9,8 +9,8 @@ const clusData = tf.concat([ clust1, clust2, clust3 ]);
 
 const checkPredTrueCnt = (predClus: tf.Tensor) => {
   return tf.max(tf.stack([
-    tf.sum(tf.equal(predClus, 0)), 
-    tf.sum(tf.equal(predClus, 1)), 
+    tf.sum(tf.equal(predClus, 0)),
+    tf.sum(tf.equal(predClus, 1)),
     tf.sum(tf.equal(predClus, 2))
   ])).dataSync()[0];
 };
@@ -29,11 +29,11 @@ const checkClusAccuracy = async (predClus: tf.Tensor) => {
 
 describe('KMeans', () => {
 
-  it('simple test', async ()=> {
+  it('simple test', async () => {
     const nBaseTensors = tf.memory().numTensors;
     const xData = [
-      [1, 2], [1, 4], [1, 0],
-      [10, 2], [10, 4], [10, 0]
+      [ 1, 2 ], [ 1, 4 ], [ 1, 0 ],
+      [ 10, 2 ], [ 10, 4 ], [ 10, 0 ]
     ];
     const kmeans = new KMeans({ nClusters: 2 });
     await kmeans.fit(xData);
@@ -41,7 +41,7 @@ describe('KMeans', () => {
     predClus.print();
     predClus.dispose();
     assert.isTrue((nBaseTensors + 1) === tf.memory().numTensors);
-  })
+  });
 
   it('train clust', async () => {
     const nBaseTensors = tf.memory().numTensors;
@@ -66,7 +66,7 @@ describe('KMeans', () => {
       tf.dispose([ idx, batchX ]);
       console.log(`Train with ${i}th batch, inertia ${inertia}`);
     }
-    
+
     const predClus = await kmeans.predict(clusData);
     const accuracy = await checkClusAccuracy(predClus);
     tf.dispose([ predClus ]);
@@ -90,7 +90,7 @@ describe('KMeans', () => {
     assert.isTrue(accuracy > 0.9);
     assert.isTrue((nBaseTensors + 2) === tf.memory().numTensors);
   });
-  
+
   it('different initialization (random)', async () => {
     const nBaseTensors = tf.memory().numTensors;
     const kmeansRandom = new KMeans({ nClusters: 3, init: 'random' });

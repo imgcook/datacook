@@ -177,10 +177,10 @@ const irisTransformedFirst3 = tf.tensor([
   [ 2.88899057, 0.14494943, -0.01790026 ]
 ]);
 
-const irisExplainedVarianceCorr = tf.tensor([ 2.91808505, 0.9141649 , 0.14674182 ]);
+const irisExplainedVarianceCorr = tf.tensor([ 2.91808505, 0.9141649, 0.14674182 ]);
 const irisExplainedVarianceRatioCorr = tf.tensor([ 0.72962445, 0.22850762, 0.03668922 ]);
 const irisTransformedFirst3Corr = tf.tensor([
-  [ -2.26470281, 0.4800266 , -0.12770602 ],
+  [ -2.26470281, 0.4800266, -0.12770602 ],
   [ -2.08096115, -0.67413356, -0.23460885 ],
   [ -2.36422905, -0.34190802, 0.04420148 ]
 ]);
@@ -197,7 +197,7 @@ describe('Principle Component Analysis', () => {
     console.log('explained varaince ratio:', pca.explainedVarianceRatio.arraySync());
     assert.isTrue(tensorEqual(irisExplainedVarianceRatio, pca.explainedVarianceRatio, 1e-4));
     assert.isTrue(tensorEqual(irisExplainedVariance, pca.explainedVariance, 1e-4));
-    
+
   });
 
   it('iris pca transform', async () => {

@@ -8,7 +8,7 @@ describe('Gamma', () => {
     const b = gamma(1);
     const c = gamma(2);
     const d = gamma(3);
-    const e = gamma(5);  
+    const e = gamma(5);
     const f = gamma(5.5);
     const aTrue = Infinity;
     const bTrue = 1;
@@ -28,7 +28,7 @@ describe('Gamma', () => {
     const b = lnGamma(0.03);
     const c = lnGamma(0.2);
     const d = lnGamma(0.5);
-    const e = lnGamma(5);  
+    const e = lnGamma(5);
     const f = lnGamma(5.5);
     const g = lnGamma(10);
     assert.isTrue(a === Infinity);
