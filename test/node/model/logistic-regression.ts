@@ -4,12 +4,11 @@ import { LogisticRegressionPredictor } from '../../../src/model/linear-model/log
 import * as tf from '@tensorflow/tfjs-core';
 import { assert } from 'chai';
 import 'mocha';
-import { Tensor } from '@tensorflow/tfjs-core';
 import { accuracyScore } from '../../../src/metrics/classifier';
 import { tensorEqual } from '../../../src/linalg/utils';
 
 const cases = tf.mul(tf.randomNormal([ 10000, 5 ]), [ 100, 100, 200, 100, 10 ]);
-const weight = tf.tensor([ 2, 3, 1, -4, 6 ])
+const weight = tf.tensor([ 2, 3, 1, -4, 6 ]);
 const eta = tf.add(tf.sum(tf.mul(cases, weight), 1), -20).arraySync() as number[];
 const y = tf.greater(eta, 0);
 const yMult = eta.map((e: number): number => e < -200 ? 1 : e < 0 ? 2 : e < 200 ? 3 : 4);
@@ -17,14 +16,14 @@ const yMult = eta.map((e: number): number => e < -200 ? 1 : e < 0 ? 2 : e < 200 
 describe('Logistic ', () => {
 
   it('predict class probabilities', async () => {
-    const lr = new LogisticRegression({optimizerType: 'sgd', optimizerProps: {learningRate: 0.1}});
+    const lr = new LogisticRegression({ optimizerType: 'sgd', optimizerProps: { learningRate: 0.1 } });
     await lr.fit(cases, y);
     const probs = await lr.predictProba(cases);
     assert.equal(tf.sum(tf.lessEqual(probs, 1)).dataSync() as any, 10000);
   });
 
   it('predict class probabilities (multi-classification)', async () => {
-  const lr = new LogisticRegression({optimizerType: 'sgd', optimizerProps: {learningRate: 0.1}});
+    const lr = new LogisticRegression({ optimizerType: 'sgd', optimizerProps: { learningRate: 0.1 } });
     await lr.fit(cases, yMult);
     const probs = await lr.predictProba(cases);
     assert.isTrue(tensorEqual(tf.sum(probs, 1), tf.ones([ 10000 ]), 1e-5));
@@ -54,9 +53,9 @@ describe('Logistic ', () => {
     const batchSize = 32;
     for (let i = 0; i < 800; i++) {
       const j = Math.floor(i % batchSize);
-      const batchX = tf.slice(cases, [j * batchSize, 0], [batchSize ,5]);
-      const batchY = tf.slice(y, [j * batchSize], [batchSize]);
-      await lr.trainOnBatch(batchX, batchY)
+      const batchX = tf.slice(cases, [ j * batchSize, 0 ], [ batchSize, 5 ]);
+      const batchY = tf.slice(y, [ j * batchSize ], [ batchSize ]);
+      await lr.trainOnBatch(batchX, batchY);
     }
     const predY = await lr.predict(cases);
     const acc = accuracyScore(y, predY);
@@ -71,9 +70,9 @@ describe('Logistic ', () => {
     const batchSize = 32;
     for (let i = 0; i < 800; i++) {
       const j = Math.floor(i % batchSize);
-      const batchX = tf.slice(cases, [j * batchSize, 0], [batchSize ,5]);
-      const batchY = tf.slice(yMult, [j * batchSize], [batchSize]);
-      await lr.trainOnBatch(batchX, batchY)
+      const batchX = tf.slice(cases, [ j * batchSize, 0 ], [ batchSize, 5 ]);
+      const batchY = tf.slice(yMult, [ j * batchSize ], [ batchSize ]);
+      await lr.trainOnBatch(batchX, batchY);
     }
     const predY = await lr.predict(cases);
     const acc = accuracyScore(yMult, predY);
@@ -82,7 +81,7 @@ describe('Logistic ', () => {
   });
   it('save and load model', async () => {
     const lr = new LogisticRegression();
-    await lr.fit(cases, y); 
+    await lr.fit(cases, y);
     const modelJson = await lr.toJson();
     const lr2 = new LogisticRegression();
     await lr2.fromJson(modelJson);
@@ -93,7 +92,7 @@ describe('Logistic ', () => {
   });
   it('save and load model (multi-classification)', async () => {
     const lr = new LogisticRegression();
-    await lr.fit(cases, yMult); 
+    await lr.fit(cases, yMult);
     const modelJson = await lr.toJson();
     const lr2 = new LogisticRegression();
     await lr2.fromJson(modelJson);
@@ -104,7 +103,7 @@ describe('Logistic ', () => {
   });
   it('save and load model as predictor', async () => {
     const lr = new LogisticRegression();
-    await lr.fit(cases, y); 
+    await lr.fit(cases, y);
     const modelJson = await lr.toJson();
     const lr2 = new LogisticRegressionPredictor();
     await lr2.fromJson(modelJson);
@@ -115,7 +114,7 @@ describe('Logistic ', () => {
   });
   it('save and load model as predictor (multi-classification)', async () => {
     const lr = new LogisticRegression();
-    await lr.fit(cases, yMult); 
+    await lr.fit(cases, yMult);
     const modelJson = await lr.toJson();
     const lr2 = new LogisticRegressionPredictor();
     await lr2.fromJson(modelJson);
