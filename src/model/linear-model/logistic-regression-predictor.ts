@@ -3,9 +3,10 @@ import { checkShape } from "../../linalg/utils";
 import { checkArray } from "../../utils/validation";
 import { BaseClassifier } from "../base";
 import '@tensorflow/tfjs-backend-cpu';
+
 /**
  * Logistic regression predictor
- * */
+ */
 export class LogisticRegressionPredictor extends BaseClassifier {
 
   private featureSize: number;

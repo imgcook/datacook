@@ -2,7 +2,7 @@ import { Tensor1D, tidy, sum, square, sub, mean, divNoNan, Tensor } from '@tenso
 import { checkArray } from '../utils/validation';
 import { shapeEqual } from '../linalg';
 
-export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[]): { yTrueTensor: Tensor, yPredTensor: Tensor } => {
+export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[]): { yTrueTensor: Tensor1D, yPredTensor: Tensor1D } => {
   return tidy(() => {
     const yTrueTensor = checkArray(yTrue, 'any', 1) as Tensor1D;
     const yPredTensor = checkArray(yPred, 'any', 1) as Tensor1D;
@@ -20,7 +20,7 @@ export const checkPairInput = (yTrue: Tensor | number[], yPred: Tensor | number[
  * @param yPred prediced labels
  * @returns r-square value
  */
-export const getRSquare = (yTrue: Tensor | number[], yPred: Tensor | number[]): number => {
+export const getRSquare = (yTrue: Tensor1D | number[], yPred: Tensor1D | number[]): number => {
   return tidy(() => {
     const { yTrueTensor, yPredTensor } = checkPairInput(yTrue, yPred);
     const numerator = sum(square(sub(yTrueTensor, yPredTensor)));
@@ -89,12 +89,13 @@ export const getAdjustedRSquare = (yTrue: Tensor | number[], yPred: Tensor | num
  * @param k number of independent regressors
  * @returns aic
  */
-export const getAicLM = (yTrue: Tensor | number[], yPred: Tensor | number[], k: number): number => {
+export const getAICLM = (yTrue: Tensor | number[], yPred: Tensor | number[], k: number): number => {
   return tidy(() => {
     const { yTrueTensor, yPredTensor } = checkPairInput(yTrue, yPred);
     const nData = yTrueTensor.shape[0];
     const sse = sum(square(sub(yTrueTensor, yPredTensor))).dataSync()[0];
-    const aic = nData * (Math.log(2 * Math.PI) + Math.log(sse) - 2 * Math.log(nData)) + nData + 2 * (k + 1);
+    // const aic = nData * (Math.log(2 * Math.PI) + Math.log(sse) - 2 * Math.log(nData)) + nData + 2 * (k + 1);
+    const aic = 2 * k + 2 * Math.log(sse);
     return aic;
   });
 };

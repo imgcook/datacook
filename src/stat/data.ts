@@ -1,4 +1,4 @@
-import { Tensor, RecursiveArray, sub, mean, divNoNan, sum, pow, sqrt, transpose, Tensor1D, topk, tensor, stack, slice, neg } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, sub, mean, divNoNan, sum, pow, sqrt, transpose, topk, stack, slice, neg } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
 
 /**
@@ -48,7 +48,7 @@ export const quantile = (xData: Tensor | RecursiveArray<number>): Tensor => {
     const isRightQuantile = i > 0.5;
     const quantileNumber = isRightQuantile ? (quantiles[i] * nData) : ((1 - quantiles[i]) * nData);
     const quantileIndex = Math.ceil(quantileNumber) + 1;
-    const { values, indices } = isRightQuantile ? (topk(xTensorTransposeNeg, quantileIndex, true)) : (topk(xTensorTranspose, quantileIndex, true));
+    const { values } = isRightQuantile ? (topk(xTensorTransposeNeg, quantileIndex, true)) : (topk(xTensorTranspose, quantileIndex, true));
     const isExact = quantileNumber === Math.floor(quantileNumber);
     const sliceNumber = isExact ? 1 : 2;
     if (isTwoDimension){

@@ -132,20 +132,19 @@ export class BaseClassifier {
   }
 }
 
-export class BaseRegressor {
-  public validateData(x: Tensor | RecursiveArray<number>, y: Tensor | RecursiveArray<number>, xDimension = 2, yDimension = 1): { xTensor: Tensor, yTensor: Tensor } {
-    return tidy(() => {
-      const xTensor = checkArray(x, 'float32', xDimension);
-      const yTensor = checkArray(y, 'float32', yDimension);
-      const xCount = xTensor.shape[0];
-      const yCount = yTensor.shape[0];
-      if (xCount != yCount) {
-        throw new RangeError(
-          'The size of training set and training labels must be the same.'
-        );
-      }
-      return { xTensor, yTensor };
-    });
+export class BaseRegressor extends BaseEstimator {
+  // TODO(sugarspectre): Add evaluation functions
+  public validateData(x: Tensor | RecursiveArray<number>, y: Tensor | RecursiveArray<number>, xDimension = 2, yDimension = 1): { x: Tensor, y: Tensor } {
+    const xTensor = checkArray(x, 'float32', xDimension);
+    const y_tensor = checkArray(y, 'float32', yDimension);
+    const xCount = xTensor.shape[0];
+    const yCount = y_tensor.shape[0];
+    if (xCount != yCount) {
+      throw new RangeError(
+        'The size of the training set and the training labels must be the same.'
+      );
+    }
+    return { x: xTensor, y: y_tensor };
   }
 }
 
