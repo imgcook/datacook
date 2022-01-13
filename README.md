@@ -3,9 +3,6 @@
 <img style="width: 350px; max-width: 100%" src="https://img.alicdn.com/imgextra/i4/O1CN01vl5B3J1hJIOG0XT8O_!!6000000004256-2-tps-603-447.png"/>
 
 Machine learning and data science library for Javascript / Typescript.
-{: .fs-6 .fw-300 }
-
-[Get started now](#getting-started){: .btn .btn-primary .fs-5 .mb-4 .mb-md-0 .mr-2 } [View it on GitHub](https://github.com/imgcook/datacook){: .btn .fs-5 .mb-4 .mb-md-0 }
 
 ---
 
