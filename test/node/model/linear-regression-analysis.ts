@@ -33,7 +33,20 @@ describe('Linear Regression', () => {
   it('train on tree dataset', async () => {
     const lm = new LinearRegressionAnalysis();
     const treeFeatureTensor = tf.tidy(() => tf.transpose(tf.tensor2d([ treesHeight, treesVolumn ])));
-    await lm.fit(treeFeatureTensor, treesGrith);
+    await lm.fit(treeFeatureTensor, treesGrith, [ 'height', 'volumn' ]);
+    const summary = lm.summary();
+    console.table(summary.coefficients);
+    console.log('r-square:', summary.rSquare);
+    console.log('Adjusted r-square:', summary.adjustedRSquare);
+    console.log('Residual Standard Error', summary.residualStandardError);
+    lm.clean();
+    dispose(treeFeatureTensor);
+  });
+
+  it('train on tree dataset (without intercept)', async () => {
+    const lm = new LinearRegressionAnalysis({ fitIntercept: false });
+    const treeFeatureTensor = tf.tidy(() => tf.transpose(tf.tensor2d([ treesHeight, treesVolumn ])));
+    await lm.fit(treeFeatureTensor, treesGrith, [ 'height', 'volumn' ]);
     const summary = lm.summary();
     console.table(summary.coefficients);
     console.log('r-square:', summary.rSquare);

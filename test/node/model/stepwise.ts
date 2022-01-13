@@ -1,5 +1,5 @@
 import * as tf from '@tensorflow/tfjs-core';
-import { stepwise } from '../../../src/model/stat/stepwise';
+import { stepwiseLinearRegression } from '../../../src/model/stat/stepwise';
 import { assert } from 'chai';
 
 const nData = 100;
@@ -29,7 +29,7 @@ describe('Linear Regression', () => {
 
   it('train on tree dataset', async () => {
     const treeFeatureTensor = tf.transpose(tf.tensor2d([ treesHeight, treesVolumn ]));
-    const lm = await stepwise(treeFeatureTensor, treesGrith);
+    const lm = await stepwiseLinearRegression(treeFeatureTensor, treesGrith, [ 'height', 'volumn' ]);
     lm.printSummary();
   });
 });

@@ -92,7 +92,7 @@ export const getAdjustedRSquare = (yTrue: Tensor | number[], yPred: Tensor | num
 export const getAICLM = (yTrue: Tensor | number[], yPred: Tensor | number[], k: number): number => {
   return tidy(() => {
     const { yTrueTensor, yPredTensor } = checkPairInput(yTrue, yPred);
-    const nData = yTrueTensor.shape[0];
+    // const nData = yTrueTensor.shape[0];
     const sse = sum(square(sub(yTrueTensor, yPredTensor))).dataSync()[0];
     // const aic = nData * (Math.log(2 * Math.PI) + Math.log(sse) - 2 * Math.log(nData)) + nData + 2 * (k + 1);
     const aic = 2 * k + 2 * Math.log(sse);
