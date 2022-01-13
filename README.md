@@ -1,6 +1,6 @@
 # DataCook
 
-<img style="width: 350px; max-width: 100%" src="https://img.alicdn.com/imgextra/i4/O1CN01vl5B3J1hJIOG0XT8O_!!6000000004256-2-tps-603-447.png"/>
+<img style="width: 350px; max-width: 100%" src="https://img.alicdn.com/imgextra/i2/O1CN01YJeTZV1dAoavsEwuP_!!6000000003696-2-tps-1069-353.png"/>
 
 Machine learning and data science library for Javascript / Typescript.
 
