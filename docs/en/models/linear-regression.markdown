@@ -204,8 +204,8 @@ view2.line().position('x*y');
 chart.render();
 ```
 
-<div id="lm-chart">
-</div>
+<!-- <div id="lm-chart">
+</div> -->
 
 <script>
   const { LinearRegression } = datacook.Model;

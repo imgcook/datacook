@@ -1,9 +1,9 @@
 ---
 layout: default
-title: Variance
+title: getCovarianceMatrix
 parent: Statistics
 nav_order: 1
 lang: en
 ---
 
-# Variance
+# getCovarianceMatrix

@@ -1,9 +1,9 @@
 ---
 layout: default
-title: Variance
+title: getCorrelationMatrix
 parent: Statistics
 nav_order: 1
 lang: en
 ---
 
-# Variance
+# getCorrelationMatrix
