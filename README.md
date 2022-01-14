@@ -1,85 +1,51 @@
-# datacook
+# DataCook
 
-A JavaScript library for feature engineering on datasets, it helps you to cook trainable datus out
-as its name, [datacook][].
+<img style="width: 350px; max-width: 100%" src="https://img.alicdn.com/imgextra/i2/O1CN01YJeTZV1dAoavsEwuP_!!6000000003696-2-tps-1069-353.png"/>
+
+Machine learning and data science library for Javascript / Typescript.
+
+---
 
 ## Getting started
 
-Install [datacook][] via NPM:
+### Dependencies
 
-```js
-npm install @pipcook/datacook --save
+DataCook is built for javascript environment and can run in both [node.js](https://nodejs.org/) platform and browser. DataCook relies on [tensorflow.js](https://www.tensorflow.org/js) for basic numeric computation.
+
+### Quick installation
+
+DataCook can be installed by npm:
+
+```bash
+npm install @pipcook/datacook
 ```
 
-And write your first example:
+or by yarn
 
-```js
-import { Image } from '@pipcook/datacook';
-
-const dog = Image.read('test/node/image/artifacts/dog.jpg');
-const data = [ ...img.resize(100, 100).data ];  // the 100x100 data.
+```javascript
+yarn add @pipcook/datacook
 ```
 
-Build your own word2vec model:
+### Quick start: Train a simple linear-regression model
 
-```js
-import { Text } from '@pipcook/datacook';
-const text = 'The king is a man who rules over a nation, he always have a woman beside him called the\
- queen.\n she helps the king controls the affars of the nation.\n Perhaps, she acclaimed the position of a king\
- when the king her husband is deceased.'.split('\n');
-const stopWords = [ 'a', 'in', 'when', 'the', 'of', 'is', 'who' ];
-const word2vec = new Text.Word2Vec(text, 5, stopWords);
+```javascript
+import { Model } from '@pipcook/datacook';
 
-// train the model
-await word2vec.train();
-word2vec.similarity('king', 'man'); // < 1.0
-word2vec.mostSimilar('king'); // returns words and its weights.
+const { LinearRegression } = Model;
+
+const X = [
+  [4, 5],
+  [2, 3],
+  [1, 4],
+  [3, 8],
+];
+const y = [10, 5.5, 6.5, 12];
+// create model
+const lm = new LinearRegression();
+// train linear model using feature set X and label set y
+await lm.fit(X, y);
+// get prediction
+const yPred = lm.predict(X);
+yPred.print();
+// [10, 6, 6, 12]
 ```
-
-## Contributing
-
-To contribute to [datacook][], start from forking the repository, then clone to your local machine:
-
-```shell
-$ git clone https://github.com/imgcook/datacook.git
-$ cd datacook
-```
-
-Install dependencies:
-
-```shell
-$ npm install
-```
-
-Run tests for both Node.js and browser environment:
-
-```shell
-npm run test
-```
-
-To run specific tests:
-
-```shell
-$ npm run test:node     # Node.js
-$ npm run test:browser  # Browser
-```
-
-To build the source code to the dist folder, run:
-
-```shell
-$ npm run build
-```
-
-We could use [webpack-bundle-analyzer][] to analysis the Web dependencies:
-
-```shell
-$ npx webpack --profile --json > stat.json
-$ npx webpack-bundle-analyzer stat.json
-```
-
-## License
-
-Apache 2.0
-
-[datacook]: https://github.com/imgcook/datacook
-[webpack-bundle-analyzer]: https://www.npmjs.com/package/webpack-bundle-analyzer
