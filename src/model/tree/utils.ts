@@ -1,30 +1,14 @@
 /**
- * Sort n-element arrays pointed to by Xf and samples, simultaneously,
- * @param values 
- * @param indicies 
- * @param start 
- * @param end 
- * @returns 
- */
-export const sort = (values: number[], indicies: number[], start: number, end: number) => {
-  if (start === end) {
-    return;
-  }
-  const n = end - start;
-  const maxDepth = 2 * Math.log(n);
-  introSort(values, indicies, start, end, maxDepth);
-};
-
-/**
  * Median of three pivot selection, after Bentley and McIlroy (1993).
- * @param values 
- * @param n 
+ * @param values input array
+ * @param start start position
+ * @param end end position
  */
 export const median3 = (values: number[], start: number, end: number): number => {
   const n = end - start;
-  let a = values[start];
-  let b = values[start + Math.floor(n / 2)];
-  let c = values[end];
+  const a = values[start],
+    b = values[start + Math.floor(n / 2)],
+    c = values[end];
   if (a < b) {
     if (b < c) {
       return b;
@@ -43,67 +27,20 @@ export const median3 = (values: number[], start: number, end: number): number =>
   return b;
 };
 
-/**
- * intro sort
- * @param values 
- * @param indicies 
- * @param start 
- * @param end 
- * @param maxDepth 
- * @returns 
- */
-export const introSort = (values: number[], indicies: number[], start: number, end: number, maxDepth: number): void => {
-  let pivot: number;
-  let i = 0;
-  let l = 0;
-  let r = 0;
-  let n = end - start;
-  while (n > 1) {
-    /**
-     * max depth limit exceeded ("gone quadratic")
-     */
-    if (maxDepth <= 0) {
-      heapSort(values, indicies, start, end);
-      return;
-    }
-    maxDepth -= 1
-    pivot = median3(values, start, end);
-    // tree-way partition
-    i = l = start;
-    r = end;
-    while (i < r) {
-      if (values[i] < pivot) {
-        swap(values, indicies, i, l);
-        i += 1;
-        l += 1;
-      } else {
-        if (values[i] > pivot) {
-          r -= 1;
-          swap(values, indicies, i, r);
-        } else {
-          i += 1;
-        }
-      }
-    }
-    introSort(values, indicies, start, l, maxDepth);
-    start = r;
-  }
-};
-
 export const swap = (values: number[], indices: number[], i: number, j: number): void => {
   if (i === j) return;
-  [values[i], values[j]] = [values[j], values[i]];
-  [indices[i], indices[j]] = [indices[j], indices[i]];
+  [ values[i], values[j] ] = [ values[j], values[i] ];
+  [ indices[i], indices[j] ] = [ indices[j], indices[i] ];
 };
 
 /**
  * Restore heap order in values[start:end] by moving the max element to start.
- * @param values 
- * @param indices 
- * @param start 
- * @param end 
+ * @param values
+ * @param indices
+ * @param start
+ * @param end
  */
-export const siftDown = (values: number[], indices: number[], start: number, end: number) => {
+export const siftDown = (values: number[], indices: number[], start: number, end: number): void => {
   let child = 0;
   let root = start;
   let maxInd = start;
@@ -127,27 +64,86 @@ export const siftDown = (values: number[], indices: number[], start: number, end
 
 /**
  * heap sort
- * @param values 
- * @param indices 
- * @param startInd 
- * @param endInd 
+ * @param values values
+ * @param indices indicies
+ * @param startInd start index
+ * @param endInd end index
  */
-export const heapSort = (values: number[], indices: number[], startInd: number, endInd: number) => {
+export const heapSort = (values: number[], indices: number[], startInd: number, endInd: number): void => {
   const n = endInd - startInd;
   let start = startInd + (n - 2) / 2;
   let end = endInd;
   // heapify
-  while (true) {
+  while (start >= startInd) {
     siftDown(values, indices, start, end);
-    if (start === 0) {
-      break;
-    }
     start -= 1;
   }
   end = endInd - 1;
   while (end > start) {
     swap(values, indices, start, end);
-    siftDown(values, indices, start , end);
+    siftDown(values, indices, start, end);
     end = end - 1;
   }
+};
+
+/**
+ * intro sort
+ * @param values values
+ * @param indicies indicies
+ * @param start start index
+ * @param end end index
+ * @param maxDepth max depth for quick sort
+ */
+export const introSort = (values: number[], indicies: number[], start: number, end: number, maxDepth: number): void => {
+  let pivot: number;
+  let i = 0;
+  let l = 0;
+  let r = 0;
+  const n = end - start;
+  while (n > 1) {
+    /**
+     * max depth limit exceeded ("gone quadratic")
+     */
+    if (maxDepth <= 0) {
+      heapSort(values, indicies, start, end);
+      return;
+    }
+    maxDepth -= 1;
+    pivot = median3(values, start, end);
+    // tree-way partition
+    i = l = start;
+    r = end;
+    while (i < r) {
+      if (values[i] < pivot) {
+        swap(values, indicies, i, l);
+        i += 1;
+        l += 1;
+      } else {
+        if (values[i] > pivot) {
+          r -= 1;
+          swap(values, indicies, i, r);
+        } else {
+          i += 1;
+        }
+      }
+    }
+    introSort(values, indicies, start, l, maxDepth);
+    start = r;
+  }
+};
+
+/**
+ * Sort n-element arrays pointed to by Xf and samples, simultaneously,
+ * @param values values
+ * @param indicies input indicies
+ * @param start start index for sort
+ * @param end end index for sort
+ */
+export const sort = (values: number[], indicies: number[], start: number, end: number): void => {
+  if (start === end) {
+    return;
+  }
+  const n = end - start;
+  const maxDepth = 2 * Math.log(n);
+  introSort(values, indicies, start, end, maxDepth);
 };
