@@ -35,16 +35,16 @@ export const swap = (values: number[], indices: number[], i: number, j: number):
 
 /**
  * Restore heap order in values[start:end] by moving the max element to start.
- * @param values
- * @param indices
- * @param start
- * @param end
+ * @param values input array
+ * @param indices indices
+ * @param start start index
+ * @param end end index
  */
 export const siftDown = (values: number[], indices: number[], start: number, end: number): void => {
   let child = 0;
   let root = start;
   let maxInd = start;
-  while (true) {
+  while (maxInd !== root) {
     child = root * 2 + 1;
     maxInd = root;
     if (child < end && values[maxInd] < values[child]) {
@@ -92,7 +92,7 @@ export const heapSort = (values: number[], indices: number[], startInd: number, 
  * @param indicies indicies
  * @param start start index
  * @param end end index
- * @param maxDepth max depth for quick sort
+ * @param maxDepth max depth for quick
  */
 export const introSort = (values: number[], indicies: number[], start: number, end: number, maxDepth: number): void => {
   let pivot: number;

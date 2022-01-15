@@ -32,7 +32,7 @@ export abstract class Criterion {
   abstract nodeImpurity (): number;
   abstract childrenImpurity (): { impurityLeft: number, impurityRight: number };
   abstract update (newPos: number): void;
-  
+  abstract reset (): void;
   /**
    * Initialize the criterion.
    * @param y The target stored as a buffer for memory efficiency
