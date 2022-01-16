@@ -11,7 +11,7 @@ const INITIAL_STACK_SIZE = 10;
 const TREE_UNDEFINED = -2;
 const EPSILON = 1e-10;
 
-class DepthFirstTreeBuilder {
+export class DepthFirstTreeBuilder {
   public splitter: Splitter;
   public minSamplesSplit: number;
   public minSamplesLeaf: number;
