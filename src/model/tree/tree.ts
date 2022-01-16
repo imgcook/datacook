@@ -1,6 +1,7 @@
 import { Tensor1D, sum, equal, add, Tensor, TensorLike, RecursiveArray, gather, slice } from "@tensorflow/tfjs-core";
 import { checkArray } from "../../utils/validation";
 
+export const SIZE_MAX = Number.MAX_SAFE_INTEGER;
 export interface Node {
   parent: number;
   /**
@@ -90,7 +91,7 @@ export class Tree {
    * Finds the terminal region (=leaf node) for each sample in X.
    * @param xData input sample
    */
-  public applyDense = (xData: Tensor | RecursiveArray<number>): number => {
+  public applyDense = (xData: number[][]): number => {
     const xTensor = checkArray(xData, 'float32', 2);
     const nSamples = xTensor.shape[0];
     for (let i = 0; i < nSamples; i++) {
@@ -108,6 +109,24 @@ export class Tree {
     }
   };
 
+  public resize(capacity: number): void {
+    if (capacity === this.capacity && this.nodes) {
+      return;
+    }
+    if (capacity === SIZE_MAX) {
+      if (this.capacity === 0) {
+        this.capacity = 3;
+      } else {
+        this.capacity = 2 * this.capacity;
+      }
+    } else {
+      this.capacity = capacity;
+    }
+    if (capacity < this.nodeCount) {
+      this.nodeCount = capacity;
+    }
+    // TODO: capacity > this.nodeCount
+  }
   public applyDecisionPathDense = (xData: Tensor | RecursiveArray<number>, capacity: Tensor) => {
     const xTensor = checkArray(xData, 'float32', 2);
 
@@ -116,4 +135,4 @@ export class Tree {
 }
 
 export const buildPrunedTree = (origTree: Tree, leavesInSubTree: boolean[]): Tree => {
-} 
+};

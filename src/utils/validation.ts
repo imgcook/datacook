@@ -5,6 +5,12 @@ export function checkArrayShapeEqual(array1: Tensor | RecursiveArray<number>, ar
   // todo
 }
 
+// export function checkJSArray(array: number[] | number[][] | number[][][], dtype = 'any', ensureDimension = -1): boolean {
+//   if (!array instanceof Array) {
+
+//   }
+// }
+
 export function checkArray(array: Tensor | RecursiveArray<number>, dtype = 'any', ensureDimension = -1): Tensor {
   return tidy(() => {
     if (array instanceof Array) {

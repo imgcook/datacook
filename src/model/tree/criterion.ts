@@ -41,13 +41,25 @@ export abstract class Criterion {
    * @param start The first sample to use in the mask
    * @param end The last sample to use in the mask
    */
-  public init(y: number[], samples: number[], weightedNSamples: number, start: number, end: number): void {
+  public init(y: number[], sampleWeight: number[], samples: number[], weightedNSamples: number, start: number, end: number): void {
     this.weightedNSamples = weightedNSamples;
     this.samples = samples;
     this.y = y;
     this.start = start;
     this.end = end;
     this.weightedNNodeSamples = 0;
+    this.sampleWeight = sampleWeight;
+
+    for (let i = start; i < end; i++) {
+      const pos = samples[i];
+      let w = 1;
+      if (this.sampleWeight instanceof Array) {
+        w = sampleWeight[pos];
+      }
+      this.weightedNNodeSamples += w;
+      const k = y[pos];
+      this.sumTotal[k] += w;
+    }
   }
   /**
    * Compute a proxy of the impurity reduction.

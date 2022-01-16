@@ -1,5 +1,3 @@
-import { features } from 'process';
-import { threadId } from 'worker_threads';
 import { Criterion } from './criterion';
 import { sort } from './utils';
 
@@ -14,7 +12,7 @@ export interface SplitRecord {
   improvement: number;
 }
 
-abstract class Splitter {
+export abstract class Splitter {
   public criterion: Criterion;
   public nSamples: number;
   public samples: number[];
@@ -28,6 +26,7 @@ abstract class Splitter {
   public impurityRight: number;
   public threshold: number;
   public improvement: number;
+  public sampleWeight: number[];
   public weightedNSamples: number;
   public X: number[][];
   public y: number[];
@@ -51,7 +50,7 @@ abstract class Splitter {
    * @param y targets vector
    * @param sampleWeight sample weights
    */
-  public init(X: number[][], y: number[], sampleWeight: []): void {
+  public init(X: number[][], y: number[], sampleWeight: number[]): void {
     this.nSamples = X.length;
     this.samples = new Array(this.nSamples);
     let j = 0;
@@ -68,18 +67,23 @@ abstract class Splitter {
     }
     this.nFeatures = X[0].length;
     this.featureValues = X;
+    this.sampleWeight = sampleWeight;
     this.features = Array.from(new Array(this.nFeatures).keys());
     this.y = y;
     this.X = X;
   }
 
-  public nodeReset(start: number, end: number, weightedNNodeSamples: number[]): void {
+  public nodeReset(start: number, end: number): void {
     this.start = start;
     this.end = end;
-    this.criterion.init(this.y, this.samples, this.weightedNSamples, this.start, this.end);
+    this.criterion.init(this.y, this.sampleWeight, this.samples, this.weightedNSamples, this.start, this.end);
   }
 
-  abstract nodeSplit(impurity: number, nConstantFeatures: number[]): SplitRecord;
+  public nodeImpurity(): number {
+    return this.criterion.nodeImpurity();
+  }
+
+  abstract nodeSplit(impurity: number, nConstantFeatures: number): {split: SplitRecord, nConstantFeatures: number};
 }
 
 // export class BaseDenseSplitter extends Splitter {
@@ -89,14 +93,14 @@ abstract class Splitter {
 // }
 
 export class BestSplitter extends Splitter {
-  public nodeSplit(impurity: number, nConstantFeatures: number[]): SplitRecord {
+  public nodeSplit(impurity: number, nConstantFeatures: number): {split: SplitRecord, nConstantFeatures: number} {
     const samples = this.samples;
     const start = this.start;
     const end = this.end;
     let nVisitedFeatures = 0;
     let nFoundConstants = 0;
     let nDrawnConstants = 0;
-    const nKnownConstants = nConstantFeatures[0];
+    const nKnownConstants = nConstantFeatures;
     let nTotalConstants = nKnownConstants;
     let currentFeature: number;
     let featureX: number[];
@@ -198,6 +202,6 @@ export class BestSplitter extends Splitter {
       bestSplit.impurityRight = impurityRight;
       bestSplit.improvement = this.criterion.impurityImprovement(impurity, impurityLeft, impurityRight);
     }
-    return bestSplit;
+    return { split: bestSplit, nConstantFeatures: nTotalConstants };
   }
 }
