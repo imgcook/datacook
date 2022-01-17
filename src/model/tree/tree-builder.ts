@@ -36,7 +36,7 @@ export class DepthFirstTreeBuilder {
     this.minImpurityDecrease = minImpurityDecrease;
   }
 
-  public build(tree: Tree, X: number[][], y: number[], sampleWeight: number[]) {
+  public build(tree: Tree, X: number[][], y: number[], sampleWeight: number[]): void {
     let initCapacity = 0;
     let maxDepthSeen = -1;
 
@@ -121,3 +121,7 @@ export class DepthFirstTreeBuilder {
     tree.maxDepth = maxDepthSeen;
   }
 }
+
+export const buildPrunedTree = (originTree: Tree, capacity: number): Tree => {
+  const tree = new Tree();
+};
