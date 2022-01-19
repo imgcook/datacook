@@ -21,3 +21,4 @@ Makefile
 karma.conf.js
 webpack.config.js
 tsconfig.json
+dist/web
