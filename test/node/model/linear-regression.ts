@@ -9,7 +9,52 @@ const cases = tf.mul(tf.randomNormal([ 10000, 5 ]), [ 1, 10, 100, 2, 3 ]);
 const weight = tf.tensor([ 2, 3, 1, 4, 6 ]);
 const y = tf.add(tf.sum(tf.mul(cases, weight), 1), 10);
 
+const heights = [
+  1.47,
+  1.5,
+  1.52,
+  1.55,
+  1.57,
+  1.6,
+  1.63,
+  1.65,
+  1.68,
+  1.7,
+  1.73,
+  1.75,
+  1.78,
+  1.8,
+  1.83
+];
+
+const weights = [
+  52.21,
+  53.12,
+  54.48,
+  55.84,
+  57.2,
+  58.57,
+  59.93,
+  61.29,
+  63.11,
+  64.47,
+  66.28,
+  68.1,
+  69.92,
+  72.19,
+  74.46
+];
+
+
 describe('Linear Regression', () => {
+
+  it('train on weight and height', async () => {
+    const lm = new LinearRegression();
+    await lm.fit(heights.map((d) => [d]), weights);
+    const yPred = await lm.predict(heights.map((d) => [d]));
+    const meanDist = tf.tidy(() => tf.sum(tf.sub(tf.mean(yPred), tf.tensor(weights))).dataSync()[0]);
+    assert.isTrue(meanDist < 0.1);
+  });
 
   it('train simple dataset', async () => {
     const lm = new LinearRegression({ optimizerType: 'adam', optimizerProps: { learningRate: 0.1 } });
