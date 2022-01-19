@@ -129,7 +129,7 @@ export const solveEigenVectors = async (matrix: Tensor, eigenValues: Tensor, tol
  * @param maxIter max iteration times, default to 200
  */
 export const eigenSolve = async (matrix: Tensor, tol = 1e-4, maxIter = 200, symmetric = false): Promise<[Tensor, Tensor]> => {
-  const [ eigenValues, q ] = solveEigenValues(matrix, tol, maxIter);
+  const [ eigenValues, q ] = tidy(() => solveEigenValues(matrix, tol, maxIter));
   if (symmetric) {
     return [ eigenValues, q ];
   }
