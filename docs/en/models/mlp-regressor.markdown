@@ -85,6 +85,29 @@ async fromJson(modelJson: string)
 | --------- | ---- | ----------- |
 | modelJson | string | model json string |
 
+## Examples
+
+
+```typescript
+import '@tensorflow/tfjs-backend-cpu';
+import * as tf from '@tensorflow/tfjs-core';
+import * as DataCook from '@pipcook/datacook';
+const MLPRegressor = DataCook.Model;
+const cases = tf.mul(tf.randomNormal([ 10000, 5 ]), [ 1, 10, 100, 2, 3 ]);
+const weight = tf.tensor([ 2, 3, 1, 4, 6 ]);
+const y = tf.add(tf.sum(tf.mul(cases, weight), 1), 10);
+const mlp = new MLPRegressor({
+    hiddenLayerSizes: [ 4, 10 ],
+    activations: 'relu',
+    optimizerType: 'adam',
+    optimizerProps: { learningRate: 0.01 }
+});
+await mlp.fit(cases, y);
+const yPred = await mlp.predict(cases) as Tensor1D;
+assert.isTrue(getRSquare(yPred, y as Tensor1D) > 0.8);
+```
+
+
 
 ### toJson
 
