@@ -102,9 +102,17 @@ const mlp = new MLPRegressor({
     optimizerType: 'adam',
     optimizerProps: { learningRate: 0.01 }
 });
+
+// model fit
 await mlp.fit(cases, y);
+// predict
 const yPred = await mlp.predict(cases) as Tensor1D;
-assert.isTrue(getRSquare(yPred, y as Tensor1D) > 0.8);
+
+// save and load
+const modelJson = await mlp.toJson();
+const mlp2 = new MLPRegressor({});
+mlp2.fromJson(modelJson);
+const yPred2 = await mlp2.predict(cases);
 ```
 
 
