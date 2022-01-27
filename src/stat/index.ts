@@ -9,5 +9,5 @@ export {
 } from './corcov';
 
 export {
-  genHistData
+  getHistData
 } from './hist';

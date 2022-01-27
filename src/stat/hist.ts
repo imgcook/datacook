@@ -1,4 +1,5 @@
 import { Tensor1D } from "@tensorflow/tfjs-core";
+import { checkJSArray } from "../utils/validation";
 
 /**
  * Get histogram data for given input
