@@ -61,7 +61,6 @@ export class NonLinearRegression extends BaseEstimator {
       dispose([ residuals, jacobian, values ]);
     }
     this.coeffs = coeffs;
-    
   }
 
   public async predict(x: Tensor): Promise<Tensor> {
