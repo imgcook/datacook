@@ -24,7 +24,7 @@ export function checkArray (array: Tensor | RecursiveArray<number>, dtype = 'any
 }
 
 
-export function checkJSArray (array: Tensor | RecursiveArray<number>, dtype = 'any', ensureDimension = -1): number | number[] | number[][] | number[][][] | number[][][][] | number[][][][][] | number[][][][][][] {
+export function checkJSArray(array: Tensor | RecursiveArray<number>, dtype = 'any', ensureDimension = -1): number | number[] | number[][] | number[][][] | number[][][][] | number[][][][][] | number[][][][][][] {
   return tidy(() => {
     const tensor = checkArray(array, dtype, ensureDimension);
     return tensor.arraySync();
