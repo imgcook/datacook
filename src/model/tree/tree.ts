@@ -32,6 +32,7 @@ export interface Node {
    * weighted_n_node_samples holds the weighted number of training samples reaching node.
    */
   weightedNodeSampleCount: number;
+  nNodeSamples: number;
 }
 
 export interface TreeParams {
@@ -59,6 +60,7 @@ export class Tree {
     this.nFeature = nFeature;
     this.nOutput = nOutput;
     this.nClass = nClass;
+    this.nodes = [];
   }
 
   public nLeaves = (): number => {
@@ -127,11 +129,48 @@ export class Tree {
     }
     // TODO: capacity > this.nodeCount
   }
-  public applyDecisionPathDense = (xData: Tensor | RecursiveArray<number>, capacity: Tensor) => {
-    const xTensor = checkArray(xData, 'float32', 2);
+  // public applyDecisionPathDense(xData: Tensor | RecursiveArray<number>, capacity: Tensor): void {
+  //   const xTensor = checkArray(xData, 'float32', 2);
+  // }
+  public addNode(parent: number,
+    isLeft: boolean,
+    isLeaf: boolean,
+    feature: number,
+    threshold: number,
+    impurity: number,
+    nNodeSamples: number,
+    weightedNNodeSamples: number
+  ): number {
+    const nodeId = this.nodeCount;
+    if (nodeId >= this.capacity) {
+      // if (this.resize())
+      this.resize(nodeId);
+    }
+    const node = this.nodes[nodeId];
+    node.impurity = impurity;
+    node.nNodeSamples = nNodeSamples;
+    node.weightedNodeSampleCount = weightedNNodeSamples;
+
+    if (isLeaf) {
+      node.leftChild = null;
+      node.rightChild = null;
+      node.feature = null;
+      node.threshold = null;
+    } else {
+      node.feature = feature;
+      node.threshold = threshold;
+    }
+    if (parent >= 0) {
+      if (isLeft) {
+        this.nodes[parent].leftChild = nodeId;
+      } else {
+        this.nodes[parent].rightChild = nodeId;
+      }
+    }
+    this.nodeCount += 1;
+    return nodeId;
 
   }
-
 }
 
 export const buildPrunedTree = (origTree: Tree, leavesInSubTree: boolean[]): Tree => {
