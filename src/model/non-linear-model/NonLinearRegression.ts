@@ -6,7 +6,7 @@ import { BaseEstimator } from '../base';
 import { getJacobian } from '../../linalg/jacobian';
 import { LinearRegressionAnalysis } from '../stat/linear-regression-analysis';
 
-export interface NonLinearRegressionParams {
+export interface NonLinearRegressionTrainParams {
   initParams: number[] | Tensor1D,
   tol?: number,
   maxIterTimes?: number
@@ -21,7 +21,7 @@ export class NonLinearRegression extends BaseEstimator {
   public async fit(expr: string | ((tf: any, features: Tensor<Rank>, ...args: Variable[]) => Scalar),
     x: Tensor | RecursiveArray<number>,
     y: Tensor | RecursiveArray<number>,
-    params: NonLinearRegressionParams): Promise<void> {
+    params: NonLinearRegressionTrainParams): Promise<void> {
 
     if (typeof(expr) != 'string' && typeof(expr) != 'function') {
       throw new TypeError('Invalid input function');
