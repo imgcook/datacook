@@ -1,7 +1,7 @@
-import { divNoNan, RecursiveArray, sqrt, Tensor, sub, Rank, mul, add, tidy } from "@tensorflow/tfjs-core";
-import { getVariance, getMean } from "../stat";
-import { checkArray } from "../utils/validation";
-import { TransformerMixin } from "./base";
+import { divNoNan, RecursiveArray, sqrt, Tensor, sub, Rank, mul, add, tidy } from '@tensorflow/tfjs-core';
+import { getVariance, getMean } from '../stat';
+import { checkArray } from '../utils/validation';
+import { TransformerMixin } from './base';
 export interface StandardScalerParams {
   withMean?: boolean;
   withStd?: boolean;
