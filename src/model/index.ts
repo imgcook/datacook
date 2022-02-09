@@ -4,3 +4,4 @@ export { PCA } from './pca';
 export { KMeans } from './clustering/kmeans';
 export { LinearRegressionAnalysis } from './stat/linear-regression-analysis';
 export { stepwiseLinearRegression } from './stat/stepwise';
+export { NonLinearRegression, NonLinearRegressionTrainParams } from './non-linear-model/NonLinearRegression';
