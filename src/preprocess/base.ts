@@ -1,5 +1,5 @@
-import { RecursiveArray, Tensor } from "@tensorflow/tfjs-core";
-import { BaseEstimator } from "../model/base";
+import { RecursiveArray, Tensor } from '@tensorflow/tfjs-core';
+import { BaseEstimator } from '../model/base';
 
 export abstract class TransformerMixin extends BaseEstimator {
   constructor(){

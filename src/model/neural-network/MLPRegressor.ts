@@ -1,8 +1,7 @@
-import { Tensor, RecursiveArray, squeeze, tensor, stack } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, Optimizer, squeeze, tensor, stack } from '@tensorflow/tfjs-core';
 import { callbacks, layers, sequential, Sequential, CustomCallback } from '@tensorflow/tfjs-layers';
 import { BaseRegressor } from '../base';
 import { checkArray } from '../../utils/validation';
-import { Optimizer } from '@tensorflow/tfjs-core';
 import { OptimizerProps, OptimizerType, getOptimizer } from '../../utils/optimizer-types';
 import { InitailizerType, LossType, getLossFunction } from '../../utils/sgd-types';
 import { ActivationIdentifier } from '@tensorflow/tfjs-layers/dist/keras_format/activation_config';

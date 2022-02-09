@@ -11,7 +11,7 @@ export interface StandardScalerParams {
  * Standardize features by removing the mean and scaling to unit variance.
  * The standard score of a sample `x` is calculated as: z = (x - u) / s
  */
-export class StandardScaler extends TransformerMixin{
+export class StandardScaler extends TransformerMixin {
   public mean: Tensor;
   public standardVariance: Tensor;
   public withMean: boolean;
