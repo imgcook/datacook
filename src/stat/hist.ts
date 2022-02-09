@@ -1,5 +1,5 @@
-import { Tensor1D } from "@tensorflow/tfjs-core";
-import { checkJSArray } from "../utils/validation";
+import { Tensor1D } from '@tensorflow/tfjs-core';
+import { checkJSArray } from '../utils/validation';
 
 /**
  * Get histogram data for given input
@@ -24,7 +24,7 @@ export const getHistData = (xData: Tensor1D | number[], params?: {
     counts: number[],
   } => {
   const xArray = checkJSArray(xData, 'float32', 1) as number[];
-  const nData = xArray.length;
+  const numberOfData = xArray.length;
   const minVal = Math.min(...xArray);
   const maxVal = Math.max(...xArray);
   const { bins = 50, leftLimit = minVal, rightLimit = maxVal } = params;
@@ -34,7 +34,7 @@ export const getHistData = (xData: Tensor1D | number[], params?: {
   const step = (rightLimit - leftLimit) / bins;
   const steps = Array.from(new Array(bins).keys()).map((i) => leftLimit + step * i);
   const counts = new Array(bins).fill(0);
-  for (let i = 0; i < nData; i++) {
+  for (let i = 0; i < numberOfData; i++) {
     if (xArray[i] < leftLimit || xArray[i] > rightLimit) {
       continue;
     }
