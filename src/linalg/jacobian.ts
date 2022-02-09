@@ -1,4 +1,3 @@
-// import { Scalar, Tensor, Variable, variableGrads, gather, stack, tidy } from '@tensorflow/tfjs-core';
 import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-layers';
 const { variableGrads, gather, stack, tidy } = tf;
