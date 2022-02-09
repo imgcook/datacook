@@ -1,5 +1,5 @@
-import { losses } from "@tensorflow/tfjs-core";
-import { LossOrMetricFn } from "@tensorflow/tfjs-layers/dist/types";
+import { losses } from '@tensorflow/tfjs-core';
+import { LossOrMetricFn } from '@tensorflow/tfjs-layers/dist/types';
 
 export type InitailizerType = 'constant' | 'glorotNormal' | 'glorotUniform' |
   'heNormal' | 'heUniform' | 'identity' | 'leCunNormal' | 'leCunUniform' | 'ones' |
