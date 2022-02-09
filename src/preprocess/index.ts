@@ -1,1 +1,1 @@
-export { OneHotEncoder } from './encoder';
+export { OneHotEncoder, LabelEncoder } from './encoder';
