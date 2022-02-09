@@ -1,6 +1,7 @@
-import { Scalar, Tensor, Variable, variableGrads, gather, stack, tidy } from "@tensorflow/tfjs-core";
+// import { Scalar, Tensor, Variable, variableGrads, gather, stack, tidy } from '@tensorflow/tfjs-core';
 import * as tf from '@tensorflow/tfjs-core';
 import '@tensorflow/tfjs-layers';
+const { variableGrads, gather, stack, tidy } = tf;
 /**
  * Solve jacobian matrix for a given expression `expr`, input tensor `x` and varaibles
  * jac[i, j] = d(expr(x[i], var[j])) / d(var[j])
@@ -10,8 +11,8 @@ import '@tensorflow/tfjs-layers';
  * @param coeffs array of coefficients
  * @returns jacobian
  */
-export const getJacobian = (expr: (tf: any, x: Tensor, ...coeffs: Variable[]) => Scalar,
-  x: Tensor, ...coeffs: Variable[]): { values: Tensor, jacobian: Tensor} => {
+export const getJacobian = (expr: (tf: any, x: tf.Tensor, ...coeffs: tf.Variable[]) => tf.Scalar,
+  x: tf.Tensor, ...coeffs: tf.Variable[]): { values: tf.Tensor, jacobian: tf.Tensor} => {
   return tidy(() => {
     const n = x.shape[0];
     const jacStack = [];
@@ -19,7 +20,7 @@ export const getJacobian = (expr: (tf: any, x: Tensor, ...coeffs: Variable[]) =>
     for (let i = 0; i < n; i++) {
       const xi = gather(x, i);
       const { value, grads } = variableGrads(() => expr(tf, xi, ...coeffs));
-      const gradsI: Tensor[] = [];
+      const gradsI: tf.Tensor[] = [];
 
       Object.keys(grads).forEach((varName) => {
         gradsI.push(grads[varName]);
