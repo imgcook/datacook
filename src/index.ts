@@ -12,6 +12,7 @@ export * as Metrics from './metrics';
 export * as Linalg from './linalg';
 export * as Preprocess from './preprocess';
 export * as Stat from './stat';
+export * as tf from '@tensorflow/tfjs-core';
 
 export const Text = {
   Counter,
