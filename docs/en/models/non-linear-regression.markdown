@@ -124,16 +124,12 @@ Following is an example of fitting an exponential relationship between `x` and `
         const nlr = new NonLinearRegression();
         const x = Array.from(new Array(50).keys()).map((d) => [d]);
         const y = x.map((d) => 5 * Math.exp(-0.5 * d[0]) + Math.random() - 0.5);
-        console.log(x);
-        console.log(y);
         await nlr.fit((tf, x, a, b) => tf.squeeze(tf.mul(b, tf.exp(tf.mul(tf.neg(a), x)))),
             x,
             y,
             {initParams: [0.4, 5]});
-        console.log(nlr);
         const a = nlr.coeffs[0].dataSync()[0];
         const b = nlr.coeffs[1].dataSync()[0];
-        console.log(a,b);
         const data = x.map((d) => ({
             x: d[0],
             yPred: b * Math.exp(-a * d[0])
@@ -203,16 +199,12 @@ Following is an example of fitting an exponential relationship between `x` and `
         const nlr = new NonLinearRegression();
         const x = Array.from(new Array(50).keys()).map((d) => [d]);
         const y = x.map((d) => 5 * Math.exp(-0.5 * d[0]) + Math.random() - 0.5);
-        console.log(x);
-        console.log(y);
         await nlr.fit((tf, x, a, b) => tf.squeeze(tf.mul(b, tf.exp(tf.mul(tf.neg(a), x)))),
             x,
             y,
             {initParams: [0.4, 5]});
-        console.log(nlr);
         const a = nlr.coeffs[0].dataSync()[0];
         const b = nlr.coeffs[1].dataSync()[0];
-        console.log(a,b);
         const data = x.map((d) => ({
             x: d[0],
             yPred: b * Math.exp(-a * d[0])
@@ -221,8 +213,6 @@ Following is an example of fitting an exponential relationship between `x` and `
             x: d[0],
             yTrue: y[i]
         }));
-        console.log(data);
-        console.log(originData);
         const chart = new Mix('chart', {
             appendPadding: 8,
             syncViewPadding: true,
