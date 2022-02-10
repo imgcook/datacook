@@ -18,7 +18,7 @@ describe('Base Model', () => {
     const testEstimator = new TestEstimator(a);
     testEstimator.clean();
     assert.isTrue((tf.memory().numTensors - nBaseTensors) === 0);
-    
+
   });
   it('reset model tensor parameter', () => {
     const nBaseTensors = tf.memory().numTensors;

@@ -10,5 +10,6 @@ dist/
 tsconfig.tsbuildinfo
 yarn-error
 yarn.lock
+package-lock.json
 *.log
 *.tgz
