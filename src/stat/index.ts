@@ -7,3 +7,7 @@ export {
   getCovarianceMatrix,
   getCorrelationMatrix
 } from './corcov';
+
+export {
+  getHistData
+} from './hist';
