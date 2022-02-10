@@ -245,10 +245,10 @@ export const getClassificationReport = async (yTrue: Tensor | string[] | number[
   const averageRecall = getRecallScoreByConfusionMatrix(confusionMatrix, average);
   const averageF1 = getF1ScoreByConfusionMatrix(confusionMatrix, average);
   return {
-    precisions: precisions,
-    recalls: recalls,
-    f1s: f1s,
-    confusionMatrix: confusionMatrix,
+    precisions,
+    recalls,
+    f1s,
+    confusionMatrix,
     categories,
     accuracy,
     averageF1,

@@ -1,6 +1,6 @@
-import { Tensor, unique, oneHot, cast, tensor, argMax, reshape, slice, stack, sub, squeeze, greaterEqual, topk, Tensor1D, tidy } from "@tensorflow/tfjs-core";
-import { checkArray } from "../utils/validation";
-import { checkShape } from "../linalg/utils";
+import { Tensor, unique, oneHot, cast, tensor, argMax, reshape, slice, stack, sub, squeeze, greaterEqual, topk, Tensor1D, tidy } from '@tensorflow/tfjs-core';
+import { checkArray } from '../utils/validation';
+import { checkShape } from '../linalg/utils';
 
 export type CateMap = {
   [ key: string ]: number
@@ -44,7 +44,7 @@ export abstract class EncoderBase {
  * Encode categorical features as a one-hot numeric array.
  *
  */
-export class OneHotEncoder extends EncoderBase{
+export class OneHotEncoder extends EncoderBase {
   public drop: OneHotDropTypes;
 
   /**
