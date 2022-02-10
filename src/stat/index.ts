@@ -1,6 +1,7 @@
 export {
   getVariance,
-  normalize
+  normalize,
+  getMean
 } from './data';
 
 export {
