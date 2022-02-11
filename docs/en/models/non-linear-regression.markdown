@@ -5,7 +5,7 @@ parent: Models
 lang: en
 ---
 
-# NonLinearRegression
+# Nonlinear Regression
 
 Nonlinear regression is a form of regression analysis in which observational data are modeled by a function
 which is a nonlinear combination of independent variables.
@@ -30,7 +30,7 @@ const nlr = new NonLinearRegression();
 
 ### coeffs <Tensor[]>
 
-Fitting variables object.
+Object of fitted variables.
 
 ## Methods
 
@@ -138,8 +138,6 @@ Following is an example of fitting an exponential relationship between `x` and `
             x: d[0],
             yTrue: y[i]
         }));
-        console.log(data);
-        console.log(originData);
         const chart = new Mix('chart', {
             appendPadding: 8,
             syncViewPadding: true,
