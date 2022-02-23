@@ -1,9 +1,9 @@
 import { Tensor, RecursiveArray, cast, tensor, tidy } from '@tensorflow/tfjs-core';
 import { shapeEqual } from '../linalg';
 
-export function checkArrayShapeEqual(array1: Tensor | RecursiveArray<number>, array2: Tensor | RecursiveArray<number>): boolean {
-  // todo
-}
+// export function checkArrayShapeEqual(array1: Tensor | RecursiveArray<number>, array2: Tensor | RecursiveArray<number>): boolean {
+//   // todo
+// }
 
 // export function checkJSArray(array: number[] | number[][] | number[][][], dtype = 'any', ensureDimension = -1): boolean {
 //   if (!array instanceof Array) {

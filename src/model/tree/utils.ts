@@ -71,7 +71,7 @@ export const siftDown = (values: number[], indices: number[], start: number, end
  */
 export const heapSort = (values: number[], indices: number[], startInd: number, endInd: number): void => {
   const n = endInd - startInd;
-  let start = startInd + (n - 2) / 2;
+  let start = Math.floor(startInd + (n - 2) / 2);
   let end = endInd;
   // heapify
   while (start >= startInd) {

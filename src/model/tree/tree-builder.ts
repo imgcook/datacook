@@ -36,7 +36,7 @@ export class DepthFirstTreeBuilder {
     this.minImpurityDecrease = minImpurityDecrease;
   }
 
-  public build(tree: Tree, X: number[][], y: number[], sampleWeight: number[]): void {
+  public build(tree: Tree, X: number[][], y: number[], sampleWeight: number[] = null): void {
     let initCapacity = 0;
     let maxDepthSeen = -1;
 
@@ -65,6 +65,7 @@ export class DepthFirstTreeBuilder {
     });
     while (!stack.isEmpty()) {
       stackRecord = stack.pop();
+      console.log(stackRecord);
       const { start, end, depth, parent, isLeft } = stackRecord;
       let { impurity, nConstantFeatures } = stackRecord;
       const nNodeSamples = end - start;
@@ -90,7 +91,6 @@ export class DepthFirstTreeBuilder {
       if (nodeId === SIZE_MAX) {
         return;
       }
-      // this.splitter.no
       if (!isLeaf) {
         // push right node
         stack.push({
@@ -104,8 +104,8 @@ export class DepthFirstTreeBuilder {
         });
         // push left node
         stack.push({
-          start: split.pos,
-          end,
+          start,
+          end: split.pos,
           depth: depth + 1,
           parent: nodeId,
           isLeft: true,
@@ -122,6 +122,6 @@ export class DepthFirstTreeBuilder {
   }
 }
 
-export const buildPrunedTree = (originTree: Tree, capacity: number): Tree => {
-  const tree = new Tree();
-};
+// export const buildPrunedTree = (originTree: Tree, capacity: number): Tree => {
+//   const tree = new Tree();
+// };

@@ -17,9 +17,14 @@ export interface Node {
    */
   impurity: number;
   /**
+   * Counts of each class
+   */
+  counts?: number;
+
+  /**
    * Contains the constant prediction value of each node.
    */
-  value: number;
+  value?: number;
   /**
    * Feature holds the feature to split on, for the internal node.
    */
@@ -31,8 +36,9 @@ export interface Node {
   /**
    * weighted_n_node_samples holds the weighted number of training samples reaching node.
    */
-  weightedNodeSampleCount: number;
+  weightedNNodeSamples: number;
   nNodeSamples: number;
+  isLeft: boolean;
 }
 
 export interface TreeParams {
@@ -61,6 +67,7 @@ export class Tree {
     this.nOutput = nOutput;
     this.nClass = nClass;
     this.nodes = [];
+    this.nodeCount = 0;
   }
 
   public nLeaves = (): number => {
@@ -75,10 +82,10 @@ export class Tree {
       if (node.leftChild != -1 && node.rightChild != -1){
         const leftNode = this.nodes[node.leftChild];
         const rightNode = this.nodes[node.rightChild];
-        importances[node.feature] += node.impurity * node.weightedNodeSampleCount - leftNode.impurity * leftNode.weightedNodeSampleCount - rightNode.impurity * rightNode.weightedNodeSampleCount;
+        importances[node.feature] += node.impurity * node.weightedNNodeSamples - leftNode.impurity * leftNode.weightedNNodeSamples - rightNode.impurity * rightNode.weightedNNodeSamples;
       }
     });
-    const sampleCount = this.nodes[0].weightedNodeSampleCount;
+    const sampleCount = this.nodes[0].weightedNNodeSamples;
     importances = importances.map((imp) => imp * 1.0 / sampleCount);
     if (normalize) {
       const normalizer = importances.reduce((sum, imp) => sum + imp);
@@ -146,20 +153,34 @@ export class Tree {
       // if (this.resize())
       this.resize(nodeId);
     }
-    const node = this.nodes[nodeId];
-    node.impurity = impurity;
-    node.nNodeSamples = nNodeSamples;
-    node.weightedNodeSampleCount = weightedNNodeSamples;
+    const node = {
+      parent: parent,
+      impurity: impurity,
+      nNodeSamples: nNodeSamples,
+      weightedNNodeSamples: weightedNNodeSamples,
+      leftChild: -1,
+      rightChild: -1,
+      feature: !isLeaf ? feature : -1,
+      threshold: !isLeaf ? threshold : -1,
+      isLeft: isLeft
+    };
+    // node.impurity = impurity;
+    // node.nNodeSamples = nNodeSamples;
+    // node.weightedNNodeSamples = weightedNNodeSamples;
 
-    if (isLeaf) {
-      node.leftChild = null;
-      node.rightChild = null;
-      node.feature = null;
-      node.threshold = null;
-    } else {
-      node.feature = feature;
-      node.threshold = threshold;
-    }
+    // if (!isLeaf) {
+    //   node.feature = feature;
+    //   node.threshold = threshold;
+    // }
+    // if (isLeaf) {
+    //   node.leftChild = null;
+    //   node.rightChild = null;
+    //   node.feature = null;
+    //   node.threshold = null;
+    // } else {
+    //   node.feature = feature;
+    //   node.threshold = threshold;
+    // }
     if (parent >= 0) {
       if (isLeft) {
         this.nodes[parent].leftChild = nodeId;
@@ -167,11 +188,12 @@ export class Tree {
         this.nodes[parent].rightChild = nodeId;
       }
     }
+    this.nodes.push(node);
     this.nodeCount += 1;
     return nodeId;
 
   }
 }
 
-export const buildPrunedTree = (origTree: Tree, leavesInSubTree: boolean[]): Tree => {
-};
+// export const buildPrunedTree = (origTree: Tree, leavesInSubTree: boolean[]): Tree => {
+// };

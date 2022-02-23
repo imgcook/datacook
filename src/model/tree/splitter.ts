@@ -50,14 +50,14 @@ export abstract class Splitter {
    * @param y targets vector
    * @param sampleWeight sample weights
    */
-  public init(X: number[][], y: number[], sampleWeight: number[]): void {
+  public init(X: number[][], y: number[], sampleWeight?: number[]): void {
     this.nSamples = X.length;
-    this.samples = new Array(this.nSamples);
-    let j = 0;
+    this.samples = [];
+    // let j = 0;
     for (let i = 0; i < this.nSamples; i++) {
-      if (sampleWeight && sampleWeight[i] != 0) {
-        this.samples[j] = i;
-        j += 1;
+      if (sampleWeight && sampleWeight[i] != 0 || !sampleWeight) {
+        this.samples.push(i);
+        // j += 1;
       }
       if (sampleWeight) {
         this.weightedNSamples += sampleWeight[i];
@@ -133,9 +133,12 @@ export class BestSplitter extends Splitter {
         currentFeature = this.features[fj];
         featureX = new Array(this.nSamples);
         for (let i = this.start; i < this.end; i++) {
-          featureX[i] = this.X[i][currentFeature];
+          const p = samples[i];
+          featureX[i] = this.X[p][currentFeature];
         }
+
         sort(featureX, samples, start, end);
+
         if (featureX[end - 1] <= featureX[start] + FEATURE_THRESHOLD) {
           [ this.features[fj], this.features[nTotalConstants] ] = [ this.features[nTotalConstants], this.features[fj] ];
           nFoundConstants += 1;
@@ -146,7 +149,7 @@ export class BestSplitter extends Splitter {
           this.criterion.reset();
           let p = start;
           while (p < end) {
-            while (p + 1 < end && featureX[p] + FEATURE_THRESHOLD) {
+            while (p + 1 < end && Math.abs(featureX[p + 1] - featureX[p]) <= FEATURE_THRESHOLD) {
               p += 1;
             }
             p += 1;
@@ -155,7 +158,7 @@ export class BestSplitter extends Splitter {
               if ((currentPos - start) < this.minSampleLeaf || (end - currentPos) < this.minSampleLeaf) {
                 continue;
               }
-              this.criterion.update(currentPos);
+              this.criterion.update(samples, currentPos);
 
               if ((this.criterion.weightedNLeft < this.minWeightLeaf) ||
                 this.criterion.weightedNRight < this.minWeightLeaf) {
@@ -174,6 +177,10 @@ export class BestSplitter extends Splitter {
                 }
                 bestProxyImprovement = currentProxyImprovement;
                 bestSplit.pos = currentPos;
+                const { impurityLeft, impurityRight } = this.criterion.childrenImpurity();
+                bestSplit.impurityLeft = impurityLeft;
+                bestSplit.impurityRight = impurityRight;
+                bestSplit.improvement = this.criterion.impurityImprovement(impurity, impurityLeft, impurityRight);
                 bestSplit.feature = currentFeature;
                 bestSplit.threshold = currentThreshold;
               }
@@ -195,12 +202,12 @@ export class BestSplitter extends Splitter {
           [ this.samples[p], this.samples[partitionEnd] ] = [ this.samples[partitionEnd], this.samples[p] ];
         }
       }
-      this.criterion.reset();
-      this.criterion.update(bestSplit.pos);
-      const { impurityLeft, impurityRight } = this.criterion.childrenImpurity();
-      bestSplit.impurityLeft = impurityLeft;
-      bestSplit.impurityRight = impurityRight;
-      bestSplit.improvement = this.criterion.impurityImprovement(impurity, impurityLeft, impurityRight);
+      // this.criterion.reset();
+      // this.criterion.update(this.samples, bestSplit.pos);
+      // const { impurityLeft, impurityRight } = this.criterion.childrenImpurity();
+      // bestSplit.impurityLeft = impurityLeft;
+      // bestSplit.impurityRight = impurityRight;
+      // bestSplit.improvement = this.criterion.impurityImprovement(impurity, impurityLeft, impurityRight);
     }
     return { split: bestSplit, nConstantFeatures: nTotalConstants };
   }

@@ -31,7 +31,7 @@ export abstract class Criterion {
    */
   abstract nodeImpurity (): number;
   abstract childrenImpurity (): { impurityLeft: number, impurityRight: number };
-  abstract update (newPos: number): void;
+  abstract update (samples: number[], newPos: number): void;
   abstract reset (): void;
   /**
    * Initialize the criterion.
@@ -49,11 +49,14 @@ export abstract class Criterion {
     this.end = end;
     this.weightedNNodeSamples = 0;
     this.sampleWeight = sampleWeight;
-
+    this.nClasses = Math.max(...y) + 1;
+    this.sumTotal = new Array(this.nClasses).fill(0);
+    this.sumLeft = new Array(this.nClasses).fill(0);
+    this.sumRight = new Array(this.nClasses).fill(0);
     for (let i = start; i < end; i++) {
       const pos = samples[i];
       let w = 1;
-      if (this.sampleWeight instanceof Array) {
+      if (this.sampleWeight && this.sampleWeight instanceof Array && this.sampleWeight.length) {
         w = sampleWeight[pos];
       }
       this.weightedNNodeSamples += w;
@@ -106,15 +109,19 @@ export abstract class ClassificationCriterion extends Criterion {
     this.weightedNRight = 0;
     this.weightedNLeft = this.weightedNNodeSamples;
     this.pos = this.end;
+    for (let k = 0; k < this.nClasses; k++) {
+      this.sumLeft[k] = this.sumTotal[k];
+      this.sumRight[k] = 0;
+    }
   }
   /**
    * update statistics by moving samples to left child
    * @param newPos new ending position for which to move samples from right child to left child.
    */
-  public update(newPos: number): void {
+  public update(samples: number[], newPos: number): void {
     if (newPos - this.pos <= this.end - newPos) {
       for (let p = this.pos; p < newPos; p++) {
-        const i = this.samples[p];
+        const i = samples[p];
         const w = this.sampleWeight ? this.sampleWeight[i] : 1;
         const labelIndex = this.y[i];
         this.sumLeft[labelIndex] += w;
@@ -123,7 +130,7 @@ export abstract class ClassificationCriterion extends Criterion {
     } else {
       this.reverseReset();
       for (let p = this.end - 1; p > newPos - 1; p--) {
-        const i = this.samples[p];
+        const i = samples[p];
         const w = this.sampleWeight ? this.sampleWeight[i] : 1;
         const labelIndex = this.y[i];
         this.sumLeft[labelIndex] -= w;
@@ -150,7 +157,7 @@ export abstract class ClassificationCriterion extends Criterion {
  * i.e. the impurity of samples[start:end]. The smaller the impurity the
  * better.
  */
-export class Entropy extends ClassificationCriterion {
+export class EntropyCriterion extends ClassificationCriterion {
   public nodeImpurity = (): number => {
     let entropy = 0;
     for (let k = 0; k < this.nClasses; k++) {
@@ -172,11 +179,11 @@ export class Entropy extends ClassificationCriterion {
       const countKLeft = this.sumLeft[k];
       const countKRight = this.sumRight[k];
       if (countKLeft > 0.0) {
-        const pk = countKLeft * 1.0 / this.weightedNLeft;
+        const pk = countKLeft / this.weightedNLeft;
         entropyLeft -= pk * Math.log(pk);
       }
       if (countKRight > 0.0) {
-        const pk = countKRight * 1.0 / this.weightedNRight;
+        const pk = countKRight / this.weightedNRight;
         entropyRight -= pk * Math.log(pk);
       }
     }
@@ -190,7 +197,7 @@ export class Entropy extends ClassificationCriterion {
 /**
  * Gini impurity
  */
-export class Gini extends ClassificationCriterion {
+export class GiniCriterion extends ClassificationCriterion {
   public nodeImpurity = (): number => {
     let sqCount = 0;
     for (let k = 0; k < this.nClasses; k++) {
