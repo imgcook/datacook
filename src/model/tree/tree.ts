@@ -16,15 +16,14 @@ export interface Node {
    * impurity holds the impurity (i.e., the value of the splitting criterion) at node i.
    */
   impurity: number;
-  /**
-   * Counts of each class
-   */
-  counts?: number;
-
+  // /**
+  //  * Counts of samples of each classes reaching node i
+  //  */
+  // nClassSamples?: number[];
   /**
    * Contains the constant prediction value of each node.
    */
-  value?: number;
+  value?: number[];
   /**
    * Feature holds the feature to split on, for the internal node.
    */
@@ -37,6 +36,9 @@ export interface Node {
    * weighted_n_node_samples holds the weighted number of training samples reaching node.
    */
   weightedNNodeSamples: number;
+  /**
+   * number of training samples reaching node i
+   */
   nNodeSamples: number;
   isLeft: boolean;
 }
@@ -100,7 +102,7 @@ export class Tree {
    * Finds the terminal region (=leaf node) for each sample in X.
    * @param xData input sample
    */
-  public applyDense = (xData: number[][]): number => {
+  public applyDense = (xData: number[][]): number[] => {
     const xTensor = checkArray(xData, 'float32', 2);
     const nSamples = xTensor.shape[0];
     for (let i = 0; i < nSamples; i++) {
@@ -146,7 +148,8 @@ export class Tree {
     threshold: number,
     impurity: number,
     nNodeSamples: number,
-    weightedNNodeSamples: number
+    weightedNNodeSamples: number,
+    value: number[]
   ): number {
     const nodeId = this.nodeCount;
     if (nodeId >= this.capacity) {
@@ -162,7 +165,8 @@ export class Tree {
       rightChild: -1,
       feature: !isLeaf ? feature : -1,
       threshold: !isLeaf ? threshold : -1,
-      isLeft: isLeft
+      isLeft: isLeft,
+      value: value
     };
     // node.impurity = impurity;
     // node.nNodeSamples = nNodeSamples;

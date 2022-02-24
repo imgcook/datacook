@@ -29,10 +29,13 @@ export abstract class Criterion {
   /**
    * calculating the impurity of the node
    */
-  abstract nodeImpurity (): number;
-  abstract childrenImpurity (): { impurityLeft: number, impurityRight: number };
+  abstract nodeImpurity(): number;
+  abstract childrenImpurity(): { impurityLeft: number, impurityRight: number };
   abstract update (samples: number[], newPos: number): void;
-  abstract reset (): void;
+  abstract reset(): void;
+  abstract nodeValue(): number[];
+  abstract leftValue(): number[];
+  abstract rightValue(): number[];
   /**
    * Initialize the criterion.
    * @param y The target stored as a buffer for memory efficiency
@@ -148,7 +151,13 @@ export abstract class ClassificationCriterion extends Criterion {
    * Compute the node value of samples[start:end] into dest.
    */
   public nodeValue(): number[] {
-    return this.sumTotal;
+    return [ ...this.sumTotal ];
+  }
+  public leftValue(): number[] {
+    return [ ...this.sumLeft ];
+  }
+  public rightValue(): number[] {
+    return [ ...this.sumRight ];
   }
 }
 

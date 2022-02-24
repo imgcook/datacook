@@ -69,7 +69,9 @@ export class DepthFirstTreeBuilder {
       const { start, end, depth, parent, isLeft } = stackRecord;
       let { impurity, nConstantFeatures } = stackRecord;
       const nNodeSamples = end - start;
+
       this.splitter.nodeReset(start, end);
+      const nodeValue = this.splitter.nodeValue();
       const weightedNNodeSamples = this.splitter.criterion.weightedNNodeSamples;
       let isLeaf = (depth >= this.maxDepth ||
         nNodeSamples < this.minSamplesSplit ||
@@ -87,7 +89,8 @@ export class DepthFirstTreeBuilder {
         isLeaf = (isLeaf || split.pos >= end || (split.improvement + EPSILON < this.minImpurityDecrease));
       }
       const nodeId = tree.addNode(parent, isLeft, isLeaf, split.feature,
-        split.threshold, impurity, nNodeSamples, weightedNNodeSamples);
+        split.threshold, impurity, nNodeSamples, weightedNNodeSamples, nodeValue);
+
       if (nodeId === SIZE_MAX) {
         return;
       }
