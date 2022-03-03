@@ -17,7 +17,7 @@ const covArray = JSON.parse(rawdata.toString());
 const cov = tf.tensor2d(covArray);
 
 describe('EigenSolver', () => {
-    
+
   it('spectrum decomposition', async () => {
     const [ d, q ] = await eigenSolve(matrix);
     const di = tf.diag(d);

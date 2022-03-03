@@ -22,7 +22,7 @@ module.exports = {
         'functions': false
       }
     ],
-    "@typescript-eslint/no-unused-vars": [ "error" ],
+    '@typescript-eslint/no-unused-vars': [ 'error' ],
     'comma-spacing': [
       'error',
       {

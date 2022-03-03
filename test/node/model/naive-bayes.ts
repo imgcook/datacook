@@ -6,20 +6,20 @@ import { assert } from 'chai';
 import 'mocha';
 
 const cases = tf.tensor2d([
-  [2, 1, 0, 0, 0, 0],
-  [2, 0, 1, 0, 0, 0],
-  [1, 0, 0, 1, 0, 0],
-  [1, 0, 0, 0, 1, 1]
+  [ 2, 1, 0, 0, 0, 0 ],
+  [ 2, 0, 1, 0, 0, 0 ],
+  [ 1, 0, 0, 1, 0, 0 ],
+  [ 1, 0, 0, 0, 1, 1 ]
 ]);
-const labels = ['A', 'A', 'A', 'B'];
+const labels = [ 'A', 'A', 'A', 'B' ];
 
 const testCases = tf.tensor2d([
-  [2, 0, 0, 0, 0, 0],
-  [6, 0, 0, 0, 0, 0],
-  [1, 0, 0, 3, 0, 0],
-  [0, 0, 0, 0, 4, 6]
+  [ 2, 0, 0, 0, 0, 0 ],
+  [ 6, 0, 0, 0, 0, 0 ],
+  [ 1, 0, 0, 3, 0, 0 ],
+  [ 0, 0, 0, 0, 4, 6 ]
 ]);
-const testLabels = ['A', 'A', 'A', 'B'];
+const testLabels = [ 'A', 'A', 'A', 'B' ];
 
 describe('Naive bayes', () => {
 

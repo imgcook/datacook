@@ -1,6 +1,6 @@
 import { Tensor, RecursiveArray, tensor, tidy, dispose, Tensor2D, Tensor1D } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
-import { OneHotEncoder } from '../preprocess';
+import { OneHotEncoder } from '../preprocess/encoder';
 import { OneHotDropTypes } from '../preprocess/encoder';
 
 export type FeatureInputType = Tensor | RecursiveArray<number>;
@@ -16,7 +16,12 @@ export type ClassMap = {
 export abstract class BaseEstimator {
   public estimatorType: string;
   public nFeature: number;
-
+  constructor() {
+    this.nFeature = 0;
+  }
+  public isClassifier(): boolean {
+    return this.estimatorType === 'classifier';
+  }
   /**
    * Check if input feature match the required feature size. If reset is true,
    * reset nFeature = x.shape[1]
@@ -132,6 +137,22 @@ export class BaseClassifier {
       );
     }
     return { x: xTensor, y: yTensor };
+  }
+}
+
+export class BaseRegressor extends BaseEstimator {
+  // TODO(sugarspectre): Add evaluation functions
+  public validateData(x: Tensor | RecursiveArray<number>, y: Tensor | RecursiveArray<number>, xDimension = 2, yDimension = 1): { x: Tensor, y: Tensor } {
+    const xTensor = checkArray(x, 'float32', xDimension);
+    const y_tensor = checkArray(y, 'float32', yDimension);
+    const xCount = xTensor.shape[0];
+    const yCount = y_tensor.shape[0];
+    if (xCount != yCount) {
+      throw new RangeError(
+        'The size of the training set and the training labels must be the same.'
+      );
+    }
+    return { x: xTensor, y: y_tensor };
   }
 }
 

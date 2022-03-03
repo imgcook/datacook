@@ -7,6 +7,6 @@
  */
 export const numEqual = (a: number, b: number, tol = 0): boolean => {
   if (a !== Infinity)
-    return Math.abs(a - b) < tol;
+    return Math.abs(a - b) <= tol;
   return a === b;
 };
