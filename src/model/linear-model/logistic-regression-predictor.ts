@@ -2,7 +2,6 @@ import { RecursiveArray, Tensor, matMul, tensor, add, sigmoid, softmax } from "@
 import { checkShape } from "../../linalg/utils";
 import { checkArray } from "../../utils/validation";
 import { BaseClassifier } from "../base";
-import '@tensorflow/tfjs-backend-cpu';
 
 /**
  * Logistic regression predictor

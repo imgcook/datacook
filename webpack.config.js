@@ -11,7 +11,7 @@ function configure(target) {
       return ([
         'index',
         'model/linear-model/logistic-regression',
-        'model/linear-model/logistic-regression-predictor',
+        'model/linear-model/logistic-regression-predictor'
       ]).reduce(function appendEntrySource(entry, name) {
         const importPath = path.join(__dirname, 'src', `${name}.ts`);
         entry[name] = importPath;
@@ -25,14 +25,14 @@ function configure(target) {
       filename: '[name].js',
       library: {
         name: 'datacook',
-        type: 'assign-properties',
-      },
+        type: 'assign-properties'
+      }
     },
     plugins: [
       new webpack.ProvidePlugin({
-        Buffer: ['buffer', 'Buffer'],
-        process: 'process/browser',
-      }),
+        Buffer: [ 'buffer', 'Buffer' ],
+        process: 'process/browser'
+      })
     ],
     module: {
       rules: [
@@ -40,13 +40,13 @@ function configure(target) {
           use: 'ts-loader',
           test: /\.ts$/,
           exclude: [
-            /node_modules/,
-          ],
+            /node_modules/
+          ]
         }
       ]
     },
     resolve: {
-      extensions: ['.ts', '.js'],
+      extensions: [ '.ts', '.js' ],
       fallback: {
         path: require.resolve('path-browserify'),
         zlib: require.resolve('browserify-zlib'),
@@ -54,15 +54,15 @@ function configure(target) {
         https: require.resolve('https-browserify'),
         stream: require.resolve('stream-browserify'),
         buffer: require.resolve('buffer'),
-        fs: false,
-      },
+        fs: false
+      }
     },
     experiments: {
-      asyncWebAssembly: true,
-    },
+      asyncWebAssembly: true
+    }
   };
 }
 
 module.exports = [
-  configure('web'),
+  configure('web')
 ];
