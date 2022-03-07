@@ -63,7 +63,8 @@ export abstract class BaseEstimator {
   }
 }
 
-export class BaseClustering extends BaseEstimator {
+export abstract class BaseClustering extends BaseEstimator {
+  public nClusters: number;
   constructor() {
     super();
     this.estimatorType = 'clustering';
