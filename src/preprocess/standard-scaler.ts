@@ -1,4 +1,4 @@
-import { divNoNan, RecursiveArray, sqrt, Tensor, sub, Rank, mul, add, tidy } from '@tensorflow/tfjs-core';
+import { divNoNan, RecursiveArray, sqrt, Tensor, sub, Rank, mul, add, tidy, tensor } from '@tensorflow/tfjs-core';
 import { getVariance, getMean } from '../stat';
 import { checkArray } from '../utils/validation';
 import { TransformerMixin } from './base';
@@ -56,7 +56,7 @@ export class StandardScaler extends TransformerMixin {
     const xTensor = checkArray(X, 'float32', 2);
     this.checkAndSetNFeatures(xTensor, true);
     this.mean = getMean(xTensor);
-    this.standardVariance = sqrt(getVariance(xTensor));
+    this.standardVariance = tidy(() => sqrt(getVariance(xTensor)));
     this.nFeatures = xTensor.shape[1];
     this.nSamplesSeen = xTensor.shape[0];
   }
@@ -72,7 +72,7 @@ export class StandardScaler extends TransformerMixin {
       const xCentered = this.withMean ? sub(xTensor, this.mean) : xTensor;
       return this.withStd ? divNoNan(xCentered, this.standardVariance) : xCentered;
     });
-  }
+  }/*  */
   /**
    * recover scaled transformed data to original scale
    * @param X input data
@@ -85,5 +85,36 @@ export class StandardScaler extends TransformerMixin {
       const xScaleReturn = this.withStd ? mul(xTensor, this.standardVariance) : xTensor;
       return this.withMean ? add(xScaleReturn, this.mean) : xScaleReturn;
     });
+  }
+
+  /**
+   * Dump model parameters to json string.
+   * @returns Stringfied model parameters
+   */
+  public async toJson(): Promise<string> {
+    const modelParams = {
+      name: 'StandardScaler',
+      withMean: this.withMean,
+      withStd: this.withStd,
+      mean: await this.mean.array(),
+      standardVariance: await this.standardVariance.array()
+    };
+    return JSON.stringify(modelParams);
+  }
+
+  /**
+   * Load model json string.
+   * @returns Stringfied model parameters
+   */
+  public async fromJson(modelJson: string): Promise<void> {
+    const params = JSON.parse(modelJson);
+    if (params.name !== 'StandardScaler') {
+      throw new TypeError(`${params.name} is not StandardScaler`);
+    }
+    this.mean = params.mean ? tensor(params.mean) : null;
+    this.standardVariance = params.standardVariance ? tensor(params.standardVariance) : null;
+    this.withMean = params.withMean;
+    this.withStd = params.withStd;
+    if (this.mean) this.nFeature = this.mean.shape[0];
   }
 }

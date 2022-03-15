@@ -19,4 +19,16 @@ describe('Standard Scaler', () => {
     assert.isTrue(tensorEqual(means, tf.zeros([ 5 ]), 1e-3));
     assert.isTrue(tensorEqual(variance, tf.ones([ 5 ]), 1e-3));
   });
+  it('save and load model', async () => {
+    const scaler = new StandardScaler();
+    await scaler.fit(cases);
+    const modelJson = await scaler.toJson();
+    const scaler2 = new StandardScaler();
+    await scaler2.fromJson(modelJson);
+    const transformed = await scaler2.transform(cases);
+    const means = tf.mean(transformed, 0);
+    const variance = getVariance(transformed);
+    assert.isTrue(tensorEqual(means, tf.zeros([ 5 ]), 1e-3));
+    assert.isTrue(tensorEqual(variance, tf.ones([ 5 ]), 1e-3));
+  });
 });
