@@ -1,4 +1,4 @@
-import { Tensor, RecursiveArray, sub, mean, divNoNan, sum, pow, sqrt, transpose, topk, stack, slice, neg } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, sub, mean, divNoNan, sum, pow, sqrt, transpose, topk, stack, slice, neg, tidy } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
 
 /**
@@ -7,12 +7,18 @@ import { checkArray } from '../utils/validation';
  * @param xData input data
  * @returns tensor of data variance
  */
-export const getVariance = (xData: Tensor | RecursiveArray<number>): Tensor => {
-  const axisV = 0;
-  const xTensor = checkArray(xData, 'float32');
-  const nSamples = xTensor.shape[0];
-  const xCentered = sub(xTensor, mean(xTensor, axisV));
-  return divNoNan(sum(pow(xCentered, 2), axisV), nSamples - 1);
+export const getVariance = (xData: Tensor | RecursiveArray<number>, axis = 0): Tensor => {
+  return tidy(() => {
+    const xTensor = checkArray(xData, 'float32');
+    const nSamples = xTensor.shape[0];
+    if (xTensor.shape.length === 1) {
+      const xCentered = sub(xTensor, mean(xTensor));
+      return divNoNan(sum(pow(xCentered, 2)), nSamples - 1);
+    } else {
+      const xCentered = sub(xTensor, mean(xTensor, axis));
+      return divNoNan(sum(pow(xCentered, 2), axis), nSamples - 1);
+    }
+  });
 };
 
 export const getMean = (xData: Tensor | RecursiveArray<number>): Tensor => {
@@ -27,12 +33,19 @@ export const getMean = (xData: Tensor | RecursiveArray<number>): Tensor => {
  * @param xData Input data
  * @returns tensor of normalized data
  */
-export const normalize = (xData: Tensor | RecursiveArray<number>): Tensor => {
-  const axisV = 0;
-  const xTensor = checkArray(xData, 'float32');
-  const xCentered = sub(xTensor, mean(xTensor, axisV));
-  const xStd = sqrt(getVariance(xTensor));
-  return divNoNan(xCentered, xStd);
+export const normalize = (xData: Tensor | RecursiveArray<number>, axis = 0): Tensor => {
+  return tidy(() => {
+    const xTensor = checkArray(xData, 'float32');
+    if (xTensor.shape.length === 1) {
+      const xCentered = sub(xTensor, mean(xTensor));
+      const xStd = sqrt(getVariance(xTensor));
+      return divNoNan(xCentered, xStd);
+    } else {
+      const xCentered = sub(xTensor, mean(xTensor, axis));
+      const xStd = sqrt(getVariance(xTensor));
+      return divNoNan(xCentered, xStd);
+    }
+  });
 };
 
 /**

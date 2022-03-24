@@ -6,7 +6,9 @@ export {
 
 export {
   getCovarianceMatrix,
-  getCorrelationMatrix
+  getCorrelationMatrix,
+  getCorrelation,
+  getCovariance
 } from './corcov';
 
 export {

@@ -54,3 +54,13 @@ export const arrayTranpose2D = (a: number[][]): number[][] => {
   }
   return c;
 };
+
+export const arrayMean1D = (array: number[]): number => {
+  return array.reduce((a: number, b: number) => a + b) / array.length;
+};
+
+export const arrayVariance1D = (array: number[], mean?: number): number => {
+  mean = mean ? mean : arrayMean1D(array);
+  const centered = array.map((d: number) => (d - mean) * (d - mean));
+  return centered.reduce((a: number, b: number) => a + b) / (array.length - 1);
+};
