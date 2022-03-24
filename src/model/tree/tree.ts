@@ -64,9 +64,9 @@ export class Tree {
   // nodes
   public nodes: Node[];
 
-  constructor (nFeature: number, nOutput: number, nClass: number) {
+  constructor (nFeature: number, nClass: number) {
     this.nFeature = nFeature;
-    this.nOutput = nOutput;
+    // this.nOutput = nOutput;
     this.nClass = nClass;
     this.nodes = [];
     this.nodeCount = 0;
@@ -119,6 +119,10 @@ export class Tree {
       return node.value;
     }
   };
+
+  public predict(x: number[][]): number[] {
+    return this.applyDense(x);
+  }
 
   public resize(capacity: number): void {
     if (capacity === this.capacity && this.nodes) {

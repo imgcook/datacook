@@ -3,9 +3,14 @@ import { BaseEstimator } from "../base";
 import { argMax, RecursiveArray, tensor, Tensor, Tensor1D, Tensor2D } from "@tensorflow/tfjs-core";
 import { checkArray, checkJSArray } from "../../utils/validation";
 import { LabelEncoder } from "../../preprocess/encoder";
+import { Splitter } from "./splitter";
+import { EntropyCriterion, GiniCriterion } from "./criterion";
 
 export type DecisionTreeCriterion = 'entropy' | 'gini';
 export type DecisionTreeSplitter = 'best' | 'random';
+
+const CRITERIA_CLF = { "gini": GiniCriterion, "entropy": EntropyCriterion };
+export
 
 export interface BaseDecisionTreeParams {
   criterion?: DecisionTreeCriterion,
