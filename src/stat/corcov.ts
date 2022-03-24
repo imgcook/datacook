@@ -27,7 +27,8 @@ export const getCovarianceMatrix = (xData: Tensor | RecursiveArray<number>): Ten
  * @returns correlation matrix with shape with shape (m, m)
  */
 export const getCorrelationMatrix = (xData: Tensor | RecursiveArray<number>): Tensor => {
-  const xNormalized = normalize(xData);
+  const xTensor = checkArray(xData, 'float32', 2);
+  const xNormalized = normalize(xTensor, 0);
   return getCovarianceMatrix(xNormalized);
 };
 
