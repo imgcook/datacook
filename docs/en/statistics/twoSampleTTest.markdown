@@ -8,7 +8,7 @@ lang: en
 
 # twoSampleTTest()
 
-The two-sample t-test is a method used to test whether the unknown population means of two groups are equal or not. It helps to answer questions like *whether the average success rate is higher after implementing a new sales tool than before* or *whether the test results of patients who received a drug are better than test results of those who received a placebo*. 
+The two-sample t-test is a method used to test whether the unknown population means of two groups are equal or not. It helps to answer questions like *"whether the average success rate is higher after implementing a new sales tool than before"* or *"whether the test results of patients who received a drug are better than test results of those who received a placebo"*. 
 
 Therefore this method is wided used to analysze the result in A/B test. You can use this test when the values of data are independent and randomly sampled from two normal distributions.
 
