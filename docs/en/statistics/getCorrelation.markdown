@@ -1,14 +1,14 @@
 ---
 layout: default
-title: getCorrelation
+title: getCorrelation()
 parent: Statistics
 nav_order: 1
 lang: en
 ---
 
-# getCorrelation
+# getCorrelation()
 
-In statistics, correlation coefficients are indicators of the strength of the linear relationship between two different variables, X and Y. A linear correlation coefficient that is greater than zero indicates a positive relationship. A value that is less than zero signifies a negative relationship. Finally, a value of zero indicates no relationship between the two variables X and Y.
+In statistics, correlation coefficients are indicators of the strength of the linear relationship between two different variables, X and Y. A linear correlation coefficient that is greater than zero indicates a positive relationship. A value that is less thanß zero signifies a negative relationship. Finally, a value of zero indicates no relationship between the two variables X and Y.
 
 If X and Y are two random variables, with means (expected values) $\mu X$ and $μ Y$
 and standard deviations $\sigma X$ and $\sigma Y$, respectively, then their correlation is as follow:

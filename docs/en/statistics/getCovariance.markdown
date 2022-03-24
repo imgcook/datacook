@@ -1,12 +1,12 @@
 ---
 layout: default
-title: getCovariance
+title: getCovariance()
 parent: Statistics
 nav_order: 1
 lang: en
 ---
 
-# getCovariance
+# getCovariance()
 
 In statistics, covariance is a measure of the relationship between two random variables. The metric evaluates how much, or to what extent – the variables change together. 
 

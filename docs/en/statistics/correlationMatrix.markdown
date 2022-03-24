@@ -1,9 +1,9 @@
 ---
 layout: default
-title: getCorrelationMatrix
+title: getCorrelationMatrix()
 parent: Statistics
 nav_order: 1
 lang: en
 ---
 
-# getCorrelationMatrix
+# getCorrelationMatrix()
