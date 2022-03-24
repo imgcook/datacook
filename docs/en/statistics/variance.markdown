@@ -6,4 +6,4 @@ nav_order: 1
 lang: en
 ---
 
-# Variance
+# getVariance
