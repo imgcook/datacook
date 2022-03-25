@@ -1,5 +1,5 @@
 import { Tensor, RecursiveArray, sub, mean, transpose, matMul, divNoNan, Tensor1D, mul, sqrt, sum } from '@tensorflow/tfjs-core';
-import { getVariance, normalize } from './data';
+import { getVariance, standardize } from './data';
 import { checkArray } from '../utils/validation';
 
 /**
@@ -28,7 +28,7 @@ export const getCovarianceMatrix = (xData: Tensor | RecursiveArray<number>): Ten
  */
 export const getCorrelationMatrix = (xData: Tensor | RecursiveArray<number>): Tensor => {
   const xTensor = checkArray(xData, 'float32', 2);
-  const xNormalized = normalize(xTensor, 0);
+  const xNormalized = standardize(xTensor, 0);
   return getCovarianceMatrix(xNormalized);
 };
 

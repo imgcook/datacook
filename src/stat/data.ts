@@ -84,14 +84,14 @@ export const getMean = (xData: Tensor | RecursiveArray<number>, axis = -1): Tens
 };
 
 /**
- * Normalize input data.\
- * normalized_x = (X - mean(X)) / sqrt(var(X))
+ * Standardize input data.\
+ * standard_x = (X - mean(X)) / sqrt(var(X))
  * @param xData Input data
- * @param axis axis for normalize, **default = -1**, which means normalization will be
+ * @param axis axis for standardize, **default = -1**, which means standardization will be
  * applied across all axes.
- * @returns tensor of normalized data
+ * @returns data after standardization
  */
-export const normalize = (xData: Tensor | RecursiveArray<number>, axis = -1): Tensor => {
+export const standardize = (xData: Tensor | RecursiveArray<number>, axis = -1): Tensor => {
   return tidy(() => {
     const xTensor = checkArray(xData, 'float32');
     const xCentered = getCenteredData(xTensor, axis);
