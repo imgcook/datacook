@@ -30,7 +30,7 @@ getVariance(xData: Tensor | RecursiveArray<number>, axis = 0): Tensor
 | Parameter |        type        | description                                                         |
 | :-------- | :-----------------: | :------------------------------------------------------------------ |
 | xData    | Tensor \| RecursiveArray\<number\> | input data |
-| axis `optional` | number | axis to compute, **default=0**. If input data is one-dimensional, this parameter will have no effect |
+| axis `optional` | number | axis to compute, **default=-1**, which means calculation will be applied across all axes. If input data is one-dimensional, this parameter will have no effect |
 
 ## Usage
 
