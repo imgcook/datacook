@@ -163,7 +163,7 @@ describe('DepthFirstTreeBuilder', () => {
     const criterion = new EntropyCriterion();
     const splitter = new BestSplitter(criterion, 4, 3, 3);
     const treeBuilder = new DepthFirstTreeBuilder(splitter, 3, 3, 3, 4, 0);
-    const tree = new Tree(4, 3, 3);
+    const tree = new Tree(4, 3);
     treeBuilder.build(tree, irisData, label_ids);
     for (let i = 0; i < tree.nodeCount;i++){
       // if (tree.nodes[i].leftChild == -1 && tree.nodes[i].rightChild === -1) {
