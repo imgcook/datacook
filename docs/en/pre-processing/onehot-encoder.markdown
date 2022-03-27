@@ -6,7 +6,7 @@ nav_order: 1
 lang: en
 ---
 
-# OnehotEncoder
+# OneHotEncoder
 
 OneHotEncoder is used to encode categorical features as a one-hot numeric array.
 
@@ -124,7 +124,7 @@ async decode(x: Tensor | RecursiveArray<number>): Promise<Tensor>
 ```javascript
 const onehotEncoder = new OneHotEncoder();
 await onehotEncoder.init([ '1', '2', '3' ]);
-const encoded = await onehotEncoder.decode([
+const decoded = await onehotEncoder.decode([
     [0, 0, 1], [0, 0, 1], [0, 1, 0]
 ]);
 /**
