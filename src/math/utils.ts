@@ -10,12 +10,3 @@ export const numEqual = (a: number, b: number, tol = 0): boolean => {
     return Math.abs(a - b) <= tol;
   return a === b;
 };
-
-/**
- * Determine whether a number is integer or not
- * @param a input number
- * @returns true for integer, false for not
- */
-export const isInteger = (a: number): boolean => {
-  return typeof a === 'number' && a % 1 === 0;
-};

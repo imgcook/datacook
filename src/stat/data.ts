@@ -1,6 +1,5 @@
 import { Tensor, RecursiveArray, sub, mean, divNoNan, sum, pow, sqrt, transpose, topk, stack, slice, neg, tidy } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
-import { isInteger } from '../math/utils';
 
 /**
  * Get centered data.
@@ -16,7 +15,7 @@ export const getCenteredData = (xData: Tensor | RecursiveArray<number>, axis = -
     if (dim === 1) {
       return sub(xTensor, mean(xTensor));
     }
-    if (!isInteger(axis) || axis >= dim || axis < -1) {
+    if (!Number.isInteger(axis) || axis >= dim || axis < -1) {
       throw new TypeError(`Invalid axis: ${axis}`);
     }
     if (axis === -1) {
@@ -44,7 +43,7 @@ export const getVarianceFromCentered = (xCentered: Tensor, axis: number): Tensor
       const nSamples = xCentered.shape[0];
       return divNoNan(sum(pow(xCentered, 2)), nSamples - 1);
     }
-    if (!isInteger(axis) || axis >= dim || axis < -1) {
+    if (!Number.isInteger(axis) || axis >= dim || axis < -1) {
       throw new TypeError(`Invalid axis: ${axis}`);
     }
     if (axis === -1) {
