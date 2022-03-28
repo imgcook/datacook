@@ -15,7 +15,7 @@ describe('Standard Scaler', () => {
     await scaler.fit(cases);
     const transformed = await scaler.transform(cases);
     const means = tf.mean(transformed, 0);
-    const variance = getVariance(transformed);
+    const variance = getVariance(transformed, 0);
     assert.isTrue(tensorEqual(means, tf.zeros([ 5 ]), 1e-3));
     assert.isTrue(tensorEqual(variance, tf.ones([ 5 ]), 1e-3));
   });

@@ -1,12 +1,14 @@
 export {
   getVariance,
-  normalize,
+  standardize,
   getMean
 } from './data';
 
 export {
   getCovarianceMatrix,
-  getCorrelationMatrix
+  getCorrelationMatrix,
+  getCorrelation,
+  getCovariance
 } from './corcov';
 
 export {
