@@ -55,8 +55,8 @@ export class StandardScaler extends TransformerMixin {
   public async fit(X: Tensor | RecursiveArray<number>): Promise<void> {
     const xTensor = checkArray(X, 'float32', 2);
     this.checkAndSetNFeatures(xTensor, true);
-    this.mean = getMean(xTensor);
-    this.standardVariance = sqrt(getVariance(xTensor));
+    this.mean = getMean(xTensor, 0);
+    this.standardVariance = sqrt(getVariance(xTensor, 0));
     this.nFeatures = xTensor.shape[1];
     this.nSamplesSeen = xTensor.shape[0];
   }
