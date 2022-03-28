@@ -1,4 +1,5 @@
-import { getCorrelationMatrix, getCovarianceMatrix } from '../../../src/stat/corcov';
+import { getCorrelationMatrix, getCovarianceMatrix, getCorrelation, getCovariance } from '../../../src/stat/corcov';
+import { numEqual } from '../../../src/math/utils';
 import { tensor } from '@tensorflow/tfjs-core';
 import { assert } from 'chai';
 import { tensorEqual } from '../../../src/linalg';
@@ -21,20 +22,35 @@ const corrMAssert = tensor([
 
 // covariance result calculated in numpy
 const covMAssert = tensor([
-  [ 62.7, 70.5, -10.3 , 81.25 ],
+  [ 62.7, 70.5, -10.3, 81.25 ],
   [ 70.5, 126.5, -26.25, 131.25 ],
   [ -10.3, -26.25, 29.2, -83.75 ],
   [ 81.25, 131.25, -83.75, 316.5 ]
 ]);
 
 describe('Covariance and correlation', () => {
-  it('get correlation', () => {
+  it('get correlation matrix', () => {
     const corrM = getCorrelationMatrix(m);
-    assert(tensorEqual(corrM, corrMAssert, 1e-4));
+    assert.isTrue(tensorEqual(corrM, corrMAssert, 1e-4));
+  });
+
+  it('get covariance matrix', () => {
+    const covM = getCovarianceMatrix(m);
+    assert.isTrue(tensorEqual(covM, covMAssert, 1e-4));
   });
 
   it('get covariance', () => {
-    const covM = getCovarianceMatrix(m);
-    assert(tensorEqual(covM, covMAssert, 1e-4));
+    const x = [ 1, 4, 2, 8, 7 ];
+    const y = [ 2, 7, 4, 13, 10 ];
+    const cov = getCovariance(x, y);
+    assert.isTrue(numEqual(cov, 13.4, 1e-4));
   });
+
+  it('get correlation', () => {
+    const x = [ 1, 4, 2, 8, 7 ];
+    const y = [ 2, 7, 4, 13, 10 ];
+    const corr = getCorrelation(x, y);
+    assert.isTrue(numEqual(corr, 0.9899886, 1e-4));
+  });
+
 });

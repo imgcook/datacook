@@ -1,38 +1,114 @@
-import { Tensor, RecursiveArray, sub, mean, divNoNan, sum, pow, sqrt, transpose, topk, stack, slice, neg } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, sub, mean, divNoNan, sum, pow, sqrt, transpose, topk, stack, slice, neg, tidy } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
+
+/**
+ * Get centered data.
+ * centered_X = X - mean(X)
+ * @param xData input data
+ * @param axis centering axis
+ * @returns centered data
+ */
+export const getCenteredData = (xData: Tensor | RecursiveArray<number>, axis = -1): Tensor => {
+  return tidy(() => {
+    const xTensor = checkArray(xData, 'float32');
+    const dim = xTensor.shape.length;
+    if (dim === 1) {
+      return sub(xTensor, mean(xTensor));
+    }
+    if (!Number.isInteger(axis) || axis >= dim || axis < -1) {
+      throw new TypeError(`Invalid axis: ${axis}`);
+    }
+    if (axis === -1) {
+      return sub(xTensor, mean(xTensor));
+    }
+    if (axis === 0) {
+      return sub(xTensor, mean(xTensor, axis));
+    }
+    // transpose permutation
+    const perm: number[] = [];
+    const inversePerm: number[] = [];
+    for (let i = 0; i < dim; i++) {
+      const permIdx = i === 0 ? axis : i <= axis ? i - 1 : i;
+      perm[i] = permIdx;
+      inversePerm[permIdx] = i;
+    }
+    return transpose(sub(transpose(xTensor, perm), mean(xTensor, axis)), inversePerm);
+  });
+};
+
+export const getVarianceFromCentered = (xCentered: Tensor, axis: number): Tensor => {
+  return tidy(() => {
+    const dim = xCentered.shape.length;
+    if (dim === 1) {
+      const nSamples = xCentered.shape[0];
+      return divNoNan(sum(pow(xCentered, 2)), nSamples - 1);
+    }
+    if (!Number.isInteger(axis) || axis >= dim || axis < -1) {
+      throw new TypeError(`Invalid axis: ${axis}`);
+    }
+    if (axis === -1) {
+      let nSamples = 1;
+      xCentered.shape.forEach((d: number) => {
+        nSamples = nSamples * d;
+      });
+      return divNoNan(sum(pow(xCentered, 2)), sub(nSamples, 1));
+    }
+    if (axis === 0) {
+      return divNoNan(sum(pow(xCentered, 2), axis), xCentered.shape[0] - 1);
+    }
+    const nSamples = xCentered.shape[axis];
+    return divNoNan(sum(pow(xCentered, 2), axis), nSamples - 1);
+  });
+};
 
 /**
  * Calculate variance of input data.\
  * variance = (X - mean(X))'(X - mean(X)) / (n - 1)
  * @param xData input data
+ * @param axis axis for calculating variance, **default = -1**, which means calculation will be
+ * applied across all axes.
  * @returns tensor of data variance
  */
-export const getVariance = (xData: Tensor | RecursiveArray<number>): Tensor => {
-  const axisV = 0;
-  const xTensor = checkArray(xData, 'float32');
-  const nSamples = xTensor.shape[0];
-  const xCentered = sub(xTensor, mean(xTensor, axisV));
-  return divNoNan(sum(pow(xCentered, 2), axisV), nSamples - 1);
+export const getVariance = (xData: Tensor | RecursiveArray<number>, axis = -1): Tensor => {
+  return tidy(() => {
+    const xTensor = checkArray(xData, 'float32');
+    const xCentered = getCenteredData(xTensor, axis);
+    return getVarianceFromCentered(xCentered, axis);
+  });
 };
 
-export const getMean = (xData: Tensor | RecursiveArray<number>): Tensor => {
-  const axisV = 0;
+export const getMean = (xData: Tensor | RecursiveArray<number>, axis = -1): Tensor => {
   const xTensor = checkArray(xData, 'float32');
-  return mean(xTensor, axisV);
+  return mean(xTensor, axis);
 };
 
 /**
- * Normalize input data.\
- * normalized_x = (X - mean(X)) / sqrt(var(X))
+ * Standardize input data.\
+ * standard_x = (X - mean(X)) / sqrt(var(X))
  * @param xData Input data
- * @returns tensor of normalized data
+ * @param axis axis for standardize, **default = -1**, which means standardization will be
+ * applied across all axes.
+ * @returns data after standardization
  */
-export const normalize = (xData: Tensor | RecursiveArray<number>): Tensor => {
-  const axisV = 0;
-  const xTensor = checkArray(xData, 'float32');
-  const xCentered = sub(xTensor, mean(xTensor, axisV));
-  const xStd = sqrt(getVariance(xTensor));
-  return divNoNan(xCentered, xStd);
+export const standardize = (xData: Tensor | RecursiveArray<number>, axis = -1): Tensor => {
+  return tidy(() => {
+    const xTensor = checkArray(xData, 'float32');
+    const xCentered = getCenteredData(xTensor, axis);
+    const xStd = sqrt(getVarianceFromCentered(xCentered, axis));
+    const dim = xTensor.shape.length;
+    if (dim === 1 || axis === -1 || axis === 0) {
+      return divNoNan(xCentered, xStd);
+    }
+    // transpose permutation
+    const perm: number[] = [];
+    const inversePerm: number[] = [];
+    for (let i = 0; i < dim; i++) {
+      const permIdx = i === 0 ? axis : i <= axis ? i - 1 : i;
+      perm[i] = permIdx;
+      inversePerm[permIdx] = i;
+    }
+    return transpose(divNoNan(transpose(xCentered, perm), xStd), inversePerm);
+  });
 };
 
 /**

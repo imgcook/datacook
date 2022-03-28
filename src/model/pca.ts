@@ -96,7 +96,7 @@ export class PCA extends BaseEstimater {
 
 
     this.mean = mean(xTensor, 0);
-    this.variance = tidy(() => getVariance(xTensor));
+    this.variance = tidy(() => getVariance(xTensor, 0));
     this.eigenValues = slice(eigenValues, 0, nComponents);
     this.eigenVectors = slice(eigenVectors, [ 0, 0 ], [ nFeatures, nComponents ]);
     this.explainedVariance = this.eigenValues;
