@@ -107,7 +107,7 @@ export const standardize = (xData: Tensor | RecursiveArray<number>, axis = -1): 
       perm[i] = permIdx;
       inversePerm[permIdx] = i;
     }
-    return transpose(divNoNan(transpose(xTensor, perm), xStd), inversePerm);
+    return transpose(divNoNan(transpose(xCentered, perm), xStd), inversePerm);
   });
 };
 
