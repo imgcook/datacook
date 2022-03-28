@@ -25,7 +25,7 @@ export interface BaseDecisionTreeParams {
   ccpAlpha?: number
 }
 
-abstract class BaseDecisionTree extends BaseEstimator{
+class BaseDecisionTree extends BaseEstimator{
   public criterion: DecisionTreeCriterion;
   public splitter: DecisionTreeSplitter;
   public maxDepth: number;
@@ -68,16 +68,25 @@ abstract class BaseDecisionTree extends BaseEstimator{
     const isClassification = this.isClassifier();
     this.nFeature = xArray[0].length;
     if (isClassification) {
-      const yArray = checkJSArray(yData, 'any', 1);
+      const maxDepth = this.maxDepth ? this.maxDepth : Number.MAX_SAFE_INTEGER;
+      const yArray = checkJSArray(yData, 'any', 1) as any;
       this.labelEncoder = new LabelEncoder();
-      this.labelEncoder.init(yArray);
-      const yEncoded = await (await this.labelEncoder.encode(yArray)).array();
+      await this.labelEncoder.init(yArray);
+      const yEncoded = await (await this.labelEncoder.encode(yArray)).array() as number[];
       this.nClass = this.labelEncoder.categories.shape[1];
       const criterion = new CRITERIA_CLF[this.criterion];
       const splitter = new BestSplitter(criterion, this.maxFeatures, this.minSamplesLeaf, this.minWeightLeaf);
-      const treeBuilder = new DepthFirstTreeBuilder(splitter, this.minSamplesSplit, this.minSamplesLeaf, this.minWeightLeaf, this.maxDepth, this.minImpurityDecrease);
+      
+  
+      const treeBuilder = new DepthFirstTreeBuilder(
+        splitter,
+        this.minSamplesSplit,
+        this.minSamplesLeaf,
+        this.minWeightLeaf,
+        this.maxDepth,
+        this.minImpurityDecrease);
       const tree = new Tree(this.nFeature, this.nClass);
-      treeBuilder.build(tree, xArray, yEncoded);
+      treeBuilder.build(tree, xArray, yEncoded, sampleWeight);
       for (let i = 0; i < tree.nodeCount;i++){
         // if (tree.nodes[i].leftChild == -1 && tree.nodes[i].rightChild 7=== -1) {
         console.log(JSON.stringify(tree.nodes[i]));
@@ -91,7 +100,7 @@ abstract class BaseDecisionTree extends BaseEstimator{
     if (isClassification) {
       const res = this.tree.predict(xArray);
       const labelIds = await (argMax(tensor(res)) as Tensor1D ).array();
-      const labels = await (await this.labelEncoder.decode(labelIds)).array();
+      const labels = await (await this.labelEncoder.decode(labelIds)).array() as any;
       return labels;
     }
   }
