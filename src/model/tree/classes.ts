@@ -1,17 +1,23 @@
 import { Tree } from "./tree";
 import { BaseEstimator } from "../base";
-import { argMax, max, RecursiveArray, tensor, Tensor, Tensor1D, Tensor2D } from "@tensorflow/tfjs-core";
-import { checkArray, checkJSArray } from "../../utils/validation";
+import { max, RecursiveArray, tensor, Tensor, Tensor1D } from "@tensorflow/tfjs-core";
+import { checkJSArray } from "../../utils/validation";
 import { LabelEncoder } from "../../preprocess/encoder";
-import { BestSplitter, Splitter } from "./splitter";
-import { Criterion, EntropyCriterion, GiniCriterion } from "./criterion";
+import { BestSplitter } from "./splitter";
+import { EntropyCriterion, GiniCriterion } from "./criterion";
 import { DepthFirstTreeBuilder } from "./tree-builder";
 
 export type DecisionTreeCriterion = 'entropy' | 'gini';
 export type DecisionTreeSplitter = 'best';
+export type MaxFeaturesSelection = 'auto' | 'sqrt' | 'log2';
 
 const CRITERIA_CLF = { "gini": GiniCriterion, "entropy": EntropyCriterion };
 const DENSE_SPLITTERS = { "best": BestSplitter };
+
+
+function argMax(array: number[]) {
+  return [].map.call(array, (x: number, i: number) => [ x, i ]).reduce((r: number[], a: number[]) => (a[0] > r[0] ? a : r))[1];
+}
 
 export interface BaseDecisionTreeParams {
   criterion?: DecisionTreeCriterion,
@@ -19,39 +25,51 @@ export interface BaseDecisionTreeParams {
   maxDepth?: number,
   minSamplesSplit?: number,
   minSamplesLeaf?: number,
-  maxFeatures?: number,
+  maxFeatures?: number | MaxFeaturesSelection,
   maxLeafNodes?: number,
   minImpurityDecrease?: number,
-  ccpAlpha?: number
+  ccpAlpha?: number,
+  minWeightFractionLeaf?: number
 }
 
-class BaseDecisionTree extends BaseEstimator{
+class BaseDecisionTree extends BaseEstimator {
   public criterion: DecisionTreeCriterion;
   public splitter: DecisionTreeSplitter;
   public maxDepth: number;
   public minSamplesSplit: number;
   public minSamplesLeaf: number;
   public minWeightLeaf: number;
-  public maxFeatures: number;
+  public maxFeatures: number | MaxFeaturesSelection;
   public maxLeafNodes: number;
   public minImpurityDecrease: number;
   public tree: Tree;
   public ccpAlpha: number;
   public labelEncoder: LabelEncoder;
   public nClass: number;
-  public nFeature: number;
-  constructor(params: BaseDecisionTreeParams) {
+  public minWeightFractionLeaf: number;
+
+  constructor(params: BaseDecisionTreeParams = {}) {
     super();
     const { 
       criterion = 'entropy',
       splitter = 'best',
       maxDepth,
-      minSamplesSplit 
+      minSamplesSplit = 2,
+      minSamplesLeaf = 1,
+      minWeightFractionLeaf = 0,
+      maxFeatures,
+      maxLeafNodes,
+      minImpurityDecrease = 0
     } = params;
     this.criterion = criterion;
     this.splitter = splitter;
     this.maxDepth = maxDepth;
     this.minSamplesSplit = minSamplesSplit;
+    this.minSamplesLeaf = minSamplesLeaf;
+    this.minWeightFractionLeaf = minWeightFractionLeaf;
+    this.maxFeatures = maxFeatures;
+    this.maxLeafNodes = maxLeafNodes;
+    this.minImpurityDecrease = minImpurityDecrease;
   }
 
   public getDepth() {
@@ -60,33 +78,117 @@ class BaseDecisionTree extends BaseEstimator{
   public getNLeaves() {
     return this.tree.nLeaves;
   }
-  public async fit(xData: Tensor | RecursiveArray<number>, yData: Tensor | string[] | number[], sampleWeight = null) {
+  private getMaxFeatures(): number {
+    const isClassification = this.isClassifier();
+    if (!this.maxFeatures) {
+      return this.nFeature;
+    }
+    if (typeof this.maxFeatures === 'number') {
+      if (Number.isInteger(this.maxFeatures)) {
+        return this.maxFeatures;
+      } else {
+        return Math.max(this.maxFeatures, 1) * this.nFeature;
+      }
+    } else {
+      switch (this.maxFeatures) {
+        case 'auto':
+          if (isClassification) {
+            return Math.max(1, Math.sqrt(this.nFeature));
+          }
+          else {
+            return this.nFeature;
+          }
+        case 'sqrt':
+          return Math.max(1, Math.sqrt(this.nFeature));
+        case 'log2':
+          return Math.max(1, Math.log2(this.nFeature));
+        default:
+          throw new TypeError('Invalid value for maxFeatures, should be "auto", "sqrt" or "log2"');
+      }
+    }
+  }
+  private getMinSamplesSplit(nSamples: number): number {
+    if (Number.isInteger(this.minSamplesSplit)) {
+      if (!(this.minSamplesSplit >= 2)) {
+        throw new TypeError('minSamplesSplit should be an integer greater than 1 or in (0.0, 1.0]');
+      }
+      return this.minSamplesSplit;
+    }
+    if (!(this.minSamplesLeaf > 0 || this.minSamplesLeaf <= 1)) {
+      throw new TypeError('minSamplesSplit should be an integer greater than 1 or in (0.0, 1.0]');
+    }
+    return Math.max(2, Math.ceil(this.minSamplesLeaf * nSamples));
+  }
+  
+  public async fit(xData: Tensor | RecursiveArray<number>, yData: Tensor | string[] | number[], sampleWeight: number[] = null) {
     if (this.ccpAlpha < 0) {
       throw new RangeError("ccpAlpha must greater than or equal to zero");
     }
     const xArray = checkJSArray(xData, 'float32', 2) as number[][];
     const isClassification = this.isClassifier();
+    const nSamples = xArray.length;
     this.nFeature = xArray[0].length;
     if (isClassification) {
+      if (this.maxDepth < 0) {
+        throw new TypeError('maxDepth should be greater than 0');
+      }
+      if (this.maxFeatures && (this.maxFeatures <= 0 || this.maxFeatures > this.nFeature)) {
+        throw new TypeError('maxFeatures should be in (0, nFeature]')
+      }
+      if (this.maxLeafNodes && !Number.isInteger(this.maxLeafNodes)) {
+        throw new TypeError('maxLeafNodes should be integral number');
+      }
+      if (this.maxLeafNodes < 1 ) {
+        throw new TypeError('maxLeafNodes should be either null or greater than 1');
+      }
+      if (Number.isInteger(this.minSamplesLeaf)) {
+        if (this.minSamplesLeaf < 1) {
+          throw new TypeError('minSamplesLeaf should be at least 1 or in (0, 0.5]');
+        }
+      } else {
+        if (!(this.minSamplesLeaf > 0 && this.minSamplesLeaf <= 0.5)) {
+          throw new TypeError('minSamplesLeaf should be at least 1 or in (0, 0.5]');
+        }
+      }
+      if (!(this.minWeightFractionLeaf >= 0 && this.minWeightFractionLeaf <= 0.5)) {
+        throw new TypeError('minWeightFractionLeaf must in [0, 0.5]');
+      }
+      if (!(this.minImpurityDecrease >= 0)) {
+        throw new TypeError('minImpurityDecreases should be greater or equal to 0');
+      }
+  
       const maxDepth = this.maxDepth ? this.maxDepth : Number.MAX_SAFE_INTEGER;
+      const maxLeafNodes = this.maxLeafNodes ? this.maxLeafNodes : -1;
+      const minWeightLeaf = sampleWeight ?
+        this.minWeightFractionLeaf * sampleWeight.reduce((a: number, b: number): number => a + b) : 
+        this.minWeightFractionLeaf * nSamples;
+      const maxFeatures = this.getMaxFeatures();
+      const minSamplesLeaf = Number.isInteger(this.minSamplesLeaf) ?
+        this.minSamplesLeaf :
+        Math.ceil(this.minSamplesLeaf * nSamples);
+      const minSamplesSplit = this.getMinSamplesSplit(nSamples);
+      const minImpurityDecrease = this.minImpurityDecrease;
+      
       const yArray = checkJSArray(yData, 'any', 1) as any;
       this.labelEncoder = new LabelEncoder();
       await this.labelEncoder.init(yArray);
+
       const yEncoded = await (await this.labelEncoder.encode(yArray)).array() as number[];
       this.nClass = this.labelEncoder.categories.shape[1];
       const criterion = new CRITERIA_CLF[this.criterion];
-      const splitter = new BestSplitter(criterion, this.maxFeatures, this.minSamplesLeaf, this.minWeightLeaf);
+      const splitter = new BestSplitter(criterion, maxFeatures, minSamplesLeaf, minWeightLeaf);
       
   
       const treeBuilder = new DepthFirstTreeBuilder(
         splitter,
-        this.minSamplesSplit,
-        this.minSamplesLeaf,
-        this.minWeightLeaf,
-        this.maxDepth,
-        this.minImpurityDecrease);
+        minSamplesSplit,
+        minSamplesLeaf,
+        minWeightLeaf,
+        maxDepth,
+        minImpurityDecrease);
       const tree = new Tree(this.nFeature, this.nClass);
       treeBuilder.build(tree, xArray, yEncoded, sampleWeight);
+      this.tree = tree;
       for (let i = 0; i < tree.nodeCount;i++){
         // if (tree.nodes[i].leftChild == -1 && tree.nodes[i].rightChild 7=== -1) {
         console.log(JSON.stringify(tree.nodes[i]));
@@ -94,14 +196,22 @@ class BaseDecisionTree extends BaseEstimator{
       }
     }
   }
-  public async predict(xData: Tensor | number[][]): Promise<Array<number | string>> {
+  public async predict(xData: Tensor | number[][]): Promise<number[] | string[]> {
     const isClassification = this.isClassifier();
     const xArray = checkJSArray(xData, 'float32', 2) as number[][];
     if (isClassification) {
       const res = this.tree.predict(xArray);
-      const labelIds = await (argMax(tensor(res)) as Tensor1D ).array();
+      const labelIds = res.map((d: number[]): number => argMax(d));;
       const labels = await (await this.labelEncoder.decode(labelIds)).array() as any;
       return labels;
     }
+  }
+}
+
+
+export class DecisionTreeClassifier extends BaseDecisionTree {
+  constructor(params: BaseDecisionTreeParams = {}) {
+    super(params);
+    this.estimatorType = 'classifier';
   }
 }

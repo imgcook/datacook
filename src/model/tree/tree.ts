@@ -1,5 +1,5 @@
 import { Tensor1D, sum, equal, add, Tensor, TensorLike, RecursiveArray, gather, slice } from "@tensorflow/tfjs-core";
-import { checkArray } from "../../utils/validation";
+import { checkJSArray } from "../../utils/validation";
 
 export const SIZE_MAX = Number.MAX_SAFE_INTEGER;
 export interface Node {
@@ -102,25 +102,27 @@ export class Tree {
    * Finds the terminal region (=leaf node) for each sample in X.
    * @param xData input sample
    */
-  public applyDense = (xData: number[][]): number[] => {
-    const xTensor = checkArray(xData, 'float32', 2);
-    const nSamples = xTensor.shape[0];
+  public applyDense = (xData: number[][]): number[][] => {
+    const xArray = checkJSArray(xData, 'float32', 2) as number[][];
+    const nSamples = xArray.length;
+    const values = [];
     for (let i = 0; i < nSamples; i++) {
-      const sample = gather(xData, i);
+      const sample = xArray[i];
       let node = this.nodes[0];
       while (node.leftChild != -1 && node.rightChild != -1) {
-        const xFeatureVal = slice(sample, node.feature, 1).dataSync()[0];
+        const xFeatureVal = sample[node.feature];
         if (xFeatureVal <= node.threshold) {
           node = this.nodes[node.leftChild];
         } else {
           node = this.nodes[node.rightChild];
         }
       }
-      return node.value;
+      values.push(node.value);
     }
+    return values;
   };
 
-  public predict(x: number[][]): number[] {
+  public predict(x: number[][]): number[][] {
     return this.applyDense(x);
   }
 

@@ -1,8 +1,10 @@
 
 import { BestSplitter } from '../../../../src/model/tree/splitter';
-import { EntropyCriterion, GiniCriterion } from '../../../../src/model/tree/criterion';
+import { EntropyCriterion } from '../../../../src/model/tree/criterion';
 import { DepthFirstTreeBuilder } from '../../../../src/model/tree/tree-builder';
 import { Tree } from '../../../../src/model/tree/tree';
+import { accuracyScore } from '../../../../src/metrics';
+import { DecisionTreeClassifier } from '../../../../src/model/tree';
 const irisData = [
   [ 5.1, 3.5, 1.4, 0.2 ],
   [ 4.9, 3., 1.4, 0.2 ],
@@ -166,10 +168,17 @@ describe('DepthFirstTreeBuilder', () => {
     const tree = new Tree(4, 3);
     treeBuilder.build(tree, irisData, label_ids);
     for (let i = 0; i < tree.nodeCount;i++){
-      // if (tree.nodes[i].leftChild == -1 && tree.nodes[i].rightChild === -1) {
       console.log(JSON.stringify(tree.nodes[i]));
-      // }
     }
   });
 });
 
+describe('DecisionTreeClassifier', () => {
+  it('fit model', async () => {
+    const dt = new DecisionTreeClassifier();
+    await dt.fit(irisData, label_ids);
+    const predY = await dt.predict(irisData);
+    const acc = accuracyScore(label_ids, predY);
+    console.log('accuracy score: ', acc);
+  });
+});

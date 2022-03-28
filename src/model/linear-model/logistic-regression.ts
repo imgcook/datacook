@@ -187,11 +187,7 @@ export class LogisticRegression extends BaseClassifier {
       batchSize,
       epochs,
       shuffle: true,
-<<<<<<< HEAD
-      callbacks: callbacks.earlyStopping({ monitor: 'loss', minDelta: 0 })
-=======
       callbacks: callbacks.earlyStopping({ monitor: 'loss', minDelta: params.tol })
->>>>>>> a204a8a299a83931037e6addd72fe7816251b3e4
     });
     return this;
   }
