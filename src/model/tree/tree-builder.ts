@@ -19,7 +19,7 @@ export class DepthFirstTreeBuilder {
   public minImpurityDecrease: number;
   public minWeightLeaf: number;
 
-  // public checkInput(X: number[][], y: number[], sampleWeight: number[]): boolean {
+  // public checkInput(X: number[][], y: ·number[], sampleWeight: number[]): boolean {
 
   // }
   constructor(splitter: Splitter, minSamplesSplit: number,

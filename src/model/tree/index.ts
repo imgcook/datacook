@@ -1,3 +1,3 @@
 export { Tree } from './tree';
 export { DepthFirstTreeBuilder } from './tree-builder';
-export { DecisionTreeClassifier } from './classes';
+export { DecisionTreeClassifier, DecisionTreeRegressor } from './classes';

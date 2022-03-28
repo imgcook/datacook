@@ -4,7 +4,8 @@ import { EntropyCriterion } from '../../../../src/model/tree/criterion';
 import { DepthFirstTreeBuilder } from '../../../../src/model/tree/tree-builder';
 import { Tree } from '../../../../src/model/tree/tree';
 import { accuracyScore } from '../../../../src/metrics';
-import { DecisionTreeClassifier } from '../../../../src/model/tree';
+import { DecisionTreeClassifier, DecisionTreeRegressor } from '../../../../src/model/tree';
+import { assert } from 'chai';
 const irisData = [
   [ 5.1, 3.5, 1.4, 0.2 ],
   [ 4.9, 3., 1.4, 0.2 ],
@@ -174,11 +175,26 @@ describe('DepthFirstTreeBuilder', () => {
 });
 
 describe('DecisionTreeClassifier', () => {
-  it('fit model', async () => {
+  it('fit iris', async () => {
     const dt = new DecisionTreeClassifier();
     await dt.fit(irisData, label_ids);
     const predY = await dt.predict(irisData);
     const acc = accuracyScore(label_ids, predY);
     console.log('accuracy score: ', acc);
+    assert.isTrue(acc > 0.95);
+  });
+});
+
+describe('DecisionTreeRegressor', () => {
+  it('fit iris', async () => {
+    const dt = new DecisionTreeRegressor();
+    const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
+    const target = irisData.map((d) => d[3]);
+    await dt.fit(features, target);
+    const predY = await dt.predict(features);
+    console.log(predY);
+    // const acc = accuracyScore(label_ids, predY);
+    // console.log('accuracy score: ', acc);
+    // assert.isTrue(acc > 0.95);
   });
 });

@@ -10,8 +10,6 @@ export interface SplitRecord {
   feature: number;
   threshold: number;
   improvement: number;
-  leftValue: number[];
-  rightValue: number[];
   value: number[];
 }
 
@@ -124,8 +122,6 @@ export class BestSplitter extends Splitter {
       improvement: Number.MIN_SAFE_INTEGER,
       impurityLeft: Number.MAX_SAFE_INTEGER,
       impurityRight: Number.MAX_SAFE_INTEGER,
-      leftValue: [],
-      rightValue: [],
       value: []
     };
 
@@ -194,8 +190,6 @@ export class BestSplitter extends Splitter {
                 bestSplit.feature = currentFeature;
                 bestSplit.threshold = currentThreshold;
                 bestSplit.value = [ ...this.criterion.nodeValue() ];
-                bestSplit.leftValue = [ ...this.criterion.leftValue() ];
-                bestSplit.rightValue = [ ...this.criterion.rightValue() ];
               }
             }
           }

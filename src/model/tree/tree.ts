@@ -64,7 +64,7 @@ export class Tree {
   // nodes
   public nodes: Node[];
 
-  constructor (nFeature: number, nClass: number) {
+  constructor (nFeature: number, nClass?: number) {
     this.nFeature = nFeature;
     // this.nOutput = nOutput;
     this.nClass = nClass;
