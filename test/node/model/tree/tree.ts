@@ -1,4 +1,3 @@
-
 import { BestSplitter } from '../../../../src/model/tree/splitter';
 import { EntropyCriterion } from '../../../../src/model/tree/criterion';
 import { DepthFirstTreeBuilder } from '../../../../src/model/tree/tree-builder';
@@ -161,6 +160,8 @@ const irisData = [
 
 const labels = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ];
 const label_ids = labels.map((d) => d - 1);
+
+
 describe('DepthFirstTreeBuilder', () => {
   it('build tree', () => {
     const criterion = new EntropyCriterion();
@@ -177,11 +178,19 @@ describe('DepthFirstTreeBuilder', () => {
 describe('DecisionTreeClassifier', () => {
   it('fit iris', async () => {
     const dt = new DecisionTreeClassifier();
-    await dt.fit(irisData, label_ids);
+    await dt.fit(irisData, labels);
     const predY = await dt.predict(irisData);
-    const acc = accuracyScore(label_ids, predY);
+    const acc = accuracyScore(labels, predY);
     console.log('accuracy score: ', acc);
     assert.isTrue(acc > 0.95);
+  });
+  it('build pruned tree', async () => {
+    const dt = new DecisionTreeClassifier({ ccpAlpha: 0.01 });
+    await dt.fit(irisData, labels);
+    const predY = await dt.predict(irisData);
+    const acc = accuracyScore(labels, predY);
+    console.log('accuracy score: ', acc);
+    assert.isTrue(dt.tree.nodeCount < 17);
   });
 });
 
@@ -192,9 +201,5 @@ describe('DecisionTreeRegressor', () => {
     const target = irisData.map((d) => d[3]);
     await dt.fit(features, target);
     const predY = await dt.predict(features);
-    console.log(predY);
-    // const acc = accuracyScore(label_ids, predY);
-    // console.log('accuracy score: ', acc);
-    // assert.isTrue(acc > 0.95);
   });
 });

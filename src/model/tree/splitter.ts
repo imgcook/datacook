@@ -199,14 +199,6 @@ export class BestSplitter extends Splitter {
     }
 
     if (currentFeature !== bestSplit.feature) {
-      // featureX = new Array(this.nSamples);
-      // console.log('ggg');
-      // featureX = new Array(this.nSamples);
-      // for (let i = this.start; i < this.end; i++) {
-      //   const p = this.samples[i];
-      //   featureX[i] = this.X[p][bestSplit.feature];
-      // }
-      // sort(featureX, this.samples, start, end);
 
       if (bestSplit.pos < end && bestSplit.pos !== -1) {
         let partitionEnd = end;
@@ -224,31 +216,6 @@ export class BestSplitter extends Splitter {
       this.criterion.update(this.samples, bestSplit.pos);
     }
 
-    // featureX = new Array(this.nSamples);
-    // for (let i = this.start; i < this.end; i++) {
-    //   const p = this.samples[i];
-    //   featureX[i] = this.X[p][bestSplit.feature];
-    // }
-    // sort(featureX, this.samples, start, end);
-    // Reorganize into samples[start:best.pos] + samples[best.pos:end]
-    // if (bestSplit.pos < end && bestSplit.pos !== -1) {
-    //   let partitionEnd = end;
-    //   let p = start;
-    //   while (p < partitionEnd) {
-    //     if (this.X[this.samples[p]][bestSplit.feature] <= bestThreshold) {
-    //       p += 1;
-    //     } else {
-    //       partitionEnd -= 1;
-    //       [ this.samples[p], this.samples[partitionEnd] ] = [ this.samples[partitionEnd], this.samples[p] ];
-    //     }
-    //   }
-    //   // this.criterion.reset();
-    //   // this.criterion.update(this.samples, bestSplit.pos);
-    //   // const { impurityLeft, impurityRight } = this.criterion.childrenImpurity();
-    //   // bestSplit.impurityLeft = impurityLeft;
-    //   // bestSplit.impurityRight = impurityRight;
-    //   // bestSplit.improvement = this.criterion.impurityImprovement(impurity, impurityLeft, impurityRight);
-    // }
     return { split: bestSplit, nConstantFeatures: nTotalConstants };
   }
 }

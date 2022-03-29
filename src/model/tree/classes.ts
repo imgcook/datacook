@@ -6,6 +6,7 @@ import { LabelEncoder } from "../../preprocess/encoder";
 import { BestSplitter } from "./splitter";
 import { EntropyCriterion, GiniCriterion, MSECriterion } from "./criterion";
 import { DepthFirstTreeBuilder } from "./tree-builder";
+import { buildPrunedTree } from "./tree-pruner";
 
 export type DecisionTreeCriterion = 'entropy' | 'gini' | 'mse';
 export type DecisionTreeSplitter = 'best';
@@ -50,9 +51,7 @@ class BaseDecisionTree extends BaseEstimator {
 
   constructor(params: BaseDecisionTreeParams = {}) {
     super();
-    const defaultCriterion = this.isClassifier() ? 'entropy' : 'mse';
-    const { 
-      criterion = defaultCriterion,
+    const {
       splitter = 'best',
       maxDepth,
       minSamplesSplit = 2,
@@ -60,9 +59,9 @@ class BaseDecisionTree extends BaseEstimator {
       minWeightFractionLeaf = 0,
       maxFeatures,
       maxLeafNodes,
-      minImpurityDecrease = 0
+      minImpurityDecrease = 0,
+      ccpAlpha = 0
     } = params;
-    this.criterion = criterion;
     this.splitter = splitter;
     this.maxDepth = maxDepth;
     this.minSamplesSplit = minSamplesSplit;
@@ -71,6 +70,7 @@ class BaseDecisionTree extends BaseEstimator {
     this.maxFeatures = maxFeatures;
     this.maxLeafNodes = maxLeafNodes;
     this.minImpurityDecrease = minImpurityDecrease;
+    this.ccpAlpha = ccpAlpha;
   }
 
   public getDepth() {
@@ -192,6 +192,7 @@ class BaseDecisionTree extends BaseEstimator {
     const tree = new Tree(this.nFeature);
     treeBuilder.build(tree, xArray, y, sampleWeight);
     this.tree = tree;
+    this.pruneTree();
   }
   public async predict(xData: Tensor | number[][]): Promise<number[] | string[]> {
     const isClassification = this.isClassifier();
@@ -205,13 +206,24 @@ class BaseDecisionTree extends BaseEstimator {
       return res.map((d) => d[0]);
     }
   }
+  private pruneTree(): void {
+    if (this.ccpAlpha < 0) {
+      throw new TypeError("ccpAlpha must be greater than or equal to 0");
+    }
+    if (this.ccpAlpha === 0) {
+      return;
+    }
+    this.tree = buildPrunedTree(this.tree, this.ccpAlpha);
+  }
 }
 
 
 export class DecisionTreeClassifier extends BaseDecisionTree {
-  public estimatorType: string = 'classsifier';
+  public estimatorType: string = 'classifier';
   constructor(params: BaseDecisionTreeParams = {}) {
     super(params);
+    const { criterion = 'entropy' } = params;
+    this.criterion = criterion;
   }
 }
 
@@ -219,5 +231,7 @@ export class DecisionTreeRegressor extends BaseDecisionTree {
   public estimatorType: string = 'regressor';
   constructor(params: BaseDecisionTreeParams = {}) {
     super(params);
+    const { criterion = 'mse' } = params;
+    this.criterion = criterion;
   }
 }

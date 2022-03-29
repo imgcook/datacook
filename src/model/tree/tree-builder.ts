@@ -65,7 +65,6 @@ export class DepthFirstTreeBuilder {
     });
     while (!stack.isEmpty()) {
       stackRecord = stack.pop();
-      console.log(stackRecord);
       const { start, end, depth, parent, isLeft } = stackRecord;
       let { impurity, nConstantFeatures } = stackRecord;
       const nNodeSamples = end - start;
@@ -124,7 +123,3 @@ export class DepthFirstTreeBuilder {
     tree.maxDepth = maxDepthSeen;
   }
 }
-
-// export const buildPrunedTree = (originTree: Tree, capacity: number): Tree => {
-//   const tree = new Tree();
-// };

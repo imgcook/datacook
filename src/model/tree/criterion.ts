@@ -183,6 +183,7 @@ export abstract class RegressionCriterion extends Criterion {
     this.sumTotal = [ 0 ];
     this.sumLeft = [ 0 ];
     this.sumRight = [ 0 ];
+    this.sqSumTotal = 0;
     for (let i = start; i < end; i++) {
       const pos = samples[i];
       let w = 1;
@@ -335,7 +336,7 @@ export class MSECriterion extends RegressionCriterion {
       const w = this.sampleWeight ? this.sampleWeight[i] : 1;
       sqSumLeft += w * this.y[i] * this.y[i];
     }
-    sqSumRight += this.sqSumTotal - sqSumLeft;
+    sqSumRight = this.sqSumTotal - sqSumLeft;
     const leftVal = this.sumLeft[0] / this.weightedNLeft;
     const rightVal = this.sumRight[0] / this.weightedNRight;
     const impurityLeft = sqSumLeft / this.weightedNLeft - leftVal * leftVal;
