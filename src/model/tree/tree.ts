@@ -1,4 +1,3 @@
-import { Tensor1D, sum, equal, add, Tensor, TensorLike, RecursiveArray, gather, slice } from "@tensorflow/tfjs-core";
 import { checkJSArray } from "../../utils/validation";
 
 export const SIZE_MAX = Number.MAX_SAFE_INTEGER;
@@ -84,7 +83,7 @@ export class Tree {
       if (node.leftChild != -1 && node.rightChild != -1){
         const leftNode = this.nodes[node.leftChild];
         const rightNode = this.nodes[node.rightChild];
-        importances[node.feature] += node.impurity * node.weightedNNodeSamples - leftNode.impurity * leftNode.weightedNNodeSamples - rightNode.impurity * rightNode.weightedNNodeSamples;
+        importances[node.feature] += node.impurity * node.weightedNNodeSamples- leftNode.impurity * leftNode.weightedNNodeSamples - rightNode.impurity * rightNode.weightedNNodeSamples;
       }
     });
     const sampleCount = this.nodes[0].weightedNNodeSamples;
@@ -144,9 +143,7 @@ export class Tree {
     }
     // TODO: capacity > this.nodeCount
   }
-  // public applyDecisionPathDense(xData: Tensor | RecursiveArray<number>, capacity: Tensor): void {
-  //   const xTensor = checkArray(xData, 'float32', 2);
-  // }
+
   public addNode(parent: number,
     isLeft: boolean,
     isLeaf: boolean,
@@ -159,7 +156,7 @@ export class Tree {
   ): number {
     const nodeId = this.nodeCount;
     if (nodeId >= this.capacity) {
-      // if (this.resize())
+
       this.resize(nodeId);
     }
     const node = {
@@ -174,23 +171,7 @@ export class Tree {
       isLeft: isLeft,
       value: value
     };
-    // node.impurity = impurity;
-    // node.nNodeSamples = nNodeSamples;
-    // node.weightedNNodeSamples = weightedNNodeSamples;
 
-    // if (!isLeaf) {
-    //   node.feature = feature;
-    //   node.threshold = threshold;
-    // }
-    // if (isLeaf) {
-    //   node.leftChild = null;
-    //   node.rightChild = null;
-    //   node.feature = null;
-    //   node.threshold = null;
-    // } else {
-    //   node.feature = feature;
-    //   node.threshold = threshold;
-    // }
     if (parent >= 0) {
       if (isLeft) {
         this.nodes[parent].leftChild = nodeId;
