@@ -1,6 +1,6 @@
 import { Tree } from "./tree";
 import { BaseEstimator } from "../base";
-import { max, RecursiveArray, tensor, Tensor, Tensor1D } from "@tensorflow/tfjs-core";
+import { RecursiveArray, Tensor, Tensor2D } from "@tensorflow/tfjs-core";
 import { checkJSArray } from "../../utils/validation";
 import { LabelEncoder } from "../../preprocess/encoder";
 import { BestSplitter } from "./splitter";
@@ -220,10 +220,72 @@ class BaseDecisionTree extends BaseEstimator {
 
 export class DecisionTreeClassifier extends BaseDecisionTree {
   public estimatorType: string = 'classifier';
+  /**
+   * 
+   * @param params parameters 
+   * Option in params
+   * ------
+   * `criterion`: {"gini", "entropy"}, default="gini"
+   *     The function to measure the quality of split
+   * 
+   * `maxDepth`: number, 
+   *     The maximum depth of the tree. If None, the nodes will
+   *     expanded until all leaves are pure or until all leaves
+   *     contain less than `minSamplesSplit` samples.
+   * 
+   * `minSampleSplit`: number, default=2
+   *     The minimum number of samples required to split an internal
+   *     node:
+   *     - If integer value, then consider `minSamplesSplit` as the minimum
+   *       number.
+   *     - If float value, then `minSamplesSplit` is a fraction and
+   *       `Math.ceil(minSamplesSplit * nSamples)` are the minimum
+   *       number of samples for each split.
+   * 
+   * `minSamplesLeaf`: number, default=1
+   *     The minimum number of samples required to be at a leaf node.
+   *     A split point at any depth will only be considered if it leaves at
+   *     least ``min_samples_leaf`` training samples in each of the left and
+   *     right branches.  This may have the effect of smoothing the model,
+   *     especially in regression.
+   *
+   *     - If integer value, then consider `min_samples_leaf` as the minimum number.
+   *     - If float value, then `min_samples_leaf` is a fraction and
+   *       `ceil(min_samples_leaf * n_samples)` are the minimum
+   *       number of samples for each node.
+   *
+   * `min_weight_fraction_leaf` : number, default=0.0
+   *     The minimum weighted fraction of the sum total of weights (of all
+   *     the input samples) required to be at a leaf node. Samples have
+   *     equal weight when sample_weight is not provided.
+   *
+   * `max_features` : number, or {"auto", "sqrt", "log2"}, default = None
+   *     The number of features to consider when looking for the best split:
+   *
+   *     - If integer value, then consider `max_features` features at each split.
+   *     - If float value, then `max_features` is a fraction and
+   *        `int(max_features * n_features)` features are considered at each
+   *         split.
+   *     - If "auto", then `max_features=sqrt(n_features)`.
+   *     - If "sqrt", then `max_features=sqrt(n_features)`.
+   *     - If "log2", then `max_features=log2(n_features)`.
+   *     - If None, then `max_features=n_features`.
+   *
+   * `ccpAlpha`: number, default=0
+   *     Complexity parameter used for Minimal Cost-complexity Pruning.
+   *     The subtree with the largest cost complexity that is smaller
+   *     than `ccpAlpha` will be chosen. By default, no pruning is
+   *     performed. 
+   */
   constructor(params: BaseDecisionTreeParams = {}) {
     super(params);
-    const { criterion = 'entropy' } = params;
+    const { criterion = 'gini' } = params;
     this.criterion = criterion;
+  }
+
+  public async predictProb(X: number[][] | Tensor2D): Promise<number[][]> {
+    const xArray = checkJSArray(X, 'float32', 2) as number[][];
+    return this.tree.predict(xArray);
   }
 }
 

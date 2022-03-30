@@ -184,6 +184,16 @@ describe('DecisionTreeClassifier', () => {
     console.log('accuracy score: ', acc);
     assert.isTrue(acc > 0.95);
   });
+
+  it('predict probability', async () => {
+    const dt = new DecisionTreeClassifier();
+    await dt.fit(irisData, labels);
+    const predProba = await dt.predictProb(irisData);
+    // const acc = accuracyScore(labels, predY);
+    // console.log('accuracy score: ', acc);
+    // assert.isTrue(acc > 0.95);
+  });
+
   it('build pruned tree', async () => {
     const dt = new DecisionTreeClassifier({ ccpAlpha: 0.01 });
     await dt.fit(irisData, labels);

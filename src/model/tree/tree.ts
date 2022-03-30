@@ -83,7 +83,7 @@ export class Tree {
       if (node.leftChild != -1 && node.rightChild != -1){
         const leftNode = this.nodes[node.leftChild];
         const rightNode = this.nodes[node.rightChild];
-        importances[node.feature] += node.impurity * node.weightedNNodeSamples- leftNode.impurity * leftNode.weightedNNodeSamples - rightNode.impurity * rightNode.weightedNNodeSamples;
+        importances[node.feature] += node.impurity * node.weightedNNodeSamples - leftNode.impurity * leftNode.weightedNNodeSamples - rightNode.impurity * rightNode.weightedNNodeSamples;
       }
     });
     const sampleCount = this.nodes[0].weightedNNodeSamples;
@@ -120,6 +120,33 @@ export class Tree {
     }
     return values;
   };
+
+  /**
+   * Find the decsision path for each sample in X
+   * @param xData 
+   */
+  public decisionPathDense = (xData: number[][]): number[][] => {
+    const nSamples = xData.length;
+    const path: number[][] = [];
+    for (let i = 0; i < nSamples; i++) {
+      const curPath: number[] = [];
+      const sample = xData[i];
+      let node = this.nodes[0];
+      curPath.push(0);
+      while (node.leftChild != -1 && node.rightChild != -1) {
+        const xFeatureVal = sample[node.feature];
+        if (xFeatureVal <= node.threshold) {
+          node = this.nodes[node.leftChild];
+          curPath.push(node.leftChild);
+        } else {
+          node = this.nodes[node.rightChild];
+          curPath.push(node.rightChild);
+        }
+      }
+      path.push(curPath);
+    }
+    return path;
+  }
 
   public predict(x: number[][]): number[][] {
     return this.applyDense(x);

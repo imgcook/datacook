@@ -151,7 +151,7 @@ export abstract class ClassificationCriterion extends Criterion {
    * Compute the node value of samples[start:end] into dest.
    */
   public nodeValue(): number[] {
-    return [ ...this.sumTotal ];
+    return this.sumTotal.map((d) => d / this.weightedNNodeSamples);
   }
   public leftValue(): number[] {
     return [ ...this.sumLeft ];
