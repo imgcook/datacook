@@ -1,0 +1,1 @@
+export { LogisticRegressionPredictor } from './linear-model';

@@ -1,0 +1,25 @@
+{
+  "packages": [
+    "packages/datacook",
+    "packages/datacook-predictor"
+  ],
+  "version": "independent",
+  "loglevel": "verbose",
+  "npmClient": "npm",
+  "command": {
+    "publish": {
+      "npmClient": "npm",
+      "registry": "https://registry.npmjs.org"
+    },
+    "publishConfig": {
+      "access": "public"
+    },
+    "bootstrap": {
+      "nohoist": [
+        "ice-scripts",
+        "stylelint"
+      ]
+    }
+  },
+  "hoist": true
+}

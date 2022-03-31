@@ -4,3 +4,5 @@ dist
 pipcook_venv
 output
 example
+packages/datacook/test
+packages/datacook/webpack.config.js
