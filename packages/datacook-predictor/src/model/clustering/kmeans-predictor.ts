@@ -67,7 +67,7 @@ export class KMeansPredictor extends BaseClustring {
    */
   public getClusIndex(x: number[][], centroids: number[][]): number[] {
     const newDists = this.getClusDist(x, centroids);
-    return (argMin2d(new Matrix(newDists), 0) as Vector).data;
+    return (argMin2d(new Matrix(newDists), 1) as Vector).data;
   }
   /**
    * Predict sample clusters for given input.

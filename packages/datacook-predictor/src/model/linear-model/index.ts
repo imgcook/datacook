@@ -1,1 +1,0 @@
-export { LogisticRegressionPredictor } from './logistic-regression-predictor';

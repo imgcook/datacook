@@ -1,5 +1,6 @@
 const path = require("path");
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const createConfig = (target) => {
   return {
     mode: "production",
@@ -7,8 +8,7 @@ const createConfig = (target) => {
     context: path.resolve(__dirname),
     entry: {
       // TODO: recover index entry
-      logisticPredictor: './dist/model/linear-model/logistic-regression-predictor.js',
-      kmeansPredictor: './dist/model/clustering/kmeans-predictor.js'
+      kmeansPredictor: './dist/model/clustering/kmeans-predictor'
     },
     target: target,
     output: {
@@ -17,6 +17,7 @@ const createConfig = (target) => {
       library: "datacook"
     },
     plugins: [
+      new CleanWebpackPlugin(),
       new BundleAnalyzerPlugin()
     ],
     module: {

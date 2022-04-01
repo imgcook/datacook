@@ -3,10 +3,11 @@
   "version": "0.1.2",
   "description": "A JavaScript library for feature engineering on datasets",
   "main": "dist/index.js",
+  "sideEffects": false,
   "scripts": {
     "test": "npm run test:node",
     "test:node": "nyc mocha --timeout 60000 -r ts-node/register ./test/node/**/*.ts",
-    "test:simple": "mocha --timeout 60000 -r ts-node/register",
+    "test:simple": "mocha --timeout 60000 -r ts-node/register --require test/setup.ts",
     "test:browser": "karma start --single-run --browsers ChromeHeadless karma.conf.js",
     "build": "npm run clean && npm run build:node",
     "build:node": "tsc -b tsconfig.json",
@@ -37,15 +38,16 @@
   },
   "homepage": "https://github.com/imgcook/datacook#README",
   "devDependencies": {
-    "babel-loader": "^8.2.2",
     "@babel/preset-env": "^7.15.4",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.14.20",
     "@typescript-eslint/eslint-plugin": "^4.6.0",
     "@typescript-eslint/parser": "^4.6.0",
+    "babel-loader": "^8.2.2",
     "browserify": "16.5.2",
     "chai": "^4.2.0",
+    "clean-webpack-plugin": "^4.0.0",
     "coveralls": "^3.1.0",
     "eslint": "^7.1.0",
     "karma": "^6.3.4",
@@ -60,7 +62,8 @@
     "typescript": "^4.0.5",
     "webpack": "5.50.0",
     "webpack-bundle-analyzer": "^4.4.2",
-    "webpack-cli": "^4.8.0"
+    "webpack-cli": "^4.8.0",
+    "webpack-deep-scope-plugin": "^1.6.2"
   },
   "nyc": {
     "reporter": [

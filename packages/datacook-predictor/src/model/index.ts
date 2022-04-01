@@ -1,1 +1,1 @@
-export { LogisticRegressionPredictor } from './linear-model';
+export { KMeansPredictor } from './clustering/kmeans-predictor';
