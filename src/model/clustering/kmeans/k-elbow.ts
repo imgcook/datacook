@@ -1,24 +1,18 @@
 import { dispose, RecursiveArray, Tensor } from '@tensorflow/tfjs-core';
 import { KMeans } from '.';
 import { checkArray } from '../../../utils/validation';
-import { BaseClustering } from '../../base';
 
 // export class kElbow
 export interface InertiaItem {
   inertia: number;
   k: number;
+  model: KMeans;
 }
 export interface KElbowPrams {
   k?: [ number, number ],
   verbose?: boolean
 }
 
-export class KElbow {
-  public models: KMeans[];
-  constructor() {
-       
-  }
-}
 /**
  * K-elbow implements the “elbow” method to help users to select the optimal number of clusters
  * by fitting the model with a range of values for K
@@ -37,19 +31,28 @@ export const kElbow = async (estimitor: KMeans, xData: Tensor | RecursiveArray<n
   const { k = [ 2, 10 ], verbose = false } = params;
   const [ start, end ] = k;
   const elbowsData = [];
+  const {
+    tol,
+    nInit,
+    maxIterTimes,
+    init
+  } = estimitor;
+  const modelVerbosity = estimitor.verbose;
   for (let i = start; i < end; i++) {
-    estimitor.nClusters = i;
+    const curEstimator = new KMeans({ tol, nInit, maxIterTimes, init, verbose: modelVerbosity });
+    curEstimator.nClusters = i;
     if (verbose) {
       console.log('Start fitting for nCluster=', i);
     }
-    await estimitor.fit(xTensor);
-    const inertia = estimitor.inertiaDense(xTensor, estimitor.centroids);
+    await curEstimator.fit(xTensor);
+    const inertia = curEstimator.inertiaDense(xTensor, curEstimator.centroids);
     if (verbose) {
       console.log(`nCluster=${i} fitted, inertia=${inertia}`);
     }
     elbowsData.push({
       inertia,
-      k: i
+      k: i,
+      model: curEstimator
     });
   }
   if (!(xData instanceof Tensor)) {

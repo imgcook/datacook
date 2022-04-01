@@ -485,6 +485,9 @@ export class KMeans extends BaseClustering {
    * @returns Stringfied model parameters
    */
   public async toJson(): Promise<string> {
+    if (!this.centroids) {
+      throw new TypeError('Please fit model at first');
+    }
     const modelParams = {
       name: 'KMeans',
       nInit: this.nInit,
