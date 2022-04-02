@@ -7,13 +7,14 @@ const createConfig = (target) => {
     devtool: "source-map",
     context: path.resolve(__dirname),
     entry: {
-      // TODO: recover index entry
-      kmeansPredictor: './dist/model/clustering/kmeans-predictor'
+      index: './src/index.ts',
+      kmeansPredictor: './src/model/clustering/kmeans-predictor.ts'
     },
     target: target,
     output: {
       path: path.resolve(__dirname, "dist"),
       filename: '[name].bundle.js',
+      chunkFilename: '[id].js',
       library: "datacook"
     },
     plugins: [
@@ -29,13 +30,24 @@ const createConfig = (target) => {
           },
           test: /\.(js|jsx)$/,
           exclude: /node_modules/
+        },
+        {
+          test: /\.tsx?$/,
+          // ts-loader是官方提供的处理tsx的文件
+          use: 'ts-loader',
+          exclude: /node_modules/
         }
       ]
     },
     resolve: {
+      extensions: [ '.tsx', '.ts', '.js' ],
       fallback: {
         fs: false
       }
+    },
+    optimization: {
+      sideEffects: false,
+      usedExports: true
     }
   };
 };

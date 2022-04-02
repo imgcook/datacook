@@ -3,22 +3,20 @@
       "resolveJsonModule": true,
       "composite": true,
       "outDir": "./dist",
-      "rootDir": "./src",
+      "rootDir": "./",
       "declaration": true,
       "noImplicitAny": true,
       "esModuleInterop": true,
       "incremental": true,
-      "module": "es6",
-      "target": "es5",
-      "moduleResolution": "node",
+      "module": "commonjs",
+      "target": "es6",
       "lib": [ "es6" ],
       "skipLibCheck": true,
       "sourceMap": true
     },
-    "compileOnSave": true,
     "exclude": [
       "node_modules",
-      "test",
       "dist"
     ]
   }
+  

@@ -1,7 +1,6 @@
 import { assert } from 'chai';
-import 'mocha';
-import { KMeans } from '../../../../datacook/src/model/clustering/kmeans';
-import { KMeansPredictor } from '../../../src/model/clustering/kmeans-predictor';
+import { KMeans } from '@pipcook/datacook/dist/model/clustering/kmeans';
+import { KMeansPredictor } from '../../src/model/clustering/kmeans-predictor';
 
 const irisData = [
   [ 5.1, 3.5, 1.4, 0.2 ],
@@ -165,9 +164,8 @@ describe('KMeans Predictor', () => {
     await kmeansPredictor.fromJson(modelJson);
     const predClus = (await kmeans.predict(irisData)).arraySync() as number[];
     const predClus2 = await kmeansPredictor.predict(irisData);
-    for (let i = 0; i < predClus2.length; i++) {
+    for (let i = 0; i < predClus.length; i++) {
       assert.isTrue(predClus[i] === predClus2[i]);
     }
-
   });
 });
