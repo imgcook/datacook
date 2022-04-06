@@ -7,8 +7,8 @@
   "scripts": {
     "preinstall": "rm -rf ./node_modules/@pipcook && mkdir -p ./node_modules/@pipcook && ln -s `pwd`/../datacook `pwd`/node_modules/@pipcook",
     "test": "npm run test:node",
-    "test:node": "nyc mocha --timeout 60000 -r ts-node/register ./test/node/**/*.ts",
-    "test:simple": "mocha --timeout 60000 -r ts-node/register --require test/setup.ts",
+    "test:node": "env TS_NODE_PROJECT=\"tsconfig.test.json\" nyc mocha --timeout 60000 -r ts-node/register ./test/**/*.ts --require test/setup.ts",
+    "test:simple": "env TS_NODE_PROJECT=\"tsconfig.test.json\" mocha --timeout 60000 -r ts-node/register --require test/setup.ts",
     "test:browser": "karma start --single-run --browsers ChromeHeadless karma.conf.js",
     "build": "npm run clean && npm run build:node",
     "build:node": "tsc -b tsconfig.json",
@@ -40,6 +40,8 @@
   "homepage": "https://github.com/imgcook/datacook#README",
   "devDependencies": {
     "@babel/preset-env": "^7.15.4",
+    "@tensorflow/tfjs-backend-cpu": "^3.15.0",
+    "@tensorflow/tfjs-core": "^3.15.0",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.14.20",
@@ -60,22 +62,21 @@
     "karma-typescript": "^5.5.3",
     "mocha": "^7.2.0",
     "nyc": "^15.1.0",
+    "terser-webpack-plugin": "^5.3.1",
     "ts-loader": "^9.2.8",
     "ts-node": "^10.2.0",
     "typedoc": "^0.20.34",
     "typescript": "^4.6.3",
+    "uglify-js-plugin": "^0.0.6",
+    "uglifyjs-webpack-plugin": "^2.2.0",
     "webpack": "5.50.0",
     "webpack-bundle-analyzer": "^4.4.2",
-    "webpack-cli": "^4.8.0",
-    "webpack-deep-scope-plugin": "^1.6.2"
+    "webpack-cli": "^4.8.0"
   },
   "nyc": {
     "reporter": [
       "lcov",
       "text"
     ]
-  },
-  "dependencies": {
-    "ml-matrix": "^6.8.0"
   }
 }

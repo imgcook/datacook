@@ -1,6 +1,7 @@
 const path = require("path");
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const { DefinePlugin } = require('webpack');
+const TerserPlugin = require("terser-webpack-plugin");
 const createConfig = (target) => {
   return {
     mode: "production",
@@ -18,8 +19,11 @@ const createConfig = (target) => {
       library: "datacook"
     },
     plugins: [
-      new CleanWebpackPlugin(),
-      new BundleAnalyzerPlugin()
+      new BundleAnalyzerPlugin(),
+      new DefinePlugin({
+        // __BACKEND__: 'cpu'
+        'process.env.BACKEND': JSON.stringify('cpu'),
+      })
     ],
     module: {
       rules: [
@@ -47,8 +51,9 @@ const createConfig = (target) => {
     },
     optimization: {
       sideEffects: false,
-      usedExports: true
-    }
+      minimize: true,
+      minimizer: [new TerserPlugin()],
+    },
   };
 };
 

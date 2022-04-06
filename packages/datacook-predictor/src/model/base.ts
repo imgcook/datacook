@@ -1,9 +1,8 @@
 import { OneHotEncoder, OneHotDropTypes } from "../preprocess/encoder";
 import { checkJsArray2D } from "../utils";
 
-export class BaseEstimator {
+class BaseEstimator {
   public nFeature: number;
-
   /**
    * Check if input feature match the required feature size. If reset is true,
    * reset nFeature = x.shape[1]
@@ -23,7 +22,7 @@ export class BaseEstimator {
   }
 }
 
-export class BaseClustring extends BaseEstimator {
+class BaseClustring extends BaseEstimator {
   public estimatorType = 'clustering';
   public validateData(x: number[][], reset = false): void {
     checkJsArray2D(x);
@@ -31,7 +30,7 @@ export class BaseClustring extends BaseEstimator {
   }
 }
 
-export class BaseClassifier<T extends number | string> extends BaseEstimator{
+class BaseClassifier<T extends number | string> extends BaseEstimator{
     public estimatorType = 'classifier';
     public classOneHotEncoder: OneHotEncoder<T>;
     // get label one-hot expression
@@ -67,3 +66,5 @@ export class BaseClassifier<T extends number | string> extends BaseEstimator{
       return { x, y };
     }
 }
+
+export { BaseClassifier, BaseEstimator, BaseClustring };

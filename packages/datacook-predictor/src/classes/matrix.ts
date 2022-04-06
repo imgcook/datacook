@@ -33,4 +33,7 @@ export class Matrix {
   public set(i: number, j: number, x: number): void {
     this.data[i][j] = x;
   }
+  public hahaha(): void {
+    console.log('hhh');
+  }
 }
