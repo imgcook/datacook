@@ -1,11 +1,11 @@
 {
   "name": "@pipcook/datacook",
-  "version": "0.1.2-beta.12",
+  "version": "0.1.3-beta.7",
   "description": "A JavaScript library for feature engineering on datasets",
   "main": "dist/index.js",
   "dependencies": {
-    "@tensorflow/tfjs-core": "^3.8.0",
-    "@tensorflow/tfjs-layers": "^3.8.0",
+    "@tensorflow/tfjs-core": "3.8.0",
+    "@tensorflow/tfjs-layers": "3.8.0",
     "jimp": "^0.16.1",
     "seedrandom": "^3.0.5"
   },
