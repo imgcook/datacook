@@ -13,7 +13,7 @@ export const matMul2d = (x: Matrix, y: Matrix): Matrix => {
   for (let i = 0; i < nX; i++) {
     for (let j = 0; j < mY; j++) {
       for (let k = 0; k < mX; k++) {
-        out[i][j] += x.get(i, k) + y.get(k, j);
+        out[i][j] += x.get(i, k) * y.get(k, j);
       }
     }
   }

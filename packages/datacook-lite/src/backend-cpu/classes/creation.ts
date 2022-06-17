@@ -7,3 +7,4 @@ export const createZeroMatrix = (n: number, m: number): Matrix => {
   }
   return new Matrix(mat);
 };
+

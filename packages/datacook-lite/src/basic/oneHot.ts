@@ -1,7 +1,7 @@
-export const oneHot = (x: number[], size: number) => {
+export const oneHot = (x: number[], size: number): number[][] => {
   return x.map((d: number) => {
-    let dOneHot = new Array(size).fill(0);
+    const dOneHot = new Array(size).fill(0);
     dOneHot[d] = 1;
     return dOneHot;
-  })
-}
+  });
+};

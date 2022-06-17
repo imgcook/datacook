@@ -52,3 +52,10 @@ export const pow2d = (x: Matrix, y: number): Matrix => {
   };
   return basicImplement2dSingle(func, x);
 };
+
+export const sigmoid2d = (x: Matrix): Matrix => {
+  const func = (a: number): number => {
+    return 1 / (1 + Math.exp(-a));
+  };
+  return basicImplement2dSingle(func, x);
+};

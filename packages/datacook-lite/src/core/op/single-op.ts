@@ -5,7 +5,8 @@ import {
   exp2d as exp2dCPU,
   pow2d as pow2dCPU,
   neg2d as neg2dCPU,
-  abs2d as abs2dCPU
+  abs2d as abs2dCPU,
+  sigmoid2d as sigmoid2dCPU
 } from '../../backend-cpu/op/single-op';
 import { IS_CPU_BACKEND } from "../../env";
 import { getMethodErrorStr } from "./utils";
@@ -56,5 +57,13 @@ export const abs2d = (x: Matrix): Matrix => {
     return abs2dCPU(x);
   } else {
     throw new TypeError(getMethodErrorStr('abs2d'));
+  }
+};
+
+export const sigmoid2d = (x: Matrix): Matrix => {
+  if (IS_CPU_BACKEND) {
+    return sigmoid2dCPU(x);
+  } else {
+    throw new TypeError(getMethodErrorStr('sigmoid2d'));
   }
 };

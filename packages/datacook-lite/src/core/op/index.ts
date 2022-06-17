@@ -20,9 +20,14 @@ export {
   exp2d,
   pow2d,
   neg2d,
-  abs2d
+  abs2d,
+  sigmoid2d
 } from './single-op';
 
 export {
   matMul2d
 } from './matmul';
+
+export {
+  softmax2d
+} from './cofound-op';

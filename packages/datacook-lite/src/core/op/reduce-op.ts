@@ -6,7 +6,7 @@ import {
   min2d as min2dCPU,
   sum2d as sum2dCPU,
   mean2d as mean2dCPU
-} from '../../backend-cpu/op/reduce-op';
+} from '../../backend-cpu/op';
 import { IS_CPU_BACKEND } from "../../env";
 import { getMethodErrorStr } from "./utils";
 
