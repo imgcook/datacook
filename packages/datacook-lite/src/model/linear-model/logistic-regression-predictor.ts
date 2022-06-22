@@ -18,7 +18,6 @@ export class LogisticRegressionPredictor extends BaseClassifier<number | string>
   public async predict(xData: number[][]) : Promise<(string | number | boolean)[]> {
     const x = matrix(xData);
     const scores = add2d(matMul2d(x, this.modelWeights[0]), this.modelWeights[1], 0);
-    // const scores = await this.predictProba(xData);
     return this.getPredClass(scores.data);
   }
   /**
@@ -28,9 +27,9 @@ export class LogisticRegressionPredictor extends BaseClassifier<number | string>
    */
   public async predictProba(xData: number[][]) : Promise<number[][]> {
     const x = matrix(xData);
-    // if (!checkShape(x, [ -1, this.featureSize ])) {
-    //   throw TypeError('Feature size does not match');
-    // }
+    if (x.shape[1] !== this.featureSize) {
+      throw TypeError('Feature size does not match');
+    }
     const scores = add2d(matMul2d(x, this.modelWeights[0]), this.modelWeights[1], 0);
     return this.isBinaryClassification() ? sigmoid2d(scores).data : softmax2d(scores).data;
   }

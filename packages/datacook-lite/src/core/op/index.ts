@@ -31,3 +31,7 @@ export {
 export {
   softmax2d
 } from './cofound-op';
+
+export {
+  transpose2d
+} from './transform';

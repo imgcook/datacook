@@ -75,11 +75,11 @@ export class OneHotEncoder<T extends number | string> extends EncoderBase<T> {
     const xInd = x.map((d: T) => this.cateMap[d]);
     const nCate = this.categories.length;
     if (this.drop === 'binary-only' && nCate === 2) {
-        return xInd;
+      return xInd;
     } else if (this.drop === 'first') {
-    return oneHot(xInd.map((d: number) => d - 1), nCate - 1);
+      return oneHot(xInd.map((d: number) => d - 1), nCate - 1);
     } else {
-    return oneHot(xInd, nCate);
+      return oneHot(xInd, nCate);
     }
   }
   /**
@@ -99,7 +99,7 @@ export class OneHotEncoder<T extends number | string> extends EncoderBase<T> {
     if (!shapeCorrect) {
       throw new TypeError('Input shape does not match');
     }
-    const cateInd = (this.drop === 'binary-only' && nCate === 2) 
+    const cateInd = (this.drop === 'binary-only' && nCate === 2)
       ? x.map((d: number | number[]): number => Number(d instanceof Array ? d[0] > 0.5 : d > 0.5))
       : x.map((d: number[] | number): number => d instanceof Array ? d.indexOf(Math.max(...d)) : 0);
     const cateArrays: T[] = [];
