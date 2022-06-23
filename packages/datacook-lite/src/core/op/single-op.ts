@@ -1,4 +1,4 @@
-import { Matrix } from "../classes";
+import { Matrix, Vector } from "../classes";
 import {
   sqrt2d as sqrt2dCPU,
   square2d as square2dCPU,
@@ -6,7 +6,8 @@ import {
   pow2d as pow2dCPU,
   neg2d as neg2dCPU,
   abs2d as abs2dCPU,
-  sigmoid2d as sigmoid2dCPU
+  sigmoid2d as sigmoid2dCPU,
+  sqrt1d as sqrt1dCPU
 } from '../../backend-cpu/op/single-op';
 import { IS_CPU_BACKEND } from "../../env";
 import { getMethodErrorStr } from "./utils";
@@ -26,6 +27,7 @@ export const sqrt2d = (x: Matrix): Matrix => {
     throw new TypeError(getMethodErrorStr('sqrt2d'));
   }
 };
+
 
 export const exp2d = (x: Matrix): Matrix => {
   if (IS_CPU_BACKEND) {
@@ -65,5 +67,13 @@ export const sigmoid2d = (x: Matrix): Matrix => {
     return sigmoid2dCPU(x);
   } else {
     throw new TypeError(getMethodErrorStr('sigmoid2d'));
+  }
+};
+
+export const sqrt1d = (x: Vector): Vector => {
+  if (IS_CPU_BACKEND) {
+    return sqrt1dCPU(x);
+  } else {
+    throw new TypeError(getMethodErrorStr('sqrt1d'));
   }
 };

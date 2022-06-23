@@ -59,21 +59,4 @@ describe('Naive bayes', () => {
     assert.deepEqual(class_prob_sum.arraySync(), class_sum);
   });
 
-  //   it('predict test case', async () => {
-  //     const mnb = new MultinomialNB();
-  //     await mnb.train(cases, labels);
-  //     const yPred = await mnb.predict(testCases);
-  //     assert.deepEqual(yPred.arraySync() as any, testLabels);
-  //   });
-
-  //   it('save and load model', async () => {
-  //     const mnb = new MultinomialNB();
-  //     await mnb.train(cases, labels);
-  //     const modelJson = mnb.toJson();
-  //     const mnb2 = new MultinomialNB();
-  //     await mnb2.load(modelJson);
-  //     const yPred = await mnb2.predict(testCases);
-  //     assert.deepEqual(yPred.arraySync() as any, testLabels);
-  //   });
-
 });

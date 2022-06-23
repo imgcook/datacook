@@ -1,6 +1,7 @@
-import { Matrix } from "../classes";
+import { Matrix, Vector } from "../classes";
 import {
-  basicImplement2dSingle
+  basicImplement2dSingle,
+  basicImplement1dSingle
 } from "./basic-impl";
 
 
@@ -58,4 +59,11 @@ export const sigmoid2d = (x: Matrix): Matrix => {
     return 1 / (1 + Math.exp(-a));
   };
   return basicImplement2dSingle(func, x);
+};
+
+export const sqrt1d = (x: Vector): Vector => {
+  const func = (a: number): number => {
+    return Math.sqrt(a);
+  };
+  return basicImplement1dSingle(func, x);
 };

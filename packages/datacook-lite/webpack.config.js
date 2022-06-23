@@ -9,7 +9,10 @@ const createConfig = (target) => {
     context: path.resolve(__dirname),
     entry: {
       index: './src/index.ts',
-      kmeansPredictor: './src/model/clustering/kmeans-predictor.ts'
+      kmeansPredictor: './src/model/clustering/kmeans-predictor.ts',
+      logisticRegressionPredictor: './src/model/linear-model/logistic-regression-predictor.ts',
+      naiveBayesPredictor: './src/model/naive-bayes/naive-bayes-predictor.ts',
+      pcaPredictor: './src/model/pca-predictor.ts'
     },
     target: target,
     output: {

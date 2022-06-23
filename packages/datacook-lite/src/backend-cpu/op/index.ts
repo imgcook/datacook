@@ -21,7 +21,8 @@ export {
   pow2d,
   neg2d,
   abs2d,
-  sigmoid2d
+  sigmoid2d,
+  sqrt1d
 } from './single-op';
 
 export {

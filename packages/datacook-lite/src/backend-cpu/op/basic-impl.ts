@@ -1,3 +1,4 @@
+import { vector } from "../../core/classes";
 import { Matrix } from "../classes/matrix";
 import { Vector } from "../classes/vector";
 import { squeeze } from "./transform";
@@ -65,6 +66,14 @@ export const basicImplement2dBinary = (func: ImplementFuncBinary, x: Matrix, y: 
     }
   }
   return new Matrix(out);
+};
+
+export const basicImplement1dSingle = (func: ImplementFuncSingle, x: Vector): Vector => {
+  const out = new Array(x.length);
+  for (let i = 0; i < x.length; i++) {
+    out[i] = func(x.get(i));
+  }
+  return vector(out);
 };
 
 export const basicImplement2dSingle = (func: ImplementFuncSingle, x: Matrix): Matrix => {
