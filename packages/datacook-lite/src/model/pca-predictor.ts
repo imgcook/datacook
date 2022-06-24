@@ -82,4 +82,19 @@ export class PCAPredictor extends BaseEstimator {
       return matMul2d(div2d(xCentered, sqrt1d(this.variance)), this.eigenVectors).data;
     }
   }
+
+  public async toJson(): Promise<string> {
+    const modelParams = {
+      name: 'PCA',
+      mean: this.mean.data,
+      variance: this.variance.data,
+      eigenVectors: this.eigenVectors.data,
+      eigenValues: this.eigenValues.data,
+      explainedVariance: this.explainedVariance.data,
+      explainedVarianceRatio: this.explainedVarianceRatio.data,
+      method: this.method,
+      nComponents: this.nComponents
+    };
+    return JSON.stringify(modelParams);
+  }
 }
