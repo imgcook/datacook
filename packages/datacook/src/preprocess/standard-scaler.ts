@@ -1,4 +1,4 @@
-import { divNoNan, RecursiveArray, sqrt, Tensor, sub, Rank, mul, add, tidy } from '@tensorflow/tfjs-core';
+import { divNoNan, RecursiveArray, sqrt, Tensor, sub, Rank, mul, add, tidy, tensor } from '@tensorflow/tfjs-core';
 import { getVariance, getMean } from '../stat';
 import { checkArray } from '../utils/validation';
 import { TransformerMixin } from './base';
@@ -86,4 +86,28 @@ export class StandardScaler extends TransformerMixin {
       return this.withMean ? add(xScaleReturn, this.mean) : xScaleReturn;
     });
   }
+  public async toJson(): Promise<string> {
+    const modelParams = {
+      mean: this.mean.arraySync(),
+      standardVariance: this.standardVariance.arraySync(),
+      withMean: this.withMean,
+      withStd: this.withStd,
+      nFeature: this.nFeature
+    };
+    return JSON.stringify(modelParams);
+  }
+
+  public async fromJson(modelJson: string): Promise<void> {
+    const params = JSON.parse(modelJson);
+    if (params.name !== 'StandardScaler') {
+      throw new RangeError(`${params.name} is not StandardScaler`);
+    }
+    const { mean, standardVariance, withMean, withStd, nFeature } = params;
+    this.mean = mean ? tensor(mean) : this.mean;
+    this.standardVariance = standardVariance ? tensor(standardVariance) : this.standardVariance;
+    this.withMean = withMean ? withMean : this.withMean;
+    this.withStd = withStd ? withStd : this.withStd;
+    this.nFeature = nFeature ? nFeature : this.nFeature;
+  }
+
 }

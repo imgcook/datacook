@@ -2,7 +2,11 @@ export {
   add2d,
   mul2d,
   div2d,
-  sub2d
+  sub2d,
+  add1d,
+  mul1d,
+  div1d,
+  sub1d
 } from './binary-op';
 
 export {
@@ -11,7 +15,13 @@ export {
   min2d,
   max2d,
   mean2d,
-  sum2d
+  sum2d,
+  argMax1d,
+  argMin1d,
+  max1d,
+  min1d,
+  mean1d,
+  sum1d
 } from './reduce-op';
 
 export {

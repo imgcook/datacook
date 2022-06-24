@@ -3,7 +3,11 @@ import {
   add2d as add2dCpu,
   sub2d as sub2dCpu,
   mul2d as mul2dCpu,
-  div2d as div2dCpu
+  div2d as div2dCpu,
+  add1d as add1dCpu,
+  sub1d as sub1dCpu,
+  mul1d as mul1dCpu,
+  div1d as div1dCpu
 } from '../../backend-cpu/op/binary-op';
 import { IS_CPU_BACKEND } from "../../env";
 import { getMethodErrorStr } from "./utils";
@@ -40,4 +44,34 @@ export const div2d = (x: Matrix, y: Matrix | Vector | number, by = 0): Matrix =>
   }
 };
 
+export const add1d = (x: Vector, y: Vector | number): Vector => {
+  if (IS_CPU_BACKEND) {
+    return add1dCpu(x, y);
+  } else {
+    throw new TypeError(getMethodErrorStr('add1d'));
+  }
+};
 
+export const sub1d = (x: Vector, y: Vector | number): Vector => {
+  if (IS_CPU_BACKEND) {
+    return sub1dCpu(x, y);
+  } else {
+    throw new TypeError(getMethodErrorStr('sub1d'));
+  }
+};
+
+export const mul1d = (x: Vector, y: Vector | number): Vector => {
+  if (IS_CPU_BACKEND) {
+    return mul1dCpu(x, y);
+  } else {
+    throw new TypeError(getMethodErrorStr('mul1d'));
+  }
+};
+
+export const div1d = (x: Vector, y: Vector | number): Vector => {
+  if (IS_CPU_BACKEND) {
+    return div1dCpu(x, y);
+  } else {
+    throw new TypeError(getMethodErrorStr('div1d'));
+  }
+};
