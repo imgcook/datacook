@@ -16,6 +16,9 @@ export abstract class BaseEstimator {
   constructor() {
     this.nFeature = 0;
   }
+  public isClassifier(): boolean {
+    return this.estimatorType === 'classifier';
+  }
   /**
    * Check if input feature match the required feature size. If reset is true,
    * reset nFeature = x.shape[1]
