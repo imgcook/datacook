@@ -95,6 +95,10 @@ export const basicImplement2dReduceAll = (func: ImplementFuncReduce, x: Matrix):
   return func(squeezed.data);
 };
 
+export const basicImplement1dReduce = (func: ImplementFuncReduce, x: Vector): number => {
+  return func(x.data);
+};
+
 export const basicImplement2dReduce = (func: ImplementFuncReduce, x: Matrix, by: ByAxis): Vector => {
   const [ nX, mX ] = x.shape;
   if (! (by === ByAxis.ByRow || by === ByAxis.ByColumn)) {

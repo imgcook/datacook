@@ -1,4 +1,4 @@
-import { Tensor, RecursiveArray, matMul, mean, sub, div, sum, slice, divNoNan, sqrt, dispose, tidy } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, matMul, mean, sub, div, sum, slice, divNoNan, sqrt, dispose, tidy, tensor } from '@tensorflow/tfjs-core';
 import { eigenSolve } from '../linalg';
 import { getCovarianceMatrix, getCorrelationMatrix } from '../stat/corcov';
 import { checkArray } from '../utils/validation';
@@ -121,5 +121,36 @@ export class PCA extends BaseEstimater {
         return matMul(divNoNan(xCentered, sqrt(this.variance)), this.eigenVectors);
       }
     });
+  }
+
+  public async fromJson(modelJson: string): Promise<void> {
+    const modelParams = JSON.parse(modelJson);
+    if (modelParams.name !== 'PCA') {
+      throw new RangeError(`${modelParams.name} is not PCA`);
+    }
+    const { mean, variance, eigenValues, eigenVectors, explainedVariance, explainedVarianceRatio, method, nComponents } = modelParams;
+    this.mean = mean ? tensor(mean) : this.mean;
+    this.variance = variance ? tensor(variance) : this.variance;
+    this.eigenVectors = eigenVectors ? tensor(eigenVectors) : this.eigenVectors;
+    this.eigenValues = eigenValues ? tensor(eigenValues) : this.eigenValues;
+    this.explainedVariance = explainedVariance ? tensor(explainedVariance) : this.explainedVariance;
+    this.explainedVarianceRatio = explainedVarianceRatio ? tensor(explainedVarianceRatio) : this.explainedVarianceRatio;
+    this.method = method ? method : this.method;
+    this.nComponents = nComponents ? nComponents : this.nComponents;
+  }
+
+  public async toJson(): Promise<string> {
+    const modelParams = {
+      name: 'PCA',
+      mean: this.mean.arraySync(),
+      variance: this.variance.arraySync(),
+      eigenVectors: this.eigenVectors.arraySync(),
+      eigenValues: this.eigenValues.arraySync(),
+      explainedVariance: this.explainedVariance.arraySync(),
+      explainedVarianceRatio: this.explainedVarianceRatio.arraySync(),
+      method: this.method,
+      nComponents: this.nComponents
+    };
+    return JSON.stringify(modelParams);
   }
 }
