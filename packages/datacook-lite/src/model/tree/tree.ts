@@ -1,4 +1,4 @@
-import { checkJSArray } from "../../utils/validation";
+// import { checkJSArray } from "../../utils/validation";
 
 export const SIZE_MAX = Number.MAX_SAFE_INTEGER;
 export interface Node {
@@ -102,11 +102,11 @@ export class Tree {
    * @param xData input sample
    */
   public applyDense = (xData: number[][]): number[][] => {
-    const xArray = checkJSArray(xData, 'float32', 2) as number[][];
-    const nSamples = xArray.length;
+    // const xArray = checkJSArray(xData, 'float32', 2) as number[][];
+    const nSamples = xData.length;
     const values = [];
     for (let i = 0; i < nSamples; i++) {
-      const sample = xArray[i];
+      const sample = xData[i];
       let node = this.nodes[0];
       while (node.leftChild != -1 && node.rightChild != -1) {
         const xFeatureVal = sample[node.feature];

@@ -3,6 +3,7 @@ import { checkJsArray2D } from "../utils";
 
 class BaseEstimator {
   public nFeature: number;
+  public estimatorType: string;
   /**
    * Check if input feature match the required feature size. If reset is true,
    * reset nFeature = x.shape[1]
@@ -19,6 +20,9 @@ class BaseEstimator {
     if (reset || !this.nFeature) {
       this.nFeature = x[0].length;
     }
+  }
+  public isClassifier(): boolean {
+    return this.estimatorType === 'classifier';
   }
 }
 
