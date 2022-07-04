@@ -1,6 +1,6 @@
 // import { Tensor, RecursiveArray, sub, mean, divNoNan, sum, pow, sqrt, transpose, topk, stack, slice, neg, tidy } from '@tensorflow/tfjs-core';
-import { div2d, square2d } from "../backend-cpu/op";
-import { Matrix, matrix, Vector } from "../core/classes";
+import { div2d, square2d, sqrt1d } from "../backend-cpu/op";
+import { matrix, Matrix, Vector } from "../core/classes";
 import { sub2d, mean2d, sum2d, div1d } from "../core/op";
 
 /**
@@ -11,7 +11,7 @@ import { sub2d, mean2d, sum2d, div1d } from "../core/op";
  * @returns centered data
  */
 export const getCenteredData = (x: Matrix, axis = -1): Matrix => {
-    return sub2d(x, mean2d(x, axis), axis);
+  return sub2d(x, mean2d(x, axis), axis);
 };
 
 export const getVarianceFromCentered = (xCentered: Matrix, axis: number): number | Vector => {
@@ -24,7 +24,7 @@ export const getVarianceFromCentered = (xCentered: Matrix, axis: number): number
     return div1d((sum2d(squaredX, 0) as Vector), nX - 1);
   }
   if (axis === 1) {
-    return div1d((sum2d(squaredX, 1) as Vector), nX - 1);
+    return div1d((sum2d(squaredX, 1) as Vector), mX - 1);
   }
 };
 
@@ -36,15 +36,16 @@ export const getVarianceFromCentered = (xCentered: Matrix, axis: number): number
  * applied across all axes.
  * @returns tensor of data variance
  */
-export const getVariance = (xData: number[][], axis = -1):  => {
-    const xTensor = checkArray(xData, 'float32');
-    const xCentered = getCenteredData(xTensor, axis);
-    return getVarianceFromCentered(xCentered, axis);
+export const getVariance = (xData: number[][], axis = -1): Vector | number => {
+  const xMatrix = matrix(xData);
+  const xCentered = getCenteredData(xMatrix, axis);
+  return getVarianceFromCentered(xCentered, axis);
 };
 
-export const getMean = (xData: Tensor | RecursiveArray<number>, axis = -1): Tensor => {
-  const xTensor = checkArray(xData, 'float32');
-  return mean(xTensor, axis);
+export const getMean = (xData: number[][], axis = -1): Vector | number => {
+  // const xTensor = checkArray(xData, 'float32');
+  const xMatrix = matrix(xData);
+  return mean2d(xMatrix, axis);
 };
 
 /**
@@ -55,23 +56,14 @@ export const getMean = (xData: Tensor | RecursiveArray<number>, axis = -1): Tens
  * applied across all axes.
  * @returns data after standardization
  */
-export const standardize = (xData: Tensor | RecursiveArray<number>, axis = -1): Tensor => {
-  return tidy(() => {
-    const xTensor = checkArray(xData, 'float32');
-    const xCentered = getCenteredData(xTensor, axis);
-    const xStd = sqrt(getVarianceFromCentered(xCentered, axis));
-    const dim = xTensor.shape.length;
-    if (dim === 1 || axis === -1 || axis === 0) {
-      return divNoNan(xCentered, xStd);
-    }
-    // transpose permutation
-    const perm: number[] = [];
-    const inversePerm: number[] = [];
-    for (let i = 0; i < dim; i++) {
-      const permIdx = i === 0 ? axis : i <= axis ? i - 1 : i;
-      perm[i] = permIdx;
-      inversePerm[permIdx] = i;
-    }
-    return transpose(divNoNan(transpose(xCentered, perm), xStd), inversePerm);
-  });
+export const standardize = (xData: Matrix, axis = -1): Matrix => {
+  // const xTensor = checkArray(xData, 'float32');
+  const xCentered = getCenteredData(xData, axis);
+  if (axis === 1 || axis === 0) {
+    const xStd = sqrt1d(getVarianceFromCentered(xCentered, axis) as Vector);
+    return div2d(xCentered, xStd, axis);
+  } else {
+    const xStd = Math.sqrt(getVarianceFromCentered(xCentered, -1) as number);
+    return div2d(xCentered, xStd);
+  }
 };
