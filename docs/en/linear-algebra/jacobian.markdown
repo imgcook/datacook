@@ -30,8 +30,7 @@ getJacobian(expr: (tf: any, x: tf.Tensor, ...coeffs: tf.Variable[]) => tf.Scalar
 
 | Parameter |        type        | description                                                         |
 | :-------- | :-----------------: | :------------------------------------------------------------------ |
-| expr    | (tf: any, x: tf.Tensor, ...coeffs: tf.Variable[]) => tf.Scalar | expression function for x[i] and varaibles, return value should be a scalar
- * (expr: (tf: any, x: Tensor, ...coeffs: Variable[]) => Scalar |
+| expr    | (tf: any, x: tf.Tensor, ...coeffs: tf.Variable[]) => tf.Scalar | expression function for x[i] and varaibles, return value should be a scalar |
 | x | Tensor |  input tensor of shape [n, ....] |
 | coeffs |  tf.Variable[] | array of coefficients  | 
 
