@@ -1,27 +1,28 @@
 ---
 layout: default
-title: accuracyScore()
+title: getRecallScores()
 parent: Metrics
 lang: en
 ---
 
-# accuracyScore()
+# getRecallScores()
 
-Get accuracy score for classification task.
+Compute the precision score for all classes.
 
-In multilabel classification, this function computes subset accuracy: the set of labels predicted for a sample must exactly match the corresponding set of labels in y_true.
+Recall score is the ratio tp / (tp + fn), where tp is the number of true positives and fn the number of false negtive. The recall is intuitively the ability of the classifier to find all the positive samples.
+
 
 ## Import
 
 ```typescript
 import * as datacook from '@pipcook/datacook';
-const { accuracyScore } = datacook.Metrics;
+const { getRecallScores } = datacook.Metrics;
 ```
 
 ## Syntax
 
 ```typescript
-accuracyScore(yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | number[]): number
+getRecallScores(yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | number[]): number
 ```
 
 
@@ -34,4 +35,4 @@ accuracyScore(yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | nu
 
 ## Returns
 
-score: `number`, the fraction of correctly classified samples
+`Tensor` :  tensor of recall scores

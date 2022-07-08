@@ -7,7 +7,7 @@ lang: en
 
 # seed()
 
-Set the random seed.
+Set random seed according to given string value.
 
 ## Syntax
 

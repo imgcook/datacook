@@ -17,6 +17,13 @@ Machine learning and data science library for Javascript / Typescript.
 
 ---
 
+## Construction
+
+DataCook provides ready-to-use typescript/javascript api for statistical machine learning and data science. Following diagram shows the main components of DataCook. 
+
+<img src="../assets/images/construction.png" />
+
+
 ## Getting started
 
 ### Dependencies

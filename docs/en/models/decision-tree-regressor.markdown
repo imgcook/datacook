@@ -61,7 +61,7 @@ async fit(xData: Tensor | RecursiveArray<number>,
 | parameter | type | description |
 | --------- | ---- | ----------- |
 | xData | Tensor \| RecursiveArray<number> | Tensor like of shape (n_samples, n_features), input feature |
-| yData | Tensor \| string[] | number[] | Tensor like of shape (n_sample, ), input target labels |
+| yData | Tensor \|  number[] | Tensor like of shape (n_sample, ), input target values |
 | sampleWeight | number | array | sample weights, default = null |
 
 ### predict
@@ -103,17 +103,3 @@ async toJson(): Promise<string>
 #### Returns
 
 String output of model json
-
-## Examples
-
-
-```typescript
-import * as DataCook from '@pipcook/datacook';
-const { DecisionTreeClassifier } = DataCook.Model;
-const dt = new DecisionTreeClassifier();
-await dt.fit(irisData, labels);
-const predY = await dt.predict(irisData);
-const acc = accuracyScore(labels, predY);
-console.log('accuracy score: ', acc);
-```
-

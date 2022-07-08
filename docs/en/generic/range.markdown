@@ -18,3 +18,8 @@ range(start: number, end: number, step: number): Array<number>
 ## Parameters
 
 
+| Parameter |        type        | description                                                         |
+| :-------- | :-----------------: | :------------------------------------------------------------------ |
+| start  | number | start number |
+| end  | number | end number |
+| step  | number | range step |

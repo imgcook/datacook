@@ -153,11 +153,3 @@ async toJson(): Promise<string>
 
 string of model json
 
-
-## Examples
-
-```typescript
-
-```
-
-
