@@ -1,5 +1,8 @@
 import { Vector } from "./vector";
-import { Matrix as MatrixBase } from '../../core/classes';
+import { matrix, Matrix as MatrixBase } from '../../core/classes';
+import { add2d } from "../op";
+import { Denpendency } from "../../core/classes";
+import { createOneMatrix } from "./creation";
 
 export class Matrix extends MatrixBase {
   public data: number[][];
@@ -11,6 +14,9 @@ export class Matrix extends MatrixBase {
   }
   public getColumn(i: number): Vector {
     return new Vector(this.data.map((d) => d[i]));
+  }
+  public values(): number[][] {
+    return this.data;
   }
   public getRow(i: number): Vector {
     return new Vector(this.data[i]);
@@ -35,7 +41,20 @@ export class Matrix extends MatrixBase {
   public set(i: number, j: number, x: number): void {
     this.data[i][j] = x;
   }
-  public hahaha(): void {
-    console.log('hhh');
+  public backward(grad?: MatrixBase): void {
+    if (!this.grad) {
+      if (grad) {
+        this.grad = grad;
+      } else {
+        grad = createOneMatrix(this.shape[0], this.shape[1]);
+        this.grad = grad;
+      }
+    } else {
+      this.grad = add2d(this.grad, grad);
+    }
+    this.dependency.forEach((dep: Denpendency) => {
+      const targetGrad = dep.gradFunc(grad);
+      dep.target.backward(targetGrad);
+    });
   }
 }

@@ -8,3 +8,10 @@ export const createZeroMatrix = (n: number, m: number): Matrix => {
   return new Matrix(mat);
 };
 
+export const createOneMatrix = (n: number, m: number): Matrix => {
+  const mat: number[][] = new Array(n);
+  for (let i = 0; i < n; i++) {
+    mat[i] = new Array(m).fill(1);
+  }
+  return new Matrix(mat);
+};

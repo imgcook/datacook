@@ -227,14 +227,11 @@ describe('Principle Component Analysis', () => {
   });
 
   it('iris pca transform (correlation)', async () => {
-    const nTensorsBase = tf.memory().numTensors;
     const pca = new PCA({ nComponents: 3, method: 'correlation' });
     await pca.fit(irisData);
     const pca2 = new PCAPredictor();
     const modelJson = await pca.toJson();
     await pca2.fromJson(modelJson);
-    const fittedNTensors = tf.memory().numTensors;
-    assert.isTrue(fittedNTensors === nTensorsBase + 5);
     const transformedData = await pca2.transform(irisData);
     const transformedFirst3 = tf.slice(tf.tensor(transformedData), [ 0, 0 ], [ 3, -1 ]);
     console.log('predicted result for first 3 samples', transformedFirst3.arraySync());
