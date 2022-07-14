@@ -1,3 +1,5 @@
+import { Scalar } from "../../core/classes";
+import { scalar } from "../../core/classes/creation";
 import { Matrix, Vector } from "../classes";
 import {
   basicImplement2dSingle,
@@ -25,7 +27,15 @@ export const neg2d = (x: Matrix): Matrix => {
   return basicImplement2dSingle(negFunc, x);
 };
 
+export const neg2dForward = (x: Matrix): Matrix => {
+  return basicImplement2dSingle(negFunc, x);
+};
+
 export const square2d = (x: Matrix): Matrix => {
+  return basicImplement2dSingle(squareFunc, x);
+};
+
+export const square2dForward = (x: Matrix): Matrix => {
   return basicImplement2dSingle(squareFunc, x);
 };
 
@@ -64,7 +74,18 @@ export const neg1d = (x: Vector): Vector => {
   return basicImplement1dSingle(negFunc, x);
 };
 
+export const neg1dForward = (x: Vector): Vector => {
+  return basicImplement1dSingle(negFunc, x);
+};
+
 export const square1d = (x: Vector): Vector => {
+  const func = (a: number): number => {
+    return Math.pow(a, 2);
+  };
+  return basicImplement1dSingle(func, x);
+};
+
+export const square1dForward = (x: Vector): Vector => {
   const func = (a: number): number => {
     return Math.pow(a, 2);
   };
@@ -80,4 +101,8 @@ export const pow1d = (x: Vector, y: number): Vector => {
 
 export const sigmoid1d = (x: Vector): Vector => {
   return basicImplement1dSingle(sigmoidFunc, x);
+};
+
+export const square0dFroward = (x: Scalar): Scalar => {
+  return scalar(Math.pow(x.data, 2));
 };

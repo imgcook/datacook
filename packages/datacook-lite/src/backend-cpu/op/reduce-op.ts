@@ -1,8 +1,10 @@
+import { Scalar, vector } from "../../core/classes";
 import { Matrix, Vector } from "../classes";
 import {
   basicImplement2dReduce,
   basicImplement2dReduceAll,
   basicImplement1dReduce,
+  trackedImplement1dReduce,
   ByAxis
 } from "./basic-impl";
 
@@ -58,55 +60,69 @@ const argMaxFunc = (a: number[]): number => {
   return argMax;
 };
 
-export const sum1d = (x: Vector): number => basicImplement1dReduce(sumFunc, x);
+// export const sum1d = (x: Vector): Scalar => basicImplement1dReduce(sumFunc, x);
 
-export const mean1d = (x: Vector): number => basicImplement1dReduce(meanFunc, x);
+export const sum1dForward = (x: Vector): Scalar => basicImplement1dReduce(sumFunc, x);
+export const sum1dBackward = (grad: Scalar, x: Vector): Vector => vector(new Array(x.length).fill(grad.data));
 
-export const min1d = (x: Vector): number => basicImplement1dReduce(minFunc, x);
+export const sum1d = (x: Vector): Scalar => {
+  return trackedImplement1dReduce(sum1dForward, sum1dBackward, x);
+};
 
-export const max1d = (x: Vector): number => basicImplement1dReduce(maxFunc, x);
+export const mean1d = (x: Vector): Scalar => basicImplement1dReduce(meanFunc, x);
 
-export const argMax1d = (x: Vector): number => basicImplement1dReduce(argMaxFunc, x);
+export const min1d = (x: Vector): Scalar => basicImplement1dReduce(minFunc, x);
 
-export const argMin1d = (x: Vector): number => basicImplement1dReduce(argMinFunc, x);
+export const max1d = (x: Vector): Scalar => basicImplement1dReduce(maxFunc, x);
+
+export const argMax1d = (x: Vector): Scalar => basicImplement1dReduce(argMaxFunc, x);
+
+export const argMin1d = (x: Vector): Scalar => basicImplement1dReduce(argMinFunc, x);
 
 
-export const sum2d = (x: Matrix, by?: ByAxis): Vector | number => {
+export const sum2d = (x: Matrix, by?: ByAxis): Vector | Scalar => {
   if (by === undefined) {
     return basicImplement2dReduceAll(sumFunc, x);
   }
   return basicImplement2dReduce(sumFunc, x, by);
 };
 
-export const mean2d = (x: Matrix, by?: ByAxis): Vector | number => {
+export const sum2dForward = (x: Matrix, by?: ByAxis): Vector | Scalar => {
+  if (by === undefined) {
+    return basicImplement2dReduceAll(sumFunc, x);
+  }
+  return basicImplement2dReduce(sumFunc, x, by);
+};
+
+export const mean2d = (x: Matrix, by?: ByAxis): Vector | Scalar => {
   if (by === undefined) {
     return basicImplement2dReduceAll(meanFunc, x);
   }
   return basicImplement2dReduce(meanFunc, x, by);
 };
 
-export const min2d = (x: Matrix, by?: ByAxis): Vector | number => {
+export const min2d = (x: Matrix, by?: ByAxis): Vector | Scalar => {
   if (by === undefined) {
     return basicImplement2dReduceAll(minFunc, x);
   }
   return basicImplement2dReduce(minFunc, x, by);
 };
 
-export const max2d = (x: Matrix, by?: ByAxis): Vector | number => {
+export const max2d = (x: Matrix, by?: ByAxis): Vector | Scalar => {
   if (by === undefined) {
     return basicImplement2dReduceAll(maxFunc, x);
   }
   return basicImplement2dReduce(maxFunc, x, by);
 };
 
-export const argMin2d = (x: Matrix, by?: ByAxis): Vector | number => {
+export const argMin2d = (x: Matrix, by?: ByAxis): Vector | Scalar => {
   if (by === undefined) {
     return basicImplement2dReduceAll(argMinFunc, x);
   }
   return basicImplement2dReduce(argMinFunc, x, by);
 };
 
-export const argMax2d = (x: Matrix, by?: ByAxis): Vector | number => {
+export const argMax2d = (x: Matrix, by?: ByAxis): Vector | Scalar => {
   if (by === undefined) {
     return basicImplement2dReduceAll(argMaxFunc, x);
   }

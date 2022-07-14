@@ -50,7 +50,8 @@ export class Matrix extends MatrixBase {
         this.grad = grad;
       }
     } else {
-      this.grad = add2d(this.grad, grad);
+      if (grad)
+        this.grad = add2d(this.grad, grad);
     }
     this.dependency.forEach((dep: Denpendency) => {
       const targetGrad = dep.gradFunc(grad);

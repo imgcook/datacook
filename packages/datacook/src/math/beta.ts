@@ -1,7 +1,7 @@
 import { gamma } from './gamma';
 
 /**
- * Copmution of beta function
+ * Computation of beta function
  * Beta(x, y) = Gamma(x) * Gamma(y) / Gamma(x + y)
  * @returns Beta(x, y)
  */

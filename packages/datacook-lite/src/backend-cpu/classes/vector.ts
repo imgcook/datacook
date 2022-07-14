@@ -1,6 +1,7 @@
 import { Vector as VectorBase } from '../../core/classes';
 import { Denpendency } from "../../core/classes";
 import { add1d } from '../op';
+import { createOneVector } from './creation';
 export class Vector extends VectorBase{
   public data: number[];
   public length: number;
@@ -19,7 +20,17 @@ export class Vector extends VectorBase{
     return this.data;
   }
   public backward(grad: VectorBase): void {
-    this.grad = add1d(this.grad, grad);
+    if (!this.grad) {
+      if (grad) {
+        this.grad = grad;
+      } else {
+        grad = createOneVector(this.length);
+        this.grad = grad;
+      }
+    } else {
+      if (grad)
+        this.grad = add1d(this.grad, grad);
+    }
     this.dependency.forEach((dep: Denpendency) => {
       const targetGrad = dep.gradFunc(grad);
       dep.target.backward(targetGrad);

@@ -3,7 +3,7 @@ import { checkJSArray } from '../utils/validation';
 
 /**
  * Get histogram data for given input
- * @param xData inpur data of shape [nSamples, ]
+ * @param xData input data of shape [nSamples, ]
  * @param params parameters
  * Option in params
  * ----

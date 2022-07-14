@@ -21,6 +21,7 @@ export abstract class Scalar extends Tensor {
   public constructor(data: number) {
     super();
     this.data = data;
+    this.dependency = [];
   }
   abstract values(): number;
   abstract backward(grad?: Scalar): void;
@@ -55,6 +56,7 @@ export abstract class Vector extends Tensor{
     super();
     this.data = data;
     this.length = this.data.length;
+    this.dependency = [];
   }
   abstract values(): number[];
   abstract get(i: number): number;

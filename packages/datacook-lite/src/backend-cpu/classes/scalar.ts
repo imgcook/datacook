@@ -11,7 +11,17 @@ export class Scalar extends ScalarBase {
     return this.data;
   }
   public backward(grad?: ScalarBase): void {
-    this.grad = scalar(this.grad.data + grad.data);
+    if (!this.grad) {
+      if (grad) {
+        this.grad = grad;
+      } else {
+        grad = scalar(1);
+        this.grad = grad;
+      }
+    } else {
+      if (grad)
+        this.grad = scalar(this.grad.data + grad.data);
+    }
     this.dependency.forEach((dep: Denpendency) => {
       const targetGrad = dep.gradFunc(grad);
       dep.target.backward(targetGrad);
