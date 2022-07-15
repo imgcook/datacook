@@ -24,11 +24,11 @@ export type SingleGradFunc2d = (grad: Matrix, x?: Matrix, param?: any) => Matrix
 export type SingleFunc1d = (x: Vector) => Vector;
 export type SingleGradFunc1d = (grad: Vector, x?: Vector, param?: any) => Vector;
 
-export type ReduceAllFunc2d = (x: Matrix) => Scalar;
-export type ReduceAllGradFunc2d = (grad: Scalar, x: Matrix) => Matrix;
+export type ReduceAllFunc2d = (x: Matrix, by?: ByAxis) => Scalar;
+export type ReduceAllGradFunc2d = (grad: Scalar, x: Matrix, by?: ByAxis) => Matrix;
 
-export type ReduceFunc2d = (x: Matrix) => Vector;
-export type ReducedGradFunc2d = (grad: Vector, x: Matrix) => Matrix;
+export type ReduceFunc2d = (x: Matrix, by?: ByAxis) => Scalar | Vector;
+export type ReducedGradFunc2d = (grad: Vector | Scalar, x: Matrix, by?: ByAxis) => Matrix;
 
 export type ReduceFunc1d = (x: Vector) => Scalar;
 export type ReducedGradFunc1d = (grad: Scalar, x: Vector) => Vector;
@@ -221,6 +221,7 @@ export const trackedImplement1dReduce = (forwardFunc: ReduceFunc1d, backwardFunc
     target: x,
     gradFunc: (grad: Scalar): Vector => backwardFunc(grad, x)
   });
+  return outMat;
 };
 
 export const basicImplement2dReduce = (func: ImplementFuncReduce, x: Matrix, by: ByAxis): Vector => {
@@ -244,11 +245,11 @@ export const basicImplement2dReduce = (func: ImplementFuncReduce, x: Matrix, by:
   }
 };
 
-export const trackedImplement2dReduce = (forwardFunc: ReduceFunc2d, backwardFunc: ReducedGradFunc2d, x: Matrix): Vector => {
-  const outMat = forwardFunc(x);
+export const trackedImplement2dReduce = (forwardFunc: ReduceFunc2d, backwardFunc: ReducedGradFunc2d, x: Matrix, by?: ByAxis): Vector | Scalar => {
+  const outMat = forwardFunc(x, by);
   outMat.dependency.push({
     target: x,
-    gradFunc: (grad: Vector): Matrix => backwardFunc(grad, x)
+    gradFunc: (grad: Vector | Scalar): Matrix => backwardFunc(grad, x, by)
   });
   return outMat;
 };

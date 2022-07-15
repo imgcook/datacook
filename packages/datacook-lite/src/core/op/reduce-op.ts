@@ -17,8 +17,9 @@ import {
 import { IS_CPU_BACKEND } from "../../env";
 import { getMethodErrorStr } from "./utils";
 import { Scalar } from "../../backend-cpu/classes";
+import { ByAxis } from "../../backend-cpu/op/basic-impl";
 
-export const argMax2d = (x: Matrix, by = 0): Scalar | Vector => {
+export const argMax2d = (x: Matrix, by = 0): Scalar | Vector | Matrix => {
   if (IS_CPU_BACKEND) {
     return argMax2dCPU(x, by);
   } else {
@@ -26,7 +27,7 @@ export const argMax2d = (x: Matrix, by = 0): Scalar | Vector => {
   }
 };
 
-export const argMin2d = (x: Matrix, by = 0): Scalar | Vector => {
+export const argMin2d = (x: Matrix, by = 0): Scalar | Vector | Matrix => {
   if (IS_CPU_BACKEND) {
     return argMin2dCPU(x, by);
   } else {
@@ -50,7 +51,7 @@ export const min2d = (x: Matrix, by = 0): Scalar | Vector => {
   }
 };
 
-export const sum2d = (x: Matrix, by = 0): Scalar | Vector => {
+export const sum2d = (x: Matrix, by: ByAxis = 0): Scalar | Vector => {
   if (IS_CPU_BACKEND) {
     return sum2dCPU(x, by);
   } else {
@@ -58,7 +59,7 @@ export const sum2d = (x: Matrix, by = 0): Scalar | Vector => {
   }
 };
 
-export const mean2d = (x: Matrix, by = 0): Scalar | Vector => {
+export const mean2d = (x: Matrix, by: ByAxis = 0): Scalar | Vector => {
   if (IS_CPU_BACKEND) {
     return mean2dCPU(x, by);
   } else {

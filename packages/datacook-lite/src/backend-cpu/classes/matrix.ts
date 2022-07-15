@@ -42,6 +42,7 @@ export class Matrix extends MatrixBase {
     this.data[i][j] = x;
   }
   public backward(grad?: MatrixBase): void {
+    console.log('grad', grad);
     if (!this.grad) {
       if (grad) {
         this.grad = grad;
