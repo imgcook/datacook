@@ -52,7 +52,7 @@ export const add1d = (x: Vector, y: Vector | Scalar | number): Vector => {
   }
 };
 
-export const sub1d = (x: Vector, y: Vector | number): Vector => {
+export const sub1d = (x: Vector, y: Vector | number | Scalar): Vector => {
   if (IS_CPU_BACKEND) {
     return sub1dCpu(x, y);
   } else {
@@ -60,7 +60,7 @@ export const sub1d = (x: Vector, y: Vector | number): Vector => {
   }
 };
 
-export const mul1d = (x: Vector, y: Vector | number): Vector => {
+export const mul1d = (x: Vector, y: Vector | number | Scalar): Vector => {
   if (IS_CPU_BACKEND) {
     return mul1dCpu(x, y);
   } else {
@@ -68,7 +68,7 @@ export const mul1d = (x: Vector, y: Vector | number): Vector => {
   }
 };
 
-export const div1d = (x: Vector, y: Vector | number): Vector => {
+export const div1d = (x: Vector, y: Vector | number | Scalar): Vector => {
   if (IS_CPU_BACKEND) {
     return div1dCpu(x, y);
   } else {

@@ -86,7 +86,7 @@ export const sqrt2dForward = (x: Matrix): Matrix => {
 
 
 export const sqrt2dBackward = (grad: Matrix, x: Matrix): Matrix => {
-  return div2dForward(grad, sqrt2dForward(x));
+  return mul2dForward(grad, basicImplement2dSingle(sqrtGradFunc, x));
 };
 
 export const sqrt2d = (x: Matrix): Matrix => {
