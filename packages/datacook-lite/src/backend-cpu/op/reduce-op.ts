@@ -1,5 +1,5 @@
-import { matrix, Scalar, vector } from "../../core/classes";
-import { createOneMatrix, createOneVector, createZeroMatrix, Matrix, Vector } from "../classes";
+import { Scalar, vector } from "../../core/classes";
+import { createOneMatrix, createZeroMatrix, Matrix, Vector } from "../classes";
 import { concatVector, createRangeVector } from "../classes/creation";
 import {
   basicImplement2dReduce,
@@ -63,7 +63,6 @@ const argMaxFunc = (a: number[]): number => {
   return argMax;
 };
 
-// export const sum1d = (x: Vector): Scalar => basicImplement1dReduce(sumFunc, x);
 
 export const sum1dForward = (x: Vector): Scalar => basicImplement1dReduce(sumFunc, x);
 export const sum1dBackward = (grad: Scalar, x: Vector): Vector => vector(new Array(x.length).fill(grad.data));
@@ -85,10 +84,9 @@ export const argMin1dForward = (x: Vector): Scalar => basicImplement1dReduce(arg
 
 export const min1dForawrd = (x: Vector): Scalar => basicImplement1dReduce(minFunc, x);
 export const min1dBackward = (grad: Scalar, x: Vector): Vector => {
-  // const minInd = argMin1dForward(grad, x);
   const minInd = argMin1dForward(x).data;
   const arr = new Array(x.length).fill(0);
-  arr[minInd] = 1;
+  arr[minInd] = grad.data;
   return vector(arr);
 };
 
@@ -101,12 +99,12 @@ export const max1dBackward = (grad: Scalar, x: Vector): Vector => {
   // const minInd = argMin1dForward(grad, x);
   const maxInd = argMax1dForward(x).data;
   const arr = new Array(x.length).fill(0);
-  arr[maxInd] = 1;
+  arr[maxInd] = grad.data;
   return vector(arr);
 };
 
 export const max1d = (x: Vector): Scalar => {
-  return trackedImplement1dReduce(min1dForawrd, min1dBackward, x);
+  return trackedImplement1dReduce(max1dForawrd, max1dBackward, x);
 };
 
 export const argMax1d = (x: Vector): Scalar => basicImplement1dReduce(argMaxFunc, x);
@@ -114,7 +112,7 @@ export const argMax1d = (x: Vector): Scalar => basicImplement1dReduce(argMaxFunc
 export const argMin1d = (x: Vector): Scalar => basicImplement1dReduce(argMinFunc, x);
 
 export const sum2dForward = (x: Matrix, by?: ByAxis): Vector | Scalar => {
-  if (by === undefined) {
+  if (by === ByAxis.ByAll) {
     return basicImplement2dReduceAll(sumFunc, x);
   }
   return basicImplement2dReduce(sumFunc, x, by);
@@ -129,7 +127,7 @@ export const sum2d = (x: Matrix, by?: ByAxis): Scalar | Vector => {
 };
 
 export const mean2dForward = (x: Matrix, by?: ByAxis): Vector | Scalar => {
-  if (by === undefined) {
+  if (by === ByAxis.ByAll) {
     return basicImplement2dReduceAll(meanFunc, x);
   }
   return basicImplement2dReduce(meanFunc, x, by);
@@ -153,37 +151,37 @@ export const mean2d = (x: Matrix, by?: ByAxis): Vector | Scalar => {
 };
 
 export const argMin2dForward = (x: Matrix, by?: ByAxis): Vector | Matrix => {
-  if (by === undefined) {
+  if (by === ByAxis.ByAll) {
     const ind = basicImplement2dReduceAll(argMinFunc, x);
-    const indI = ind.data / x.shape[0];
-    const indJ = ind.data % x.shape[0];
+    const indI = Math.floor(ind.data / x.shape[1]);
+    const indJ = Math.floor(ind.data % x.shape[1]);
     return vector([ indI, indJ ]);
     // return basicImplement2dReduceAll(argMinFunc, x);
   } else {
-    const indI = by === ByAxis.ByColumn ? createRangeVector(0, x.shape[0]) : createRangeVector(0, x.shape[1]);
+    const indI = by === ByAxis.ByColumn ? createRangeVector(0, x.shape[1]) : createRangeVector(0, x.shape[0]);
     const indJ = basicImplement2dReduce(argMinFunc, x, by);
     if (by === ByAxis.ByColumn)
-      return concatVector([ indI, indJ ]);
+      return concatVector([ indJ, indI ], ByAxis.ByRow);
     else
-      return concatVector([ indJ, indI ]);
+      return concatVector([ indI, indJ ], ByAxis.ByRow);
   }
   // return basicImplement2dReduce(argMinFunc, x, by);
 };
 
 export const argMax2dForward = (x: Matrix, by?: ByAxis): Vector | Matrix => {
-  if (by === undefined) {
+  if (by === ByAxis.ByAll) {
     const ind = basicImplement2dReduceAll(argMaxFunc, x);
-    const indI = ind.data / x.shape[0];
-    const indJ = ind.data % x.shape[0];
+    const indI = Math.floor(ind.data / x.shape[1]);
+    const indJ = Math.floor(ind.data % x.shape[1]);
     return vector([ indI, indJ ]);
     // return basicImplement2dReduceAll(argMinFunc, x);
   } else {
-    const indI = by === ByAxis.ByColumn ? createRangeVector(0, x.shape[0]) : createRangeVector(0, x.shape[1]);
+    const indI = by === ByAxis.ByColumn ? createRangeVector(0, x.shape[1]) : createRangeVector(0, x.shape[0]);
     const indJ = basicImplement2dReduce(argMaxFunc, x, by);
     if (by === ByAxis.ByColumn)
-      return concatVector([ indI, indJ ]);
+      return concatVector([ indJ, indI ], ByAxis.ByRow);
     else
-      return concatVector([ indJ, indI ]);
+      return concatVector([ indI, indJ ], ByAxis.ByRow);
   }
   // return basicImplement2dReduce(argMinFunc, x, by);
 };
@@ -192,7 +190,7 @@ export const argMin2d = argMin2dForward;
 export const argMax2d = argMax2dForward;
 
 export const min2dForward = (x: Matrix, by?: ByAxis): Vector | Scalar => {
-  if (by === undefined) {
+  if (by === ByAxis.ByAll) {
     return basicImplement2dReduceAll(minFunc, x);
   }
   return basicImplement2dReduce(minFunc, x, by);
@@ -201,13 +199,13 @@ export const min2dForward = (x: Matrix, by?: ByAxis): Vector | Scalar => {
 export const min2dBackward = (grad: Scalar | Vector, x: Matrix, by?: ByAxis): Matrix => {
   const mat = createZeroMatrix(x.shape[0], x.shape[1]);
   const argMinInds = argMin2dForward(x, by);
-  if (by === undefined) {
+  if (by === ByAxis.ByAll) {
     const [ i, j ] = (argMinInds as Vector).data;
     mat.set(i, j, (grad as Scalar).data);
   } else {
     const inds = (argMinInds as Matrix).data;
     inds.forEach((v: [number, number]) => {
-      const val = by === ByAxis.ByRow ? (grad as Vector).get(v[1]) : (grad as Vector).get(v[0]);
+      const val = by === ByAxis.ByRow ? (grad as Vector).get(v[0]) : (grad as Vector).get(v[1]);
       mat.set(v[0], v[1], val);
     });
   }
@@ -218,9 +216,29 @@ export const min2d = (x: Matrix, by?: ByAxis): Vector | Scalar => {
   return trackedImplement2dReduce(min2dForward, min2dBackward, x, by);
 };
 
-export const max2d = (x: Matrix, by?: ByAxis): Vector | Scalar => {
-  if (by === undefined) {
+export const max2dForward = (x: Matrix, by?: ByAxis): Vector | Scalar => {
+  if (by === ByAxis.ByAll) {
     return basicImplement2dReduceAll(maxFunc, x);
   }
   return basicImplement2dReduce(maxFunc, x, by);
+};
+
+export const max2dBackward = (grad: Scalar | Vector, x: Matrix, by?: ByAxis): Matrix => {
+  const mat = createZeroMatrix(x.shape[0], x.shape[1]);
+  const argMaxInds = argMax2dForward(x, by);
+  if (by === ByAxis.ByAll) {
+    const [ i, j ] = (argMaxInds as Vector).data;
+    mat.set(i, j, (grad as Scalar).data);
+  } else {
+    const inds = (argMaxInds as Matrix).data;
+    inds.forEach((v: [number, number]) => {
+      const val = by === ByAxis.ByRow ? (grad as Vector).get(v[0]) : (grad as Vector).get(v[1]);
+      mat.set(v[0], v[1], val);
+    });
+  }
+  return mat;
+};
+
+export const max2d = (x: Matrix, by?: ByAxis): Vector | Scalar => {
+  return trackedImplement2dReduce(max2dForward, max2dBackward, x, by);
 };

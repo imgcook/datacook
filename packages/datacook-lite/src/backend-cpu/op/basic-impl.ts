@@ -7,11 +7,12 @@ import { sum1dForward, sum2dForward } from "./reduce-op";
 
 export enum ByAxis {
   ByColumn = 0,
-  ByRow = 1
+  ByRow = 1,
+  ByAll = -1
 }
 
 export type ImplementFuncBinary = (a: number, b: number) => number;
-export type ImplementFuncSingle = (a: number) => number;
+export type ImplementFuncSingle = (a: number, param?: number) => number;
 export type ImplementFuncReduce = (a: number[]) => number;
 
 export type BinaryFunc2d = (x: Matrix, y: Matrix | Vector | Scalar | number, by?: ByAxis) => Matrix;
@@ -19,9 +20,9 @@ export type BinaryGradFunc2d = (grad: Matrix, x?: Matrix, y?: Matrix | Vector | 
 export type BinaryFunc1d = (x: Vector, y: Vector | Scalar | number) => Vector;
 export type BinaryGradFunc1d = (grad: Vector, x?: Vector, y?: Vector | Scalar | number) => Vector;
 
-export type SingleFunc2d = (x: Matrix) => Matrix;
+export type SingleFunc2d = (x: Matrix, param?: any) => Matrix;
 export type SingleGradFunc2d = (grad: Matrix, x?: Matrix, param?: any) => Matrix;
-export type SingleFunc1d = (x: Vector) => Vector;
+export type SingleFunc1d = (x: Vector, param?: any) => Vector;
 export type SingleGradFunc1d = (grad: Vector, x?: Vector, param?: any) => Vector;
 
 export type ReduceAllFunc2d = (x: Matrix, by?: ByAxis) => Scalar;
@@ -131,7 +132,7 @@ export const basicImplement1dBinary = (func: ImplementFuncBinary, x: Vector, y: 
     return vector(out);
   }
   if (typeof y === 'number') {
-    const out = x.data.map((d: number) => d + y);
+    const out = x.data.map((d: number) => func(d, y));
     return vector(out);
   }
 };
@@ -174,7 +175,7 @@ export const trackedImplement1dSingle = (forwardFunc: SingleFunc1d, backwardFunc
   return outMat;
 };
 
-export const basicImplement2dSingle = (func: ImplementFuncSingle, x: Matrix): Matrix => {
+export const basicImplement2dSingle = (func: ImplementFuncSingle, x: Matrix, param?: number): Matrix => {
   const [ nX, mX ] = x.shape;
   const out: number[][] = [];
   for (let i = 0; i < nX; i++) {
@@ -182,17 +183,17 @@ export const basicImplement2dSingle = (func: ImplementFuncSingle, x: Matrix): Ma
   }
   for (let i = 0; i < nX; i++) {
     for (let j = 0; j < mX; j++) {
-      out[i][j] = func(x.get(i, j));
+      out[i][j] = func(x.get(i, j), param);
     }
   }
   return new Matrix(out);
 };
 
-export const trackedImplement2dSingle = (forwardFunc: SingleFunc2d, backwardFuncX: SingleGradFunc2d, x: Matrix): Matrix => {
-  const outMat = forwardFunc(x);
+export const trackedImplement2dSingle = (forwardFunc: SingleFunc2d, backwardFuncX: SingleGradFunc2d, x: Matrix, param?: number): Matrix => {
+  const outMat = forwardFunc(x, param);
   outMat.dependency.push({
     target: x,
-    gradFunc: (grad: Matrix): Matrix => backwardFuncX(grad, x)
+    gradFunc: (grad: Matrix): Matrix => backwardFuncX(grad, x, param)
   });
   return outMat;
 };
@@ -237,7 +238,7 @@ export const basicImplement2dReduce = (func: ImplementFuncReduce, x: Matrix, by:
     return new Vector(out);
   }
   if (by === ByAxis.ByColumn) {
-    const out: number[] = new Array(nX);
+    const out: number[] = new Array(mX);
     for (let i = 0; i < mX; i++) {
       out[i] = func(x.getColumn(i).data);
     }

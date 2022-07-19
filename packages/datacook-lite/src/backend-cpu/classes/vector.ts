@@ -19,7 +19,7 @@ export class Vector extends VectorBase{
   public values(): number[] {
     return this.data;
   }
-  public backward(grad: VectorBase): void {
+  public backward(grad?: VectorBase): void {
     if (!this.grad) {
       if (grad) {
         this.grad = grad;
@@ -32,7 +32,7 @@ export class Vector extends VectorBase{
         this.grad = add1d(this.grad, grad);
     }
     this.dependency.forEach((dep: Denpendency) => {
-      const targetGrad = dep.gradFunc(grad);
+      const targetGrad = dep.gradFunc(this.grad);
       dep.target.backward(targetGrad);
     });
   }

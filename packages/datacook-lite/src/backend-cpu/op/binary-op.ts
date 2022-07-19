@@ -124,8 +124,8 @@ export const mul1dBackwardX = (grad:Vector, x: Vector, y: Vector | Scalar | numb
   return mul1dForward(grad, y);
 };
 
-export const mul1dBackwardY = (grad:Vector, x: Vector, y: Vector | Scalar | number): Vector => {
-  return mul1dForward(grad, y);
+export const mul1dBackwardY = (grad:Vector, x: Vector): Vector => {
+  return mul1dForward(grad, x);
 };
 
 export const mul1d = (x: Vector, y: Vector | Scalar | number): Vector => {

@@ -21,7 +21,7 @@ export const createOneMatrix = (n: number, m: number): Matrix => {
 
 
 export const createOneVector = (n: number): Vector => {
-  const arr = new Array(n).fill(0);
+  const arr = new Array(n).fill(1);
   return new Vector(arr);
 };
 
@@ -38,7 +38,7 @@ export const concatVector = (vecs: Vector[], by: ByAxis = 0): Matrix => {
   for (let i = 0; i < vecs.length; i++) {
     if (vecs[i].length > maxVecLen) maxVecLen = vecs[i].length;
   }
-  const outMat = createZeroMatrix(vecs.length, maxVecLen);
+  const outMat = createZeroMatrix(maxVecLen, vecs.length);
   for (let i = 0; i < vecs.length; i++) {
     outMat.setColumn(i, vecs[i]);
   }
