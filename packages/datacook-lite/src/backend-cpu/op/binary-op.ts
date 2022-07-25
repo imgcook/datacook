@@ -150,3 +150,7 @@ export const div1dBackwardY = (grad:Vector, x: Vector, y: Vector | Scalar | numb
 export const div1d = (x: Vector, y: Vector | Scalar | number): Vector => {
   return trackedImplement1dBinary(div1dForward, div1dBackwardX, div1dBackwardY, x, y);
 };
+
+// export const add0d = (x: Scalar, y: Scalar | number): Scalar => {
+//   return tracked
+// };
