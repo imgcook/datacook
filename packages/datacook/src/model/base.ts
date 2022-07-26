@@ -153,6 +153,11 @@ export class BaseRegressor extends BaseEstimator {
   }
 }
 
+// export class BaseEnsemble extends BaseEstimator {
+//   public nEstimators: number;
+//   public estimatorParams:
+// }
+
 
 export class BaseEstimater {
   // TODO(sugarspectre): Add evaluation functions
