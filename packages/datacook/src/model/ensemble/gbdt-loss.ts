@@ -16,8 +16,8 @@ export abstract class LossFunction {
    * @param predictions predictions of the tree at iteration i - 1
    */
   abstract negativeGradient(
-    y: number[] | string[] | boolean[],
-    predictions: number[] | string[] | boolean[],
+    y: number[] | number[][],
+    predictions: number[][],
     k?: number,
     sampleWeight?: number[]
   ): number[];
@@ -36,9 +36,9 @@ export abstract class LossFunction {
   abstract updateTerminalRegions(
     tree: Tree,
     xData: number[][],
-    yData: number[],
+    yData: number[][],
     residual: number[],
-    predictions: number[],
+    predictions: number[][],
     sampleWeight?: number[],
     sampleMask?: number[],
     learningRate?: number,
@@ -53,14 +53,15 @@ export abstract class LossFunction {
     terminalRegions: number[][],
     leaf: number,
     xData: number[][],
-    y: number[],
+    y: number[][],
     residual: number[],
-    predictions: number[],
+    predictions: number[][],
     sampleWeight?: number[],
     sampleMask?: number[],
     learningRate?: number,
     k?: number
   ): void;
 
-  abstract computeLoss(y: number[], predictions: number[], sampleMask?: number[], sampleWeight?: number[]): number;
+  abstract getInitPredictions(x: number[][], estimator: any): number[][];
+  abstract computeLoss(y: number[][], predictions: number[][], sampleWeight?: number[], sampleMask?: number[]): number;
 }
