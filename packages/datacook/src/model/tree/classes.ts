@@ -121,6 +121,12 @@ class BaseDecisionTree extends BaseEstimator {
     return Math.max(2, Math.ceil(this.minSamplesLeaf * nSamples));
   }
 
+  /**
+   * Fit model according to X, y.
+   * @param xData Tensor like of shape (n_samples, n_features), input feature
+   * @param yData Tensor like of shape (n_sample, ), input target label
+   * @param sampleWeight Sample weights
+   */
   public async fit(xData: Tensor | RecursiveArray<number>, yData: Tensor | string[] | number[], sampleWeight: number[] = null) {
     if (this.ccpAlpha < 0) {
       throw new RangeError("ccpAlpha must greater than or equal to zero");

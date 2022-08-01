@@ -34,9 +34,9 @@ export const predictRegressionTreeFast = (x: number[][], nodes: Node[], k: numbe
 
 export const predictStages = (x: number[][], estimators: DecisionTreeRegressor[], scale: number, out: number[][]): number[][] => {
   const k = estimators.length;
-  for (let i = 0; i < x.length; i++) {
-    out.push(new Array(k).fill(0));
-  }
+  // for (let i = 0; i < x.length; i++) {
+  //   out.push(new Array(k).fill(0));
+  // }
   for (let i = 0; i < k; i++) {
     const nodes = estimators[i].tree.nodes;
     predictRegressionTreeFast(x, nodes, i, out, scale);
