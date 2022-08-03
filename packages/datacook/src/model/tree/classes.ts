@@ -1,13 +1,12 @@
 import { Tree } from "./tree";
-import { BaseClassifier, BaseEstimator, ClassMap } from "../base";
-import { RecursiveArray, tensor, Tensor, Tensor2D } from "@tensorflow/tfjs-core";
+import { BaseEstimator } from "../base";
+import { RecursiveArray, Tensor, Tensor2D } from "@tensorflow/tfjs-core";
 import { checkJSArray } from "../../utils/validation";
-import { LabelEncoder, OneHotDropTypes, OneHotEncoder } from "../../preprocess/encoder";
+import { LabelEncoder } from "../../preprocess/encoder";
 import { BestSplitter } from "./splitter";
 import { EntropyCriterion, GiniCriterion, MSECriterion } from "./criterion";
 import { DepthFirstTreeBuilder } from "./tree-builder";
 import { buildPrunedTree } from "./tree-pruner";
-import { applyMixins } from "../../utils/mix";
 
 export type DecisionTreeCriterion = 'entropy' | 'gini' | 'mse';
 export type DecisionTreeSplitter = 'best';
@@ -273,7 +272,7 @@ class BaseDecisionTree extends BaseEstimator {
     this.estimatorType = estimatorType ? estimatorType : this.estimatorType;
     if (tree) {
       this.tree = this.tree ? this.tree : new Tree();
-      this.tree.fromJson(tree);
+      await this.tree.fromJson(tree);
     }
     if (classes && estimatorType === 'classifier') {
       this.labelEncoder = new LabelEncoder();

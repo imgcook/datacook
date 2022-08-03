@@ -1,4 +1,4 @@
-import { DecisionTreeRegressor, Tree } from "../tree";
+import { Tree } from "../tree";
 
 export interface LossFunctionConstructor {
   new (): LossFunction;

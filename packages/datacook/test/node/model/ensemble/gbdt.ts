@@ -5,7 +5,7 @@ import { Tree } from '../../../../src/model/tree/tree';
 import { accuracyScore, getRSquare } from '../../../../src/metrics';
 import { DecisionTreeClassifier, DecisionTreeRegressor } from '../../../../src/model/tree';
 import { assert } from 'chai';
-import { GradientBoostingDecisionTree } from '../../../../src/model/ensemble/gbdt';
+import { GradientBoostingRegressor, GradientBoostingClassifier } from '../../../../src/model/ensemble/gbdt';
 const irisData = [
   [ 5.1, 3.5, 1.4, 0.2 ],
   [ 4.9, 3., 1.4, 0.2 ],
@@ -168,64 +168,65 @@ describe('GradientBoostingDecisionTree', () => {
   it('build gbdt (regression)', async () => {
     const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
     const target = irisData.map((d) => d[3]);
-    const gbdt = new GradientBoostingDecisionTree({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
-    gbdt.estimatorType = 'regressor';
+    const gbdt = new GradientBoostingRegressor({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
     await gbdt.fit(features, target);
     const predictions = await gbdt.predict(irisData);
-    const predY = predictions.map((d) => d[0]);
-    // console.log(JSON.stringify(predictions));
-    const r2 = getRSquare(target, predY as number[]);
+    const r2 = getRSquare(target, predictions as number[]);
     console.log('r2', r2);
-    // const criterion = new EntropyCriterion();
-    // const splitter = new BestSplitter(criterion, 4, 3, 3);
-    // const treeBuilder = new DepthFirstTreeBuilder(splitter, 3, 3, 3, 4, 0);
-    // const tree = new Tree(4, 3);
-    // treeBuilder.build(tree, irisData, label_ids);
-    // for (let i = 0; i < tree.nodeCount;i++){
-    //   console.log(JSON.stringify(tree.nodes[i]));
-    // }
   });
   it('build gbdt (binary classification)', async () => {
     const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
-    const gbdt = new GradientBoostingDecisionTree({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    const gbdt = new GradientBoostingClassifier({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
     gbdt.estimatorType = 'classifier';
     await gbdt.fit(features, binomialIds);
     const predictions = await gbdt.predict(irisData);
     const acc = accuracyScore(binomialIds, predictions);
     console.log("acc", acc);
-    // const predY = predictions.map((d) => d[0]);
-    // console.log(JSON.stringify(predictions));
-    // const r2 = getRSquare(target, predY as number[]);
-    // console.log('r2', r2);
-    // const criterion = new EntropyCriterion();
-    // const splitter = new BestSplitter(criterion, 4, 3, 3);
-    // const treeBuilder = new DepthFirstTreeBuilder(splitter, 3, 3, 3, 4, 0);
-    // const tree = new Tree(4, 3);
-    // treeBuilder.build(tree, irisData, label_ids);
-    // for (let i = 0; i < tree.nodeCount;i++){
-    //   console.log(JSON.stringify(tree.nodes[i]));
-    // }
   });
   it('build gbdt (multi classification)', async () => {
     const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
-    const gbdt = new GradientBoostingDecisionTree({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    const gbdt = new GradientBoostingClassifier({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
     gbdt.estimatorType = 'classifier';
     await gbdt.fit(features, label_ids);
     const predictions = await gbdt.predict(irisData);
-    console.log(predictions);
     const acc = accuracyScore(label_ids, predictions);
     console.log("acc", acc);
-    // const predY = predictions.map((d) => d[0]);
-    // console.log(JSON.stringify(predictions));
-    // const r2 = getRSquare(target, predY as number[]);
-    // console.log('r2', r2);
-    // const criterion = new EntropyCriterion();
-    // const splitter = new BestSplitter(criterion, 4, 3, 3);
-    // const treeBuilder = new DepthFirstTreeBuilder(splitter, 3, 3, 3, 4, 0);
-    // const tree = new Tree(4, 3);
-    // treeBuilder.build(tree, irisData, label_ids);
-    // for (let i = 0; i < tree.nodeCount;i++){
-    //   console.log(JSON.stringify(tree.nodes[i]));
-    // }
+
+  });
+  it('save and load model (regression)', async () => {
+    const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
+    const target = irisData.map((d) => d[3]);
+    const gbdt = new GradientBoostingRegressor({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    await gbdt.fit(features, target);
+    const modelJson = await gbdt.toJson();
+    const gbdt2 = new GradientBoostingRegressor({});
+    await gbdt2.fromJson(modelJson);
+    const predictions = await gbdt2.predict(irisData);
+    const r2 = getRSquare(target, predictions as number[]);
+    console.log('r2', r2);
+  });
+  it('save and load model (binary classification)', async () => {
+    const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
+    const gbdt = new GradientBoostingClassifier({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    gbdt.estimatorType = 'classifier';
+    await gbdt.fit(features, binomialIds);
+    const modelJson = await gbdt.toJson();
+    const gbdt2 = new GradientBoostingClassifier({});
+    await gbdt2.fromJson(modelJson);
+    const predictions = await gbdt2.predict(irisData);
+    const acc = accuracyScore(binomialIds, predictions);
+    console.log("acc", acc);
+  });
+  it('save and load model (multi classification)', async () => {
+    const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
+    const gbdt = new GradientBoostingClassifier({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    gbdt.estimatorType = 'classifier';
+    await gbdt.fit(features, label_ids);
+    const modelJson = await gbdt.toJson();
+    const gbdt2 = new GradientBoostingClassifier({});
+    await gbdt2.fromJson(modelJson);
+    const predictions = await gbdt2.predict(irisData);
+    const acc = accuracyScore(label_ids, predictions);
+    console.log("acc", acc);
   });
 });

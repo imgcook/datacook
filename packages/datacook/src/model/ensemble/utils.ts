@@ -44,4 +44,28 @@ export const predictStages = (x: number[][], estimators: DecisionTreeRegressor[]
   return out;
 };
 
-// export const predictStage = (x: number[][], estimator)
+/**
+ * Split train and test set according to given fraction
+ * @param fraction fraction for splitting
+ * @param x input features
+ * @param y input labels
+ * @param sampleWeight sample weight
+ * @returns [ train features, test features, train labels, test labels, train sample weight, test sample weight ]
+ */
+export const trainTestSplit = (fraction: number, x: number[][], y: number[][], sampleWeight?: number[]): [
+  number[][],
+  number[][],
+  number[][],
+  number[][],
+  number[] | undefined,
+  number[] | undefined
+] => {
+  const mask = randomSampleMask(x.length, Math.floor(x.length * fraction));
+  const xTrain = x.filter((v, i) => !mask[i]);
+  const yTrain = x.filter((v, i) => !mask[i]);
+  const sampleWeightTrain = sampleWeight ? sampleWeight.filter((v, i) => !mask[i]) : undefined;
+  const xTest = x.filter((v, i) => mask[i]);
+  const yTest = y.filter((v, i) => mask[i]);
+  const sampleWeightTest = sampleWeight ? sampleWeight.filter((v, i) => mask[i]) : undefined;
+  return [ xTrain, xTest, yTrain, yTest, sampleWeightTrain, sampleWeightTest ];
+};
