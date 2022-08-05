@@ -1,6 +1,6 @@
 import { Tensor, Tensor1D, RecursiveArray, cast, tensor, tidy } from '@tensorflow/tfjs-core';
 
-export function checkArray (array: Tensor | RecursiveArray<number>, dtype = 'any', ensureDimension = -1): Tensor {
+export function checkArray (array: Tensor | RecursiveArray<number | string | boolean>, dtype = 'any', ensureDimension = -1): Tensor {
   return tidy(() => {
     if (array instanceof Array) {
       array = tensor(array);
@@ -24,7 +24,7 @@ export function checkArray (array: Tensor | RecursiveArray<number>, dtype = 'any
 }
 
 
-export function checkJSArray(array: Tensor | RecursiveArray<number>, dtype = 'any', ensureDimension = -1): number | number[] | number[][] | number[][][] | number[][][][] | number[][][][][] | number[][][][][][] {
+export function checkJSArray(array: Tensor | RecursiveArray<number | string | boolean>, dtype = 'any', ensureDimension = -1): number | number[] | number[][] | number[][][] | number[][][][] | number[][][][][] | number[][][][][][] {
   return tidy(() => {
     const tensor = checkArray(array, dtype, ensureDimension);
     return tensor.arraySync();

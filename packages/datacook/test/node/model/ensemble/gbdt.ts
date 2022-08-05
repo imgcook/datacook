@@ -1,10 +1,4 @@
-import { BestSplitter } from '../../../../src/model/tree/splitter';
-import { EntropyCriterion } from '../../../../src/model/tree/criterion';
-import { DepthFirstTreeBuilder } from '../../../../src/model/tree/tree-builder';
-import { Tree } from '../../../../src/model/tree/tree';
 import { accuracyScore, getRSquare } from '../../../../src/metrics';
-import { DecisionTreeClassifier, DecisionTreeRegressor } from '../../../../src/model/tree';
-import { assert } from 'chai';
 import { GradientBoostingRegressor, GradientBoostingClassifier } from '../../../../src/model/ensemble/gbdt';
 const irisData = [
   [ 5.1, 3.5, 1.4, 0.2 ],

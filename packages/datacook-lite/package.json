@@ -82,5 +82,8 @@
       "lcov",
       "text"
     ]
+  },
+  "dependencies": {
+    "@pipcook/datacook": "^0.1.3-beta.7"
   }
 }
