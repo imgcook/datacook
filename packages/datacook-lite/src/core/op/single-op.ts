@@ -34,7 +34,6 @@ export const sqrt2d = (x: Matrix): Matrix => {
   }
 };
 
-
 export const exp2d = (x: Matrix): Matrix => {
   if (IS_CPU_BACKEND) {
     return exp2dCPU(x);
