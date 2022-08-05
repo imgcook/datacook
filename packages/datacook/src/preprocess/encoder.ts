@@ -19,7 +19,7 @@ export abstract class EncoderBase {
    * @param x data input used to init encoder
    * @param categories user input categories
    */
-  public async init(x: Tensor | number[] | string[]): Promise<void> {
+  public async init(x: Tensor | number[] | string[] | boolean[]): Promise<void> {
     const { values } = unique(x);
     if (values.dtype === 'int32' || values.dtype === 'float32') {
       this.categories = topk(values, values.shape[0], false).values;
@@ -76,7 +76,7 @@ export class OneHotEncoder extends EncoderBase {
    * @param x feature array need to encode
    * @returns transformed one-hot feature
    */
-  public async encode(x: Tensor | number[] | string[]): Promise<Tensor> {
+  public async encode(x: Tensor | number[] | string[] | boolean[]): Promise<Tensor> {
     if (!this.categories) {
       throw TypeError('Please init encoder using init()');
     }
@@ -140,7 +140,7 @@ export class LabelEncoder extends EncoderBase {
    * @param x feature array need to encode
    * @returns transformed one-hot feature
    */
-  public async encode(x: Tensor | number[] | string[]): Promise<Tensor> {
+  public async encode(x: Tensor | number[] | string[] | boolean[]): Promise<Tensor> {
     if (!this.categories) {
       throw TypeError('Please init encoder using init()');
     }

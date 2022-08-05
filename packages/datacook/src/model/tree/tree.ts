@@ -120,6 +120,36 @@ export class Tree {
     }
     return values;
   };
+  /**
+   * Finds the terminal region (=leaf node) for each sample in X.
+   * @param xData input sample
+   */
+  public applyNode = (xData: number[][]): number[] => {
+    const xArray = checkJSArray(xData, 'float32', 2) as number[][];
+    const nSamples = xArray.length;
+    const leaves = [];
+    for (let i = 0; i < nSamples; i++) {
+      const sample = xArray[i];
+      let node = this.nodes[0];
+      let curNode = 0;
+      while (node.leftChild != -1 && node.rightChild != -1) {
+        const xFeatureVal = sample[node.feature];
+        if (xFeatureVal <= node.threshold) {
+          node = this.nodes[node.leftChild];
+          if (node.leftChild !== -1) {
+            curNode = node.leftChild;
+          }
+        } else {
+          node = this.nodes[node.rightChild];
+          if (node.rightChild !== -1) {
+            curNode = node.rightChild;
+          }
+        }
+      }
+      leaves.push(curNode);
+    }
+    return leaves;
+  };
 
   /**
    * Find the decsision path for each sample in X
