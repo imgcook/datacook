@@ -108,7 +108,7 @@ export class LeastSquaredError extends RegressionLossFunction {
   constructor() {
     super();
   }
-  negativeGradient(y: number[][], predictions: number[][], k: number, sampleWeight?: number[]): number[] {
+  negativeGradient(y: number[][], predictions: number[][], k: number): number[] {
     const grad = new Array(y.length).fill(0);
     for (let i = 0; i < y.length; i++) {
       grad[i] = y[i][k] - predictions[i][k];
@@ -154,7 +154,7 @@ export abstract class ClassificationLossFunction extends LossFunction {
 }
 
 export abstract class DevianceLossFunction extends ClassificationLossFunction {
-  negativeGradient(y: number[][], predictions: number[][], k = 0, sampleWeight?: number[]): number[] {
+  negativeGradient(y: number[][], predictions: number[][], k = 0): number[] {
     const grads = new Array(y.length);
     for (let i = 0; i < y.length; i++) {
       grads[i] = y[i][k] - 1 / (1 + Math.exp(-predictions[i][k]));

@@ -13,7 +13,7 @@ export type DecisionTreeSplitter = 'best';
 export type MaxFeaturesSelection = 'auto' | 'sqrt' | 'log2';
 
 const CRITERIA_CLF = { "gini": GiniCriterion, "entropy": EntropyCriterion, 'mse': MSECriterion };
-const DENSE_SPLITTERS = { "best": BestSplitter };
+// const DENSE_SPLITTERS = { "best": BestSplitter };
 
 
 function argMax(array: number[]) {
@@ -164,7 +164,7 @@ class BaseDecisionTree extends BaseEstimator {
     }
 
     const maxDepth = this.maxDepth ? this.maxDepth : Number.MAX_SAFE_INTEGER;
-    const maxLeafNodes = this.maxLeafNodes ? this.maxLeafNodes : -1;
+    // const maxLeafNodes = this.maxLeafNodes ? this.maxLeafNodes : -1;
     const minWeightLeaf = sampleWeight ?
       this.minWeightFractionLeaf * sampleWeight.reduce((a: number, b: number): number => a + b) :
       this.minWeightFractionLeaf * nSamples;
