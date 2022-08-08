@@ -49,25 +49,3 @@ export const mul1d = (x: Vector, y: Vector | number): Vector => {
 export const div1d = (x: Vector, y: Vector | number): Vector => {
   return basicImplement1dBinary(divFunc, x, y);
 };
-<<<<<<< HEAD
-=======
-
-export const div1dBackwardX = (grad:Vector, x: Vector, y: Vector | Scalar | number): Vector => {
-  return div1dForward(grad, y);
-};
-
-export const div1dBackwardY = (grad:Vector, x: Vector, y: Vector | Scalar | number): Vector => {
-  let ySquare;
-  if (y instanceof Vector) ySquare = square1dForward(y);
-  if (y instanceof Scalar) ySquare = square0dFroward(y);
-  return neg1dForward(div1dForward(mul1dForward(grad, x), ySquare));
-};
-
-export const div1d = (x: Vector, y: Vector | Scalar | number): Vector => {
-  return trackedImplement1dBinary(div1dForward, div1dBackwardX, div1dBackwardY, x, y);
-};
-
-// export const add0d = (x: Scalar, y: Scalar | number): Scalar => {
-//   return tracked
-// };
->>>>>>> cf92074... optimizer

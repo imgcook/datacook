@@ -12,25 +12,6 @@ export type ImplementFuncBinary = (a: number, b: number) => number;
 export type ImplementFuncSingle = (a: number) => number;
 export type ImplementFuncReduce = (a: number[]) => number;
 
-export const basicImplement1dBinary = (func: ImplementFuncBinary, x: Vector, y: Vector | Scalar | number): Vector => {
-  const nX = x.length;
-  const out = new Array(nX);
-  if (y instanceof Vector) {
-    const nY = y.length;
-    if (nX !== nY) {
-      throw new TypeError(`Required length of y is ${nX}, receive ${nY}`);
-    }
-    for (let i = 0; i < nX; i++) {
-      out[i] = func(x.get(i), y.get(i));
-    }
-    return vector(out);
-  }
-  if (typeof y === 'number') {
-    const out = x.data.map((d: number) => func(d, y));
-    return vector(out);
-  }
-};
-
 export const basicImplement2dBinary = (func: ImplementFuncBinary, x: Matrix, y: Matrix | Vector | number, by?: ByAxis): Matrix => {
   const [ nX, mX ] = x.shape;
   if (!(y instanceof Matrix) && !(y instanceof Vector) && !(typeof y === 'number')) {
@@ -93,6 +74,26 @@ export const basicImplement1dSingle = (func: ImplementFuncSingle, x: Vector): Ve
     out[i] = func(x.get(i));
   }
   return vector(out);
+};
+
+
+export const basicImplement1dBinary = (func: ImplementFuncBinary, x: Vector, y: Vector | number): Vector => {
+  const nX = x.length;
+  const out = new Array(nX);
+  if (y instanceof Vector) {
+    const nY = y.length;
+    if (nX !== nY) {
+      throw new TypeError(`Required length of y is ${nX}, receive ${nY}`);
+    }
+    for (let i = 0; i < nX; i++) {
+      out[i] = func(x.get(i), y.get(i));
+    }
+    return vector(out);
+  }
+  if (typeof y === 'number') {
+    const out = x.data.map((d: number) => func(d, y));
+    return vector(out);
+  }
 };
 
 export const basicImplement2dSingle = (func: ImplementFuncSingle, x: Matrix): Matrix => {
