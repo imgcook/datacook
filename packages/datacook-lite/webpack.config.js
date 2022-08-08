@@ -22,7 +22,7 @@ const createConfig = (target) => {
       library: "datacook"
     },
     plugins: [
-      new BundleAnalyzerPlugin(),
+      new BundleAnalyzerPlugin({ analyzerMode: 'static' }),
       new DefinePlugin({
         // __BACKEND__: 'cpu'
         'process.env.BACKEND': JSON.stringify('cpu')
