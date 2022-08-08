@@ -1,34 +1,19 @@
 import { Tree } from "./tree";
-<<<<<<< HEAD
-import { BaseClassifier, BaseEstimator, ClassMap } from "../base";
-import { RecursiveArray, tensor, Tensor, Tensor2D } from "@tensorflow/tfjs-core";
-import { checkJSArray } from "../../utils/validation";
-import { LabelEncoder, OneHotDropTypes, OneHotEncoder } from "../../preprocess/encoder";
-=======
 import { BaseEstimator } from "../base";
 import { RecursiveArray, Tensor, Tensor2D } from "@tensorflow/tfjs-core";
 import { checkJSArray } from "../../utils/validation";
 import { LabelEncoder } from "../../preprocess/encoder";
->>>>>>> 29627e940ac3f9106bc2937efc579191b08fc2d9
 import { BestSplitter } from "./splitter";
 import { EntropyCriterion, GiniCriterion, MSECriterion } from "./criterion";
 import { DepthFirstTreeBuilder } from "./tree-builder";
 import { buildPrunedTree } from "./tree-pruner";
-<<<<<<< HEAD
-import { applyMixins } from "../../utils/mix";
-=======
->>>>>>> 29627e940ac3f9106bc2937efc579191b08fc2d9
 
 export type DecisionTreeCriterion = 'entropy' | 'gini' | 'mse';
 export type DecisionTreeSplitter = 'best';
 export type MaxFeaturesSelection = 'auto' | 'sqrt' | 'log2';
 
 const CRITERIA_CLF = { "gini": GiniCriterion, "entropy": EntropyCriterion, 'mse': MSECriterion };
-<<<<<<< HEAD
-const DENSE_SPLITTERS = { "best": BestSplitter };
-=======
 // const DENSE_SPLITTERS = { "best": BestSplitter };
->>>>>>> 29627e940ac3f9106bc2937efc579191b08fc2d9
 
 
 function argMax(array: number[]) {
@@ -179,11 +164,7 @@ class BaseDecisionTree extends BaseEstimator {
     }
 
     const maxDepth = this.maxDepth ? this.maxDepth : Number.MAX_SAFE_INTEGER;
-<<<<<<< HEAD
-    const maxLeafNodes = this.maxLeafNodes ? this.maxLeafNodes : -1;
-=======
     // const maxLeafNodes = this.maxLeafNodes ? this.maxLeafNodes : -1;
->>>>>>> 29627e940ac3f9106bc2937efc579191b08fc2d9
     const minWeightLeaf = sampleWeight ?
       this.minWeightFractionLeaf * sampleWeight.reduce((a: number, b: number): number => a + b) :
       this.minWeightFractionLeaf * nSamples;
@@ -291,11 +272,7 @@ class BaseDecisionTree extends BaseEstimator {
     this.estimatorType = estimatorType ? estimatorType : this.estimatorType;
     if (tree) {
       this.tree = this.tree ? this.tree : new Tree();
-<<<<<<< HEAD
-      this.tree.fromJson(tree);
-=======
       await this.tree.fromJson(tree);
->>>>>>> 29627e940ac3f9106bc2937efc579191b08fc2d9
     }
     if (classes && estimatorType === 'classifier') {
       this.labelEncoder = new LabelEncoder();

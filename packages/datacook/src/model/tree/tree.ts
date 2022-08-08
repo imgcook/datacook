@@ -120,8 +120,6 @@ export class Tree {
     }
     return values;
   };
-<<<<<<< HEAD
-=======
   /**
    * Finds the terminal region (=leaf node) for each sample in X.
    * @param xData input sample
@@ -152,7 +150,6 @@ export class Tree {
     }
     return leaves;
   };
->>>>>>> 29627e940ac3f9106bc2937efc579191b08fc2d9
 
   /**
    * Find the decsision path for each sample in X

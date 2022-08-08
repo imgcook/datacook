@@ -1,4 +1,4 @@
-import { Tensor, mean, matMul, sub, transpose, RecursiveArray, ones, sqrt, add, divNoNan, mul, gather, slice, linalg, diag, eye, log, sum, clipByValue, neg, range, cast, reshape, square } from "@tensorflow/tfjs-core";
+import { Tensor, mean, sub, transpose, RecursiveArray, ones, sqrt, add, divNoNan, mul, gather, log, sum, clipByValue, range, cast, reshape, square } from "@tensorflow/tfjs-core";
 import { svd, tensorEqual } from "../../linalg";
 import { checkArray } from "../../utils/validation";
 import { getVariance } from "../../stat";
@@ -41,7 +41,7 @@ export class FactorAnalysis {
     const xCentered = sub(xTensor, xMeans);
     const sigma = getVariance(xTensor, 0);
     const small = 1e-12;
-    const llConst = nFeatures * Math.log(2.0 * Math.PI) + nComponent;
+    // const llConst = nFeatures * Math.log(2.0 * Math.PI) + nComponent;
     let oldllDelta: Tensor;
     let psi: Tensor = ones([ nFeatures ]);
 
@@ -49,7 +49,7 @@ export class FactorAnalysis {
       const sqrtPsi = add(sqrt(psi), small);
       const xd = divNoNan(xCentered, mul(sqrtPsi, nSqrt));
 
-      const [ u, m, w ] = await svd(transpose(xd));
+      const [ u, m ] = await svd(transpose(xd));
       const firstNInd = cast(range(0, nComponent), 'int32');
       const lastNInd = cast(range(nComponent, nFeatures), 'int32');
       const uh = gather(u, firstNInd, 1);
