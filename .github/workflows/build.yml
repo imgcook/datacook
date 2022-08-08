@@ -28,14 +28,14 @@ jobs:
           ./emsdk activate latest
           source ./emsdk_env.sh
           npm run build
-  # browser:
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: actions/setup-node@v1
-  #       with:
-  #         node-version: 14
-  #     - run: |
-  #         npm install
-  #         npm run build
-  #         npm run build:browser
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 14
+      - run: |
+          npm install
+          npm run build
+          npm run build:browser
