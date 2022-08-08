@@ -19,7 +19,7 @@
   },
   "scripts": {
     "build": "lerna run build",
-    "build:browser": "lerna run build browser",
+    "build:browser": "lerna run build:browser",
     "postinstall": "lerna clean --yes && lerna bootstrap",
     "lint": "eslint . --ext .ts --ext .js",
     "pretest": "npm run lint",
