@@ -10,8 +10,5 @@ dist/
 tsconfig.tsbuildinfo
 yarn-error
 yarn.lock
-package-lock.json
-packages/datacook/package-lock.json
-packages/datacook-lite/package-lock.json
 *.log
 *.tgz
