@@ -1,0 +1,88 @@
+{
+  "name": "@pipcook/datacook-lite",
+  "version": "0.1.2",
+  "description": "A JavaScript library for feature engineering on datasets",
+  "main": "dist/index.js",
+  "sideEffects": false,
+  "scripts": {
+    "preinstall": "rm -rf ./node_modules/@pipcook && mkdir -p ./node_modules/@pipcook && ln -s `pwd`/../datacook `pwd`/node_modules/@pipcook",
+    "test": "npm run test:node",
+    "test:node": "env TS_NODE_PROJECT=\"tsconfig.test.json\" nyc mocha --timeout 60000 -r ts-node/register ./test/**/*.ts --require test/setup.ts",
+    "test:simple": "env TS_NODE_PROJECT=\"tsconfig.test.json\" mocha --timeout 60000 -r ts-node/register --require test/setup.ts",
+    "test:browser": "karma start",
+    "build": "npm run clean && npm run build:node",
+    "build:node": "tsc -b tsconfig.json",
+    "build:browser": "npm run build:node && webpack --mode production",
+    "clean": "rm -rf ./dist && rm -rf tsconfig.tsbuildinfo",
+    "lint": "eslint ./src",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
+    "coverage": "nyc report --reporter=text-lcov | coveralls && nyc report --reporter=lcov",
+    "patch": "npm version patch",
+    "doc": "typedoc src/index.ts --name \"Datacook API\" --out ./doc --tsconfig ./tsconfig.ts --highlightTheme github-light"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/imgcook/datacook"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npm.alibaba-inc.com"
+  },
+  "keywords": [
+    "data-processing",
+    "data-analysis",
+    "data-manipulation",
+    "analysis"
+  ],
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/imgcook/datacook/issues"
+  },
+  "homepage": "https://github.com/imgcook/datacook#README",
+  "devDependencies": {
+    "@babel/preset-env": "^7.15.4",
+    "@pipcook/datacook": "^0.1.3-beta.7",
+    "@tensorflow/tfjs-backend-cpu": "^3.15.0",
+    "@tensorflow/tfjs-core": "^3.15.0",
+    "@types/chai": "^4.2.14",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^14.14.20",
+    "@typescript-eslint/eslint-plugin": "^4.6.0",
+    "@typescript-eslint/parser": "^4.6.0",
+    "babel-loader": "^8.2.2",
+    "browserify": "16.5.2",
+    "chai": "^4.2.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "coveralls": "^3.1.0",
+    "eslint": "^7.1.0",
+    "karma": "^6.4.0",
+    "karma-browserify": "7.0.0",
+    "karma-chai": "^0.1.0",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-cli": "^2.0.0",
+    "karma-mocha": "^2.0.1",
+    "karma-mocha-reporter": "^2.2.5",
+    "karma-typescript": "^5.5.3",
+    "mocha": "^6.2.3",
+    "module-alias": "^2.2.2",
+    "nyc": "^15.1.0",
+    "terser-webpack-plugin": "^5.3.1",
+    "ts-loader": "^9.2.8",
+    "ts-node": "^10.2.0",
+    "typedoc": "^0.20.34",
+    "typescript": "^4.6.3",
+    "uglify-js-plugin": "^0.0.6",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "5.50.0",
+    "webpack-bundle-analyzer": "^4.4.2",
+    "webpack-cli": "^4.8.0"
+  },
+  "_moduleAliases": {
+    "@datacook": "../datacook/src"
+  },
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text"
+    ]
+  }
+}

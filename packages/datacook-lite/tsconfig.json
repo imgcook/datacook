@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+      "resolveJsonModule": true,
+      "composite": true,
+      "outDir": "./dist",
+      "rootDir": "./src",
+      "declaration": true,
+      "noImplicitAny": true,
+      "esModuleInterop": true,
+      "incremental": true,
+      "module": "es6",
+      "target": "es6",
+      "moduleResolution": "node",
+      "lib": [ "es6" ],
+      "skipLibCheck": true,
+      "sourceMap": true
+    },
+    "compileOnSave": true,
+    "exclude": [
+      "node_modules",
+      "test",
+      "dist"
+    ]
+  }

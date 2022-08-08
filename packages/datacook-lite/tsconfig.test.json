@@ -1,0 +1,23 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+      "resolveJsonModule": true,
+      "composite": true,
+      "outDir": "./dist",
+      "rootDir": "./",
+      "declaration": true,
+      "noImplicitAny": true,
+      "esModuleInterop": true,
+      "incremental": true,
+      "module": "commonjs",
+      "target": "es5",
+      "lib": [ "es5" ],
+      "skipLibCheck": true,
+      "sourceMap": true
+    },
+    "exclude": [
+      "node_modules",
+      "dist"
+    ]
+  }
+  

@@ -4,3 +4,7 @@ dist
 pipcook_venv
 output
 example
+packages/datacook/test
+packages/datacook/webpack.config.js
+packages/datacook-lite/webpack.config.js
+packages/datacook-lite/karma.conf.js

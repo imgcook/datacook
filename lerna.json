@@ -1,0 +1,27 @@
+{
+  "packages": [
+    "packages/*"
+  ],
+  "version": "independent",
+  "loglevel": "verbose",
+  "npmClient": "npm",
+  "command": {
+    "publish": {
+      "npmClient": "npm",
+      "registry": "https://registry.npmjs.org"
+    },
+    "publishConfig": {
+      "access": "public"
+    },
+    "bootstrap": {
+      "nohoist": [
+        "ice-scripts",
+        "stylelint"
+      ]
+    }
+  },
+  "hoist": false,
+  "$schema": "node_modules/lerna/schemas/lerna-schema.json",
+  "useNx": false,
+  "useWorkspaces": false
+}
