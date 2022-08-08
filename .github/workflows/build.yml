@@ -18,29 +18,9 @@ jobs:
         with:
           node-version: 14
       - run: |
-          cd ./packages/datacook
           npm install
+          npm run build
           npm run lint
-          npm run build
-          npm run test
-          git clone https://github.com/emscripten-core/emsdk.git
-          cd emsdk
-          ./emsdk install latest
-          ./emsdk activate latest
-          source ./emsdk_env.sh
-          npm run build
-  build-datacook-lite:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 14
-      - run: |
-          cd ./packages/datacook-lite
-          npm install
-          npm run lint
-          npm run build
           npm run test
           git clone https://github.com/emscripten-core/emsdk.git
           cd emsdk
@@ -57,4 +37,5 @@ jobs:
           node-version: 14
       - run: |
           npm install
+          npm run build
           npm run build:browser
