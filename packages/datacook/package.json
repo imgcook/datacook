@@ -4,8 +4,8 @@
   "description": "A JavaScript library for feature engineering on datasets",
   "main": "dist/index.js",
   "dependencies": {
-    "@tensorflow/tfjs-core": "3.8.0",
-    "@tensorflow/tfjs-layers": "3.8.0",
+    "@tensorflow/tfjs-core": "^3.15.0",
+    "@tensorflow/tfjs-layers": "^3.15.0",
     "jimp": "^0.16.1",
     "seedrandom": "^3.0.5"
   },
@@ -14,7 +14,7 @@
     "test:node": "nyc mocha --timeout 60000 -r ts-node/register ./test/node/**/*.ts --require test/setup.ts",
     "test:simple": "mocha --timeout 60000 -r ts-node/register --require test/setup.ts",
     "test:browser": "karma start karma.conf.js",
-    "build": "npm run clean && npm run build:node && npm run build:wasm",
+    "build": "npm run clean && npm run build:node",
     "build:node": "tsc -b tsconfig.json",
     "build:browser": "webpack --mode production",
     "build:wasm": "make",
@@ -42,7 +42,7 @@
   "homepage": "https://github.com/imgcook/datacook#README",
   "devDependencies": {
     "@babel/preset-env": "^7.15.4",
-    "@tensorflow/tfjs-backend-cpu": "^3.8.0",
+    "@tensorflow/tfjs-backend-cpu": "^3.15.0",
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.0.3",
     "@types/node": "^14.14.20",

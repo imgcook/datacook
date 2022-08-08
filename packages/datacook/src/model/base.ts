@@ -26,16 +26,30 @@ export abstract class BaseEstimator {
    * @param x Input feature of shape (nSample, nFeatures).
    * @param reset if true, the `nFeatures` attribute is set to `x.shape[1]`.
    */
-  public checkAndSetNFeatures(x: Tensor, reset: boolean): void {
-    if (x?.shape?.length !== 2) {
-      throw new TypeError('x should be 2D tensor');
-    }
-    const featureCount = x.shape[1];
-    if (!reset && featureCount !== this.nFeature) {
-      throw new TypeError(`X has ${featureCount} features, but is expected to have ${this.nFeature} features as input.`);
-    }
-    if (reset || !this.nFeature) {
-      this.nFeature = x.shape[1];
+  public checkAndSetNFeatures(x: Tensor | number[][], reset: boolean): void {
+    if (x instanceof Tensor) {
+      if (x?.shape?.length !== 2) {
+        throw new TypeError('x should be 2D tensor');
+      }
+      const featureCount = x.shape[1];
+      if (!reset && featureCount !== this.nFeature) {
+        throw new TypeError(`X has ${featureCount} features, but is expected to have ${this.nFeature} features as input.`);
+      }
+      if (reset || !this.nFeature) {
+        this.nFeature = x.shape[1];
+      }
+    } else {
+      if (x instanceof Array && x[0] && x[0] instanceof Array) {
+        const featureCount = x[0].length;
+        if (!reset && featureCount !== this.nFeature) {
+          throw new TypeError(`X has ${featureCount} features, but is expected to have ${this.nFeature} features as input.`);
+        }
+        if (reset || !this.nFeature) {
+          this.nFeature = featureCount;
+        }
+        return;
+      }
+      throw new TypeError('Invalid input features');
     }
   }
   /**
@@ -152,6 +166,11 @@ export class BaseRegressor extends BaseEstimator {
     return { x: xTensor, y: y_tensor };
   }
 }
+
+// export class BaseEnsemble extends BaseEstimator {
+//   public nEstimators: number;
+//   public estimatorParams:
+// }
 
 
 export class BaseEstimater {

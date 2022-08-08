@@ -1,5 +1,5 @@
 import { Vector } from "./vector";
-import { matrix, Matrix as MatrixBase } from '../../core/classes';
+import { Matrix as MatrixBase } from '../../core/classes';
 import { add2d } from "../op";
 import { Denpendency } from "../../core/classes";
 import { createOneMatrix } from "./creation";

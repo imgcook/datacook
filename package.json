@@ -1,17 +1,17 @@
 {
-  "name": "pipcook",
+  "name": "datacook",
   "private": true,
   "workspaces": [
     "packages/*"
   ],
   "devDependencies": {
-    "@lerna/bootstrap": "^4.0.0",
+    "@lerna/bootstrap": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^4.1.1",
     "@typescript-eslint/parser": "^4.1.1",
     "docsify-cli": "^4.4.3",
     "eslint": "^7.15.0",
     "http-server": "^0.12.3",
-    "lerna": "^4.0.0",
+    "lerna": "^5.3.0",
     "nyc": "^15.1.0",
     "ts-node": "^9.1.1",
     "typedoc": "^0.17.8",
@@ -19,6 +19,7 @@
   },
   "scripts": {
     "build": "lerna run build",
+    "build:browser": "lerna run build:browser",
     "postinstall": "lerna clean --yes && lerna bootstrap",
     "lint": "eslint . --ext .ts --ext .js",
     "pretest": "npm run lint",

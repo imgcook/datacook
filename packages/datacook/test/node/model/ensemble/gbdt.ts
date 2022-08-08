@@ -1,9 +1,5 @@
-import { DecisionTreeClassifierPredictor, DecisionTreeRegressorPredictor } from '../../src/model/tree/decision-tree-predictor';
-import { accuracyScore } from '../../src/metrics/classification';
-import { getRSquare } from '@pipcook/datacook/src/metrics';
-import { DecisionTreeClassifier, DecisionTreeRegressor } from '@pipcook/datacook/dist/model/tree/classes';
-import { assert } from 'chai';
-
+import { accuracyScore, getRSquare } from '../../../../src/metrics';
+import { GradientBoostingRegressor, GradientBoostingClassifier } from '../../../../src/model/ensemble/gbdt';
 const irisData = [
   [ 5.1, 3.5, 1.4, 0.2 ],
   [ 4.9, 3., 1.4, 0.2 ],
@@ -159,36 +155,72 @@ const irisData = [
 
 const labels = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ];
 const label_ids = labels.map((d) => d - 1);
+const binomialIds = label_ids.map((d) => d > 0 ? "a" : "b");
 
 
-describe('DepthFirstTreeBuilder', () => {
-
-  it('save and load model (classifier)', async () => {
-    const dt = new DecisionTreeClassifier({ ccpAlpha: 0.01 });
-    await dt.fit(irisData, labels);
-    const modelJson = await dt.toJson();
-    const dt2 = new DecisionTreeClassifierPredictor();
-    dt2.fromJson(modelJson);
-    const predY = await dt2.predict(irisData);
-    const acc = accuracyScore(labels, predY);
-    console.log('accuracy score: ', acc);
-    assert.isTrue(dt.tree.nodeCount < 17);
-  });
-});
-
-describe('DecisionTreeRegressor', () => {
-  it('save and load model (regressor)', async () => {
-    const dt = new DecisionTreeRegressor();
+describe('GradientBoostingDecisionTree', () => {
+  it('build gbdt (regression)', async () => {
     const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
     const target = irisData.map((d) => d[3]);
-    await dt.fit(features, target);
-    const dt2 = new DecisionTreeRegressorPredictor();
-    const modelJson = await dt.toJson();
-    await dt2.fromJson(modelJson);
-    const predY_1 = await dt.predict(features);
-    const predY = await dt2.predict(features);
-    const r2_1 = getRSquare(target, predY_1 as number[]);
-    const r2 = getRSquare(target, predY as number[]);
-    assert.isTrue(Math.abs(r2_1 - r2) < 1e-3);
+    const gbdt = new GradientBoostingRegressor({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    await gbdt.fit(features, target);
+    const predictions = await gbdt.predict(irisData);
+    const r2 = getRSquare(target, predictions as number[]);
+    console.log('r2', r2);
+  });
+  it('build gbdt (binary classification)', async () => {
+    const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
+    const gbdt = new GradientBoostingClassifier({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    gbdt.estimatorType = 'classifier';
+    await gbdt.fit(features, binomialIds);
+    const predictions = await gbdt.predict(irisData);
+    const acc = accuracyScore(binomialIds, predictions);
+    console.log("acc", acc);
+  });
+  it('build gbdt (multi classification)', async () => {
+    const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
+    const gbdt = new GradientBoostingClassifier({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    gbdt.estimatorType = 'classifier';
+    await gbdt.fit(features, label_ids);
+    const predictions = await gbdt.predict(irisData);
+    const acc = accuracyScore(label_ids, predictions);
+    console.log("acc", acc);
+
+  });
+  it('save and load model (regression)', async () => {
+    const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
+    const target = irisData.map((d) => d[3]);
+    const gbdt = new GradientBoostingRegressor({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    await gbdt.fit(features, target);
+    const modelJson = await gbdt.toJson();
+    const gbdt2 = new GradientBoostingRegressor({});
+    await gbdt2.fromJson(modelJson);
+    const predictions = await gbdt2.predict(irisData);
+    const r2 = getRSquare(target, predictions as number[]);
+    console.log('r2', r2);
+  });
+  it('save and load model (binary classification)', async () => {
+    const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
+    const gbdt = new GradientBoostingClassifier({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    gbdt.estimatorType = 'classifier';
+    await gbdt.fit(features, binomialIds);
+    const modelJson = await gbdt.toJson();
+    const gbdt2 = new GradientBoostingClassifier({});
+    await gbdt2.fromJson(modelJson);
+    const predictions = await gbdt2.predict(irisData);
+    const acc = accuracyScore(binomialIds, predictions);
+    console.log("acc", acc);
+  });
+  it('save and load model (multi classification)', async () => {
+    const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
+    const gbdt = new GradientBoostingClassifier({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    gbdt.estimatorType = 'classifier';
+    await gbdt.fit(features, label_ids);
+    const modelJson = await gbdt.toJson();
+    const gbdt2 = new GradientBoostingClassifier({});
+    await gbdt2.fromJson(modelJson);
+    const predictions = await gbdt2.predict(irisData);
+    const acc = accuracyScore(label_ids, predictions);
+    console.log("acc", acc);
   });
 });

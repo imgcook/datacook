@@ -116,7 +116,7 @@ export const trackedImplement2dBinary = (forwardFunc: BinaryFunc2d, backwardFunc
   if (y instanceof Scalar) {
     outMat.dependency.push({
       target: y,
-      gradFunc: (grad: Matrix): Scalar => sum2dForward(backwardFuncY(grad, x, y)) as Scalar
+      gradFunc: (grad: Matrix): Scalar => sum2dForward(backwardFuncY(grad, x, y), -1) as Scalar
     });
   }
   return outMat;
@@ -270,7 +270,7 @@ export const trackedImplement1dReduce = (forwardFunc: ReduceFunc1d, backwardFunc
 
 export const basicImplement2dReduce = (func: ImplementFuncReduce, x: Matrix, by: ByAxis): Vector => {
   const [ nX, mX ] = x.shape;
-  if (! (by === ByAxis.ByRow || by === ByAxis.ByColumn)) {
+  if (! (by === ByAxis.ByRow || by === ByAxis.ByColumn || by === ByAxis.ByAll)) {
     throw new TypeError(`Invalid input for 'by': ${by}`);
   }
   if (by === ByAxis.ByRow) {

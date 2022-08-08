@@ -154,4 +154,3 @@ export class LabelEncoder<T extends number | string> extends EncoderBase<T> {
     return cateArrays;
   }
 }
-

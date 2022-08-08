@@ -165,6 +165,7 @@ describe('KMeans Predictor', () => {
     await kmeansPredictor.fromJson(modelJson);
     const predClus = (await kmeans.predict(irisData)).arraySync() as number[];
     const predClus2 = await kmeansPredictor.predict(irisData);
+    console.log(predClus2);
     for (let i = 0; i < predClus.length; i++) {
       assert.isTrue(predClus[i] === predClus2[i]);
     }

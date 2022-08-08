@@ -1,7 +1,7 @@
 import { Scalar } from "../../core/classes";
 import { scalar } from "../../core/classes/creation";
 import { Matrix, Vector } from "../classes";
-import { div2dForward, mul1d, mul2dForward } from "./binary-op";
+import { mul1d, mul2dForward } from "./binary-op";
 import {
   basicImplement2dSingle,
   basicImplement1dSingle,

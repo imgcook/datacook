@@ -1,7 +1,7 @@
 import { Tensor, equal, sum, div } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
 
-export const accuracyScore = ( yTrue: Tensor | string[] | number[], yPred: Tensor | string[] | number[] ): number => {
+export const accuracyScore = ( yTrue: Tensor | string[] | number[] | boolean[], yPred: Tensor | string[] | number[] | boolean[] ): number => {
   const yTrueTensor = checkArray(yTrue, 'any', 1);
   const yPredTensor = checkArray(yPred, 'any', 1);
   const yTrueCount = yTrueTensor.shape[0];
