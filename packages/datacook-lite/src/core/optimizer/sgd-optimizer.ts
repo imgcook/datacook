@@ -12,6 +12,12 @@ export class SGDOptimizer extends Optimizer {
   protected learningRate: number;
   constructor(params: Tensor[], props: SGDOptimizerProps) {
     super();
+    if (!params) {
+      throw new TypeError('Params should be provided');
+    }
+    if (!props) {
+      throw new TypeError('Learning rate should be provided');
+    }
     const { learningRate } = props;
     this.params = params;
     this.learningRate = learningRate;
