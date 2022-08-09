@@ -2,7 +2,7 @@ import { Vector } from "./vector";
 import { Matrix as MatrixBase } from '../../core/classes';
 import { add2d } from "../op";
 import { Denpendency } from "../../core/classes";
-import { createOneMatrix } from "./creation";
+import { createOneMatrix, createZeroMatrix } from "./creation";
 
 export class Matrix extends MatrixBase {
   public data: number[][];
@@ -57,5 +57,17 @@ export class Matrix extends MatrixBase {
       const targetGrad = dep.gradFunc(grad);
       dep.target.backward(targetGrad);
     });
+  }
+
+  public zeroGrad(): void {
+    this.grad = createZeroMatrix(this.shape[0], this.shape[1]);
+  }
+
+  public assign(val: number[][]): void {
+    for (let i = 0; i < this.shape[0]; i++) {
+      for (let j = 0; j < this.shape[1]; j++) {
+        this.data[i][j] = val[i][j];
+      }
+    }
   }
 }

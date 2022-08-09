@@ -1,8 +1,6 @@
 import { matrix, Scalar, vector } from '../../src/core/classes';
 import { assert } from 'chai';
-import { sum2d, mean2d, min2d, exp2d, abs2d, pow2d, sigmoid2d } from "../../src/core/op";
-import { Vector } from '../../src/backend-cpu/classes';
-import { ByAxis } from '../../src/backend-cpu/op/basic-impl';
+import { exp2d, abs2d, pow2d, sigmoid2d } from "../../src/core/op";
 import { neg2d, sqrt2d, square2d } from '../../src/backend-cpu/op';
 import { log2d } from '../../src/backend-cpu/op/single-op';
 

@@ -1,7 +1,7 @@
 // import { add2d, div2d, mul2d } from "../../src/core/op/binary-op";
 import { matrix, Scalar, vector } from '../../src/core/classes';
 import { assert } from 'chai';
-import { matMul2d, sum2d, mean2d, min2d } from "../../src/core/op";
+import { sum2d, mean2d, min2d } from "../../src/core/op";
 import { max1d, max2d, mean1d, min1d, mul1d, sum1d } from '../../src/backend-cpu/op';
 import { Vector } from '../../src/backend-cpu/classes';
 import { ByAxis } from '../../src/backend-cpu/op/basic-impl';

@@ -13,6 +13,8 @@ export abstract class Tensor {
   public dependency: Array<Denpendency>;
   abstract backward(grad?: Tensor): void;
   abstract values(): RecursiveArray;
+  abstract zeroGrad(): void;
+  abstract assign(val: number | number[] | number[][]): void;
 }
 
 export abstract class Scalar extends Tensor {
@@ -47,7 +49,7 @@ export abstract class Matrix extends Tensor {
 }
 
 
-export abstract class Vector extends Tensor{
+export abstract class Vector extends Tensor {
   public data: number[];
   public length: number;
   public grad: Vector;

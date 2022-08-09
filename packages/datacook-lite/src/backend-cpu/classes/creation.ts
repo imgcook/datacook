@@ -19,6 +19,10 @@ export const createOneMatrix = (n: number, m: number): Matrix => {
   return new Matrix(mat);
 };
 
+export const createZeroVector = (n: number): Vector => {
+  const arr = new Array(n).fill(0);
+  return new Vector(arr);
+};
 
 export const createOneVector = (n: number): Vector => {
   const arr = new Array(n).fill(1);

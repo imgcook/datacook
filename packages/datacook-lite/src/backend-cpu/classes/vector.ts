@@ -1,7 +1,7 @@
 import { Vector as VectorBase } from '../../core/classes';
 import { Denpendency } from "../../core/classes";
 import { add1d } from '../op';
-import { createOneVector } from './creation';
+import { createOneVector, createZeroVector } from './creation';
 export class Vector extends VectorBase{
   public data: number[];
   public length: number;
@@ -35,5 +35,13 @@ export class Vector extends VectorBase{
       const targetGrad = dep.gradFunc(this.grad);
       dep.target.backward(targetGrad);
     });
+  }
+  public zeroGrad(): void {
+    this.grad = createZeroVector(this.length);
+  }
+  public assign(val: number[]): void {
+    for (let i = 0; i < this.length; i++) {
+      this.data[i] = val[i];
+    }
   }
 }

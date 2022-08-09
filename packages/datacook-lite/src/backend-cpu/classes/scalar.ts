@@ -27,4 +27,10 @@ export class Scalar extends ScalarBase {
       dep.target.backward(targetGrad);
     });
   }
+  public zeroGrad(): void {
+    this.grad = scalar(0);
+  }
+  public assign(val: number): void {
+    this.data = val;
+  }
 }
