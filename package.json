@@ -20,7 +20,7 @@
   "scripts": {
     "build": "lerna run build",
     "build:browser": "lerna run build:browser",
-    "postinstall": "lerna clean --yes && lerna bootstrap",
+    "postinstall": "lerna clean --yes && lerna link && lerna bootstrap",
     "lint": "eslint . --ext .ts --ext .js",
     "pretest": "npm run lint",
     "test": "lerna run test",
@@ -32,5 +32,6 @@
     "beta-release": "lerna publish from-package --no-verify-access --dist-tag beta -y",
     "cov": "./tools/coverage.sh",
     "cov:report": "nyc report -r=lcov"
-  }
+  },
+  "__npminstall_done": false
 }
