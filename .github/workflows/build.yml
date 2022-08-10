@@ -18,10 +18,17 @@ jobs:
         with:
           node-version: 14
       - run: |
+          cd packages/datacook
           npm install
-          npm run build
           npm run lint
           npm run test
+          npm run build
+          cd ../../packages/datacook-lite
+          npm install
+          npm run lint
+          npm run test
+          npm run build
+          cd ../../
           git clone https://github.com/emscripten-core/emsdk.git
           cd emsdk
           ./emsdk install latest
