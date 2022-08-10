@@ -1,4 +1,4 @@
-import { neg2d, square2d, sub2d, sum2d } from '../../src/backend-cpu/op';
+import { square2d, sub2d, sum2d } from '../../src/backend-cpu/op';
 import { matrix } from '../../src/core/classes';
 import { SGDOptimizer } from '../../src/core/optimizer/sgd-optimizer';
 
