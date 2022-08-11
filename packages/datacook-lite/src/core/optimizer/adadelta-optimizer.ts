@@ -1,6 +1,5 @@
 import { Vector } from "../../backend-cpu/classes";
 import { createZeroVector } from "../../backend-cpu/classes/creation";
-import { mul1dForward, mul2dForward, sub2dForward, sub1dForward, add2dForward } from "../../backend-cpu/op/binary-op";
 import { Matrix, Scalar } from "../classes";
 import { Tensor } from "../classes";
 import { createZeroMatrix, scalar } from "../classes/creation";
