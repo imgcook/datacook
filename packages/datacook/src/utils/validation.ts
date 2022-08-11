@@ -1,6 +1,8 @@
 import { Tensor, Tensor1D, RecursiveArray, cast, tensor, tidy } from '@tensorflow/tfjs-core';
 
-export function checkArray (array: Tensor | RecursiveArray<number | string | boolean>, dtype = 'any', ensureDimension = -1): Tensor {
+export type ensureDimensionType = number[] | number;
+
+export function checkArray (array: Tensor | RecursiveArray<number | string | boolean>, dtype = 'any', ensureDimension: ensureDimensionType = -1): Tensor {
   return tidy(() => {
     if (array instanceof Array) {
       array = tensor(array);
@@ -8,8 +10,13 @@ export function checkArray (array: Tensor | RecursiveArray<number | string | boo
     if (array instanceof Tensor) {
       const dim = array.rank;
       const arr_dtype = array.dtype;
-      if (ensureDimension != -1 && dim != ensureDimension){
-        throw new TypeError(`Dimension of input require to be ${ensureDimension} but receive ${dim}`);
+      if (ensureDimension != -1) {
+        if (ensureDimension instanceof Array && ensureDimension.indexOf(dim) == -1) {
+          throw new TypeError(`Dimension of input require to be of ${ensureDimension} but receive ${dim}`);
+        }
+        if (typeof ensureDimension === 'number' && dim !== ensureDimension) {
+          throw new TypeError(`Dimension of input require to be ${ensureDimension} but receive ${dim}`);
+        }
       }
       if (dtype === 'string' || dtype === 'float32' || dtype === 'bool' || dtype === 'int32' || dtype === 'complex64'){
         if (arr_dtype != dtype){
@@ -24,7 +31,7 @@ export function checkArray (array: Tensor | RecursiveArray<number | string | boo
 }
 
 
-export function checkJSArray(array: Tensor | RecursiveArray<number | string | boolean>, dtype = 'any', ensureDimension = -1): number | number[] | number[][] | number[][][] | number[][][][] | number[][][][][] | number[][][][][][] {
+export function checkJSArray(array: Tensor | RecursiveArray<number | string | boolean>, dtype = 'any', ensureDimension: ensureDimensionType = -1): number | number[] | number[][] | number[][][] | number[][][][] | number[][][][][] | number[][][][][][] {
   return tidy(() => {
     const tensor = checkArray(array, dtype, ensureDimension);
     return tensor.arraySync();
