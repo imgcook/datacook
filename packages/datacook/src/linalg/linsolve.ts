@@ -51,6 +51,12 @@ export const linSolveFromQR = async (q: Tensor, r: Tensor, v: Tensor): Promise<T
   return await linSolveUpperTriangle(r, rhs);
 };
 
+/**
+ * Solve a genral linear equation $Mx = v$ using the QR decomposition of M.
+ * @param matrix target matrix
+ * @param v target values
+ * @returns x of Mx = v
+ */
 export const linSolveQR = async (matrix: Tensor, v: Tensor): Promise<Tensor> => {
   const [ q, r ] = linalg.qr(matrix);
   return await linSolveFromQR(q, r, v);

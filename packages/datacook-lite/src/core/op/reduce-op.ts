@@ -16,8 +16,10 @@ import {
 } from '../../backend-cpu/op';
 import { IS_CPU_BACKEND } from "../../env";
 import { getMethodErrorStr } from "./utils";
+import { Scalar } from "../../backend-cpu/classes";
+import { ByAxis } from "../../backend-cpu/op/basic-impl";
 
-export const argMax2d = (x: Matrix, by = 0): number | Vector => {
+export const argMax2d = (x: Matrix, by = 0): Scalar | Vector | Matrix => {
   if (IS_CPU_BACKEND) {
     return argMax2dCPU(x, by);
   } else {
@@ -25,7 +27,7 @@ export const argMax2d = (x: Matrix, by = 0): number | Vector => {
   }
 };
 
-export const argMin2d = (x: Matrix, by = 0): number | Vector => {
+export const argMin2d = (x: Matrix, by = 0): Scalar | Vector | Matrix => {
   if (IS_CPU_BACKEND) {
     return argMin2dCPU(x, by);
   } else {
@@ -33,7 +35,7 @@ export const argMin2d = (x: Matrix, by = 0): number | Vector => {
   }
 };
 
-export const max2d = (x: Matrix, by = 0): number | Vector => {
+export const max2d = (x: Matrix, by = 0): Scalar | Vector => {
   if (IS_CPU_BACKEND) {
     return max2dCPU(x, by);
   } else {
@@ -41,7 +43,7 @@ export const max2d = (x: Matrix, by = 0): number | Vector => {
   }
 };
 
-export const min2d = (x: Matrix, by = 0): number | Vector => {
+export const min2d = (x: Matrix, by = 0): Scalar | Vector => {
   if (IS_CPU_BACKEND) {
     return min2dCPU(x, by);
   } else {
@@ -49,7 +51,7 @@ export const min2d = (x: Matrix, by = 0): number | Vector => {
   }
 };
 
-export const sum2d = (x: Matrix, by = 0): number | Vector => {
+export const sum2d = (x: Matrix, by: ByAxis = 0): Scalar | Vector => {
   if (IS_CPU_BACKEND) {
     return sum2dCPU(x, by);
   } else {
@@ -57,7 +59,7 @@ export const sum2d = (x: Matrix, by = 0): number | Vector => {
   }
 };
 
-export const mean2d = (x: Matrix, by = 0): number | Vector => {
+export const mean2d = (x: Matrix, by: ByAxis = 0): Scalar | Vector => {
   if (IS_CPU_BACKEND) {
     return mean2dCPU(x, by);
   } else {
@@ -65,7 +67,7 @@ export const mean2d = (x: Matrix, by = 0): number | Vector => {
   }
 };
 
-export const argMax1d = (x: Vector): number => {
+export const argMax1d = (x: Vector): Scalar => {
   if (IS_CPU_BACKEND) {
     return argMax1dCPU(x);
   } else {
@@ -73,7 +75,7 @@ export const argMax1d = (x: Vector): number => {
   }
 };
 
-export const argMin1d = (x: Vector): number => {
+export const argMin1d = (x: Vector): Scalar => {
   if (IS_CPU_BACKEND) {
     return argMin1dCPU(x);
   } else {
@@ -81,7 +83,7 @@ export const argMin1d = (x: Vector): number => {
   }
 };
 
-export const min1d = (x: Vector): number => {
+export const min1d = (x: Vector): Scalar => {
   if (IS_CPU_BACKEND) {
     return min1dCPU(x);
   } else {
@@ -89,7 +91,7 @@ export const min1d = (x: Vector): number => {
   }
 };
 
-export const max1d = (x: Vector): number => {
+export const max1d = (x: Vector): Scalar => {
   if (IS_CPU_BACKEND) {
     return max1dCPU(x);
   } else {
@@ -97,7 +99,7 @@ export const max1d = (x: Vector): number => {
   }
 };
 
-export const sum1d = (x: Vector): number => {
+export const sum1d = (x: Vector): Scalar => {
   if (IS_CPU_BACKEND) {
     return sum1dCPU(x);
   } else {
@@ -105,7 +107,7 @@ export const sum1d = (x: Vector): number => {
   }
 };
 
-export const mean1d = (x: Vector): number => {
+export const mean1d = (x: Vector): Scalar => {
   if (IS_CPU_BACKEND) {
     return mean1dCPU(x);
   } else {

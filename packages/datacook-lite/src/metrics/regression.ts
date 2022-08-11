@@ -13,5 +13,5 @@ export const getRSquare = (yTrue: number[], yPred: number[]): number => {
   const yPredVector = vector(yPred);
   const numerator = sum1d(square1d(sub1d(yTrueVector, yPredVector)));
   const denom = sum1d(square1d(sub1d(yTrueVector, mean1d(yTrueVector))));
-  return 1.0 - numerator / denom;
+  return 1.0 - numerator.data / denom.data;
 };

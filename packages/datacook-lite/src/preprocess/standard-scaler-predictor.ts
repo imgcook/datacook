@@ -17,6 +17,7 @@ export class StandardScalerPredictor extends TransformerMixin {
   public standardVariance: Vector;
   public withMean: boolean;
   public withStd: boolean;
+  public nFeatures: number;
   public nSamplesSeen: number;
 
   /**

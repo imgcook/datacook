@@ -1,6 +1,7 @@
 import { Matrix } from "../classes";
+import { transpose2dForward } from "./transform";
 
-export const matMul2d = (x: Matrix, y: Matrix): Matrix => {
+export const matMulForward = (x: Matrix, y: Matrix): Matrix => {
   const [ nX, mX ] = x.shape;
   const [ nY, mY ] = y.shape;
   if (mX !== nY) {
@@ -18,4 +19,16 @@ export const matMul2d = (x: Matrix, y: Matrix): Matrix => {
     }
   }
   return new Matrix(out);
+};
+
+export const matMul2d = (x: Matrix, y: Matrix): Matrix => {
+  const outMat = matMulForward(x, y);
+  outMat.dependency.push({
+    target: x,
+    gradFunc: (grad: Matrix): Matrix => matMulForward(grad, transpose2dForward(y))
+  }, {
+    target: y,
+    gradFunc: (grad: Matrix): Matrix => matMulForward(transpose2dForward(x), grad)
+  });
+  return outMat;
 };

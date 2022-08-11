@@ -1,4 +1,4 @@
-import { Matrix, Vector } from "../classes";
+import { Matrix, Scalar, Vector } from "../classes";
 import {
   add2d as add2dCpu,
   sub2d as sub2dCpu,
@@ -12,7 +12,7 @@ import {
 import { IS_CPU_BACKEND } from "../../env";
 import { getMethodErrorStr } from "./utils";
 
-export const add2d = (x: Matrix, y: Matrix | Vector | number, by = 0): Matrix => {
+export const add2d = (x: Matrix, y: Matrix | Vector | number | Scalar, by = 0): Matrix => {
   if (IS_CPU_BACKEND) {
     return add2dCpu(x, y, by);
   } else {
@@ -20,7 +20,7 @@ export const add2d = (x: Matrix, y: Matrix | Vector | number, by = 0): Matrix =>
   }
 };
 
-export const sub2d = (x: Matrix, y: Matrix | Vector | number, by = 0): Matrix => {
+export const sub2d = (x: Matrix, y: Matrix | Vector | Scalar | number, by = 0): Matrix => {
   if (IS_CPU_BACKEND) {
     return sub2dCpu(x, y, by);
   } else {
@@ -28,7 +28,7 @@ export const sub2d = (x: Matrix, y: Matrix | Vector | number, by = 0): Matrix =>
   }
 };
 
-export const mul2d = (x: Matrix, y: Matrix | Vector | number, by = 0): Matrix => {
+export const mul2d = (x: Matrix, y: Matrix | Vector | Scalar | number, by = 0): Matrix => {
   if (IS_CPU_BACKEND) {
     return mul2dCpu(x, y, by);
   } else {
@@ -36,7 +36,7 @@ export const mul2d = (x: Matrix, y: Matrix | Vector | number, by = 0): Matrix =>
   }
 };
 
-export const div2d = (x: Matrix, y: Matrix | Vector | number, by = 0): Matrix => {
+export const div2d = (x: Matrix, y: Matrix | Vector | Scalar | number, by = 0): Matrix => {
   if (IS_CPU_BACKEND) {
     return div2dCpu(x, y, by);
   } else {
@@ -44,7 +44,7 @@ export const div2d = (x: Matrix, y: Matrix | Vector | number, by = 0): Matrix =>
   }
 };
 
-export const add1d = (x: Vector, y: Vector | number): Vector => {
+export const add1d = (x: Vector, y: Vector | Scalar | number): Vector => {
   if (IS_CPU_BACKEND) {
     return add1dCpu(x, y);
   } else {
@@ -52,7 +52,7 @@ export const add1d = (x: Vector, y: Vector | number): Vector => {
   }
 };
 
-export const sub1d = (x: Vector, y: Vector | number): Vector => {
+export const sub1d = (x: Vector, y: Vector | number | Scalar): Vector => {
   if (IS_CPU_BACKEND) {
     return sub1dCpu(x, y);
   } else {
@@ -60,7 +60,7 @@ export const sub1d = (x: Vector, y: Vector | number): Vector => {
   }
 };
 
-export const mul1d = (x: Vector, y: Vector | number): Vector => {
+export const mul1d = (x: Vector, y: Vector | number | Scalar): Vector => {
   if (IS_CPU_BACKEND) {
     return mul1dCpu(x, y);
   } else {
@@ -68,7 +68,7 @@ export const mul1d = (x: Vector, y: Vector | number): Vector => {
   }
 };
 
-export const div1d = (x: Vector, y: Vector | number): Vector => {
+export const div1d = (x: Vector, y: Vector | number | Scalar): Vector => {
   if (IS_CPU_BACKEND) {
     return div1dCpu(x, y);
   } else {

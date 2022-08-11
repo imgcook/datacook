@@ -11,7 +11,6 @@ export abstract class Matrix {
   abstract get(i: number, j: number): number;
   abstract setColumn(i: number, x: Vector | number[]): void;
   abstract set(i: number, j: number, x: number): void;
-  abstract hahaha(): void;
 }
 
 

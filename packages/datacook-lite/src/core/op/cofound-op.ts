@@ -11,6 +11,6 @@ export const softmax2d = (x: Matrix, by: ByAxis = ByAxis.ByRow): Matrix => {
   if (IS_CPU_BACKEND) {
     return softmax2dCPU(x, by);
   } else {
-    throw new TypeError(getMethodErrorStr('sub2d'));
+    throw new TypeError(getMethodErrorStr('softmax2d'));
   }
 };

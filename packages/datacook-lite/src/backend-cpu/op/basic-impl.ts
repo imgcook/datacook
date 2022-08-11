@@ -1,21 +1,47 @@
 import { vector } from "../../core/classes";
 import { Matrix } from "../classes/matrix";
 import { Vector } from "../classes/vector";
+import { Scalar } from "../classes/scalar";
 import { squeeze } from "./transform";
+import { sum1dForward, sum2dForward } from "./reduce-op";
 
 export enum ByAxis {
   ByColumn = 0,
-  ByRow = 1
+  ByRow = 1,
+  ByAll = -1
 }
 
 export type ImplementFuncBinary = (a: number, b: number) => number;
-export type ImplementFuncSingle = (a: number) => number;
+export type ImplementFuncSingle = (a: number, param?: number) => number;
 export type ImplementFuncReduce = (a: number[]) => number;
 
-export const basicImplement2dBinary = (func: ImplementFuncBinary, x: Matrix, y: Matrix | Vector | number, by?: ByAxis): Matrix => {
+export type BinaryFunc2d = (x: Matrix, y: Matrix | Vector | Scalar | number, by?: ByAxis) => Matrix;
+export type BinaryGradFunc2d = (grad: Matrix, x?: Matrix, y?: Matrix | Vector | Scalar | number, by?: ByAxis) => Matrix;
+export type BinaryFunc1d = (x: Vector, y: Vector | Scalar | number) => Vector;
+export type BinaryGradFunc1d = (grad: Vector, x?: Vector, y?: Vector | Scalar | number) => Vector;
+export type BinaryFunc0d = (x: Scalar, y: Scalar | number) => Scalar;
+export type BinaryGradFunc0d = (grad: Scalar, x: Scalar, y: Scalar | number) => Scalar;
+
+export type SingleFunc2d = (x: Matrix, param?: any) => Matrix;
+export type SingleGradFunc2d = (grad: Matrix, x?: Matrix, param?: any) => Matrix;
+export type SingleFunc1d = (x: Vector, param?: any) => Vector;
+export type SingleGradFunc1d = (grad: Vector, x?: Vector, param?: any) => Vector;
+export type SingleFunc0d = (x: Scalar, param?: any) => Scalar;
+export type SingleGradFunc0d = (grad: Scalar, x?: Scalar, param?: any) => Scalar;
+
+export type ReduceAllFunc2d = (x: Matrix, by?: ByAxis) => Scalar;
+export type ReduceAllGradFunc2d = (grad: Scalar, x: Matrix, by?: ByAxis) => Matrix;
+
+export type ReduceFunc2d = (x: Matrix, by?: ByAxis) => Scalar | Vector;
+export type ReducedGradFunc2d = (grad: Vector | Scalar, x: Matrix, by?: ByAxis) => Matrix;
+
+export type ReduceFunc1d = (x: Vector) => Scalar;
+export type ReducedGradFunc1d = (grad: Scalar, x: Vector) => Vector;
+
+export const basicImplement2dBinary = (func: ImplementFuncBinary, x: Matrix, y: Matrix | Vector | Scalar | number, by?: ByAxis): Matrix => {
   const [ nX, mX ] = x.shape;
-  if (!(y instanceof Matrix) && !(y instanceof Vector) && !(typeof y === 'number')) {
-    throw new TypeError('Invalid input y, { Matrix |  Vector | number } is required');
+  if (!(y instanceof Matrix) && !(y instanceof Vector) && !(typeof y === 'number') && !(y instanceof Scalar) ) {
+    throw new TypeError('Invalid input y, { Matrix |  Vector | Scalar | number } is required');
   }
   const out: number[][] = [];
   for (let i = 0; i < nX; i++) {
@@ -58,26 +84,45 @@ export const basicImplement2dBinary = (func: ImplementFuncBinary, x: Matrix, y: 
       }
     }
   }
-  if (typeof y === 'number') {
+  if (typeof y === 'number' || y instanceof Scalar) {
+    const t = y instanceof Scalar ? y.data : y;
     for (let i = 0; i < nX; i++) {
       for (let j = 0; j < mX; j++) {
-        out[i][j] = func(x.get(i, j), y);
+        out[i][j] = func(x.get(i, j), t);
       }
     }
   }
   return new Matrix(out);
 };
 
-export const basicImplement1dSingle = (func: ImplementFuncSingle, x: Vector): Vector => {
-  const out = new Array(x.length);
-  for (let i = 0; i < x.length; i++) {
-    out[i] = func(x.get(i));
+export const trackedImplement2dBinary = (forwardFunc: BinaryFunc2d, backwardFuncX: BinaryGradFunc2d, backwardFuncY: BinaryGradFunc2d, x: Matrix, y: Matrix | Vector | Scalar | number, by?: ByAxis): Matrix => {
+  const outMat = forwardFunc(x, y, by);
+  outMat.dependency.push({
+    target: x,
+    gradFunc: (grad: Matrix): Matrix => backwardFuncX(grad, x, y)
+  });
+  if (y instanceof Matrix) {
+    outMat.dependency.push({
+      target: y,
+      gradFunc: (grad: Matrix): Matrix => backwardFuncY(grad, x, y)
+    });
   }
-  return vector(out);
+  if (y instanceof Vector) {
+    outMat.dependency.push({
+      target: y,
+      gradFunc: (grad: Matrix): Vector => sum2dForward(backwardFuncY(grad, x, y), by) as Vector
+    });
+  }
+  if (y instanceof Scalar) {
+    outMat.dependency.push({
+      target: y,
+      gradFunc: (grad: Matrix): Scalar => sum2dForward(backwardFuncY(grad, x, y), -1) as Scalar
+    });
+  }
+  return outMat;
 };
 
-
-export const basicImplement1dBinary = (func: ImplementFuncBinary, x: Vector, y: Vector | number): Vector => {
+export const basicImplement1dBinary = (func: ImplementFuncBinary, x: Vector, y: Vector | Scalar | number): Vector => {
   const nX = x.length;
   const out = new Array(nX);
   if (y instanceof Vector) {
@@ -96,7 +141,83 @@ export const basicImplement1dBinary = (func: ImplementFuncBinary, x: Vector, y: 
   }
 };
 
-export const basicImplement2dSingle = (func: ImplementFuncSingle, x: Matrix): Matrix => {
+export const trackedImplement1dBinary = (forwardFunc: BinaryFunc1d, backwardFuncX: BinaryGradFunc1d, backwardFuncY: BinaryGradFunc1d, x: Vector, y: Vector | Scalar | number): Vector => {
+  const outMat = forwardFunc(x, y);
+  outMat.dependency.push({
+    target: x,
+    gradFunc: (grad: Vector): Vector => backwardFuncX(grad, x, y)
+  });
+  if (y instanceof Vector) {
+    outMat.dependency.push({
+      target: y,
+      gradFunc: (grad: Vector): Vector => backwardFuncY(grad, x, y)
+    });
+  }
+  if (y instanceof Scalar) {
+    outMat.dependency.push({
+      target: y,
+      gradFunc: (grad: Vector): Scalar => sum1dForward(backwardFuncY(grad, x, y)) as Scalar
+    });
+  }
+  return outMat;
+};
+
+export const basicImplement0dBinary = (func: ImplementFuncBinary, x: Scalar | number, y: Scalar | number): Scalar => {
+  const xData = x instanceof Scalar ? x.data : x;
+  const yData = y instanceof Scalar ? y.data : y;
+  const out = func(xData, yData);
+  return new Scalar(out);
+};
+
+export const trackedImplement0dBinary = (forwardFunc: BinaryFunc0d, backwardFuncX: BinaryGradFunc0d, backwardFuncY: BinaryGradFunc0d, x: Scalar, y: Scalar | number): Scalar => {
+  const out = forwardFunc(x, y);
+  if (x instanceof Scalar) {
+    out.dependency.push({
+      target: x,
+      gradFunc: (grad: Scalar): Scalar => backwardFuncX(grad, x, y)
+    });
+  }
+  if (y instanceof Scalar) {
+    out.dependency.push({
+      target: y,
+      gradFunc: (grad: Scalar): Scalar => backwardFuncY(grad, x, y)
+    });
+  }
+  return out;
+};
+
+export const basicImplement1dSingle = (func: ImplementFuncSingle, x: Vector): Vector => {
+  const out = new Array(x.length);
+  for (let i = 0; i < x.length; i++) {
+    out[i] = func(x.get(i));
+  }
+  return vector(out);
+};
+
+export const trackedImplement1dSingle = (forwardFunc: SingleFunc1d, backwardFunc: SingleGradFunc1d, x: Vector): Vector => {
+  const outMat = forwardFunc(x);
+  outMat.dependency.push({
+    target: x,
+    gradFunc: (grad: Vector): Vector => backwardFunc(grad, x)
+  });
+  return outMat;
+};
+export const basicImplement0dSingle = (func: ImplementFuncSingle, x: Scalar | number, param?: number): Scalar => {
+  const xData = x instanceof Scalar ? x.data : x;
+  const out = func(xData, param);
+  return new Scalar(out);
+};
+
+// export const trackedImplement0dSingle = (forwardFunc: SingleFunc0d, x: Scalar, param?: number): Scalar => {
+//   const outMat = forwardFunc(x);
+//   outMat.dependency.push({
+//     target: x,
+//     gradFunc:
+//   });
+//   return outMat;
+// };
+
+export const basicImplement2dSingle = (func: ImplementFuncSingle, x: Matrix, param?: number): Matrix => {
   const [ nX, mX ] = x.shape;
   const out: number[][] = [];
   for (let i = 0; i < nX; i++) {
@@ -104,24 +225,52 @@ export const basicImplement2dSingle = (func: ImplementFuncSingle, x: Matrix): Ma
   }
   for (let i = 0; i < nX; i++) {
     for (let j = 0; j < mX; j++) {
-      out[i][j] = func(x.get(i, j));
+      out[i][j] = func(x.get(i, j), param);
     }
   }
   return new Matrix(out);
 };
 
-export const basicImplement2dReduceAll = (func: ImplementFuncReduce, x: Matrix): number => {
-  const squeezed = squeeze(x);
-  return func(squeezed.data);
+export const trackedImplement2dSingle = (forwardFunc: SingleFunc2d, backwardFuncX: SingleGradFunc2d, x: Matrix, param?: number): Matrix => {
+  const outMat = forwardFunc(x, param);
+  outMat.dependency.push({
+    target: x,
+    gradFunc: (grad: Matrix): Matrix => backwardFuncX(grad, x, param)
+  });
+  return outMat;
 };
 
-export const basicImplement1dReduce = (func: ImplementFuncReduce, x: Vector): number => {
-  return func(x.data);
+
+export const basicImplement2dReduceAll = (func: ImplementFuncReduce, x: Matrix): Scalar => {
+  const squeezed = squeeze(x);
+  return new Scalar(func(squeezed.data));
+};
+
+export const trackedImplement2dReduceAll = (forwardFunc: ReduceAllFunc2d, backwardFunc: ReduceAllGradFunc2d, x: Matrix): Scalar => {
+  const outMat = forwardFunc(x);
+  outMat.dependency.push({
+    target: x,
+    gradFunc: (grad: Scalar): Matrix => backwardFunc(grad, x)
+  });
+  return outMat;
+};
+
+export const basicImplement1dReduce = (func: ImplementFuncReduce, x: Vector): Scalar => {
+  return new Scalar(func(x.data));
+};
+
+export const trackedImplement1dReduce = (forwardFunc: ReduceFunc1d, backwardFunc: ReducedGradFunc1d, x: Vector): Scalar => {
+  const outMat = forwardFunc(x);
+  outMat.dependency.push({
+    target: x,
+    gradFunc: (grad: Scalar): Vector => backwardFunc(grad, x)
+  });
+  return outMat;
 };
 
 export const basicImplement2dReduce = (func: ImplementFuncReduce, x: Matrix, by: ByAxis): Vector => {
   const [ nX, mX ] = x.shape;
-  if (! (by === ByAxis.ByRow || by === ByAxis.ByColumn)) {
+  if (! (by === ByAxis.ByRow || by === ByAxis.ByColumn || by === ByAxis.ByAll)) {
     throw new TypeError(`Invalid input for 'by': ${by}`);
   }
   if (by === ByAxis.ByRow) {
@@ -132,10 +281,19 @@ export const basicImplement2dReduce = (func: ImplementFuncReduce, x: Matrix, by:
     return new Vector(out);
   }
   if (by === ByAxis.ByColumn) {
-    const out: number[] = new Array(nX);
+    const out: number[] = new Array(mX);
     for (let i = 0; i < mX; i++) {
       out[i] = func(x.getColumn(i).data);
     }
     return new Vector(out);
   }
+};
+
+export const trackedImplement2dReduce = (forwardFunc: ReduceFunc2d, backwardFunc: ReducedGradFunc2d, x: Matrix, by?: ByAxis): Vector | Scalar => {
+  const outMat = forwardFunc(x, by);
+  outMat.dependency.push({
+    target: x,
+    gradFunc: (grad: Vector | Scalar): Matrix => backwardFunc(grad, x, by)
+  });
+  return outMat;
 };

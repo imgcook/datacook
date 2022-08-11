@@ -32,13 +32,15 @@ export {
   neg2d,
   abs2d,
   sigmoid2d,
+  log2d,
   sqrt1d,
   square1d,
   exp1d,
   pow1d,
   neg1d,
   abs1d,
-  sigmoid1d
+  sigmoid1d,
+  log1d
 } from './single-op';
 
 export {

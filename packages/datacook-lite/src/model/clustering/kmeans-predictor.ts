@@ -1,6 +1,7 @@
 import { BaseClustring } from "../base";
 import { matrix, createZeroMatrix, Vector } from "../../core/classes";
 import { sub2d, argMin2d, sum2d, square2d } from "../../core/op";
+import { Matrix } from "../../backend-cpu/classes";
 
 export type KMeansInitType = 'kmeans++' | 'random';
 const defaultMaxIterTimes = 1000;
@@ -17,7 +18,7 @@ export class KMeansPredictor extends BaseClustring {
   public tol: number;
   public randomState: number;
   public verbose: boolean;
-  public centroids: number[][];
+  public centroids: Matrix;
   /**
    * Load model parameters from json string object
    * @param modelJson model json saved as string object
@@ -35,7 +36,7 @@ export class KMeansPredictor extends BaseClustring {
     this.maxIterTimes = params.maxIterTimes ? params.maxIterTimes : defaultMaxIterTimes;
     this.tol = params.tol ? params.tol : defaultTol;
     this.init = params.init ? params.init : defaultInit;
-    this.centroids = params.centroids ? params.centroids : null;
+    this.centroids = params.centroids ? matrix(params.centroids) : null;
     this.nFeature = params.nFeature;
   }
 
@@ -46,17 +47,17 @@ export class KMeansPredictor extends BaseClustring {
    * @param centroids tensor of centroids
    * @returns tensor of distance from input samples and its assigned cluster center
    */
-  public getClusDist(x: number[][], centroids: number[][]): number[][] {
-    const xMatrix = matrix(x);
-    const centroidsMatrix = matrix(centroids);
+  public getClusDist(x: Matrix, centroids: Matrix): Matrix {
+    const xMatrix = x;
+    const centroidsMatrix = centroids;
     const [ n, m ] = xMatrix.shape;
     const distsMatrix = createZeroMatrix(n, m);
-    const nCluster = centroids.length;
+    const nCluster = centroids.shape[0];
     for (let i = 0; i < nCluster; i++) {
       const dist = sum2d(square2d(sub2d(xMatrix, centroidsMatrix.getRow(i), 0)), 1) as Vector;
       distsMatrix.setColumn(i, dist);
     }
-    return distsMatrix.data;
+    return distsMatrix;
   }
 
 
@@ -65,9 +66,9 @@ export class KMeansPredictor extends BaseClustring {
    * @param xTensor tensor of input data
    * @returns tensor of assigned cluster index
    */
-  public getClusIndex(x: number[][], centroids: number[][]): number[] {
+  public getClusIndex(x: Matrix, centroids: Matrix): Vector {
     const newDists = this.getClusDist(x, centroids);
-    return (argMin2d(matrix(newDists), 1) as Vector).data;
+    return (argMin2d(newDists, 1) as Vector);
   }
   /**
    * Predict sample clusters for given input.
@@ -75,7 +76,12 @@ export class KMeansPredictor extends BaseClustring {
    * @returns tensor of redicted cluster index
    */
   public async predict(xData: number[][]): Promise<number[]> {
+    // console.time('validate');
     this.validateData(xData);
-    return this.getClusIndex(xData, this.centroids);
+    // console.timeEnd('validate');
+    // console.time('create');
+    const x = matrix(xData);
+    // console.timeEnd('create');
+    return this.getClusIndex(x, this.centroids).data;
   }
 }

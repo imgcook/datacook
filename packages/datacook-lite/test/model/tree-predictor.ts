@@ -158,6 +158,8 @@ const irisData = [
 ];
 
 const labels = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ];
+const label_ids = labels.map((d) => d - 1);
+
 
 describe('DepthFirstTreeBuilder', () => {
 
@@ -183,9 +185,10 @@ describe('DecisionTreeRegressor', () => {
     const dt2 = new DecisionTreeRegressorPredictor();
     const modelJson = await dt.toJson();
     await dt2.fromJson(modelJson);
+    const predY_1 = await dt.predict(features);
     const predY = await dt2.predict(features);
+    const r2_1 = getRSquare(target, predY_1 as number[]);
     const r2 = getRSquare(target, predY as number[]);
-    console.log('r2', r2);
-    assert.isTrue(r2 > 0.8);
+    assert.isTrue(Math.abs(r2_1 - r2) < 1e-3);
   });
 });
