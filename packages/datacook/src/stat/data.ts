@@ -1,5 +1,6 @@
-import { Tensor, RecursiveArray, sub, mean, divNoNan, sum, pow, sqrt, transpose, topk, stack, slice, neg, tidy } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, sub, mean, divNoNan, sum, pow, sqrt, transpose, topk, stack, slice, neg, tidy, Tensor1D, Tensor2D, gather, squeeze, tensor, reshape } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
+import { quickSelectMedian, quickSelectQuantiles } from './utils';
 
 /**
  * Get centered data.
@@ -82,6 +83,39 @@ export const getMean = (xData: Tensor | RecursiveArray<number>, axis = -1): Tens
   return mean(xTensor, axis);
 };
 
+const dataImplementFunc2D = (xData: number[] | number[][] | Tensor1D | Tensor2D,
+  func: (arr: number[]) => number | number[] | number[][], axis = -1): Tensor => {
+  let xTensor = checkArray(xData, 'float32', [ 1, 2 ]);
+  if (xTensor.rank == 1) {
+    return tensor(func(xTensor.arraySync() as number[]));
+  } else {
+    if (axis === -1) {
+      const xArr = reshape(xTensor, [ -1 ]).arraySync() as number[];
+      return tensor(func(xArr));
+    }
+    if (axis === 0) {
+      xTensor = tidy(() => transpose(xTensor));
+    }
+    const medians = [];
+    for (let i = 0; i < xTensor.shape[0]; i++) {
+      const arr = squeeze(gather(xTensor, [ i ])).arraySync() as number[];
+      medians.push(func(arr));
+    }
+    return tensor(medians);
+  }
+};
+
+/**
+ * Calculate median of given data
+ * @param xData input data, could be one or two dimensional tensor-like input
+ * @param axis axis for calculating median, **default = -1**, which means calculation will be
+ * applied across all axes.
+ * @returns tensor of data median
+ */
+export const getMedian = (xData: number[] | number[][] | Tensor1D | Tensor2D, axis = -1): Tensor => {
+  return dataImplementFunc2D(xData, quickSelectMedian, axis);
+};
+
 /**
  * Standardize input data.\
  * standard_x = (X - mean(X)) / sqrt(var(X))
@@ -109,6 +143,10 @@ export const standardize = (xData: Tensor | RecursiveArray<number>, axis = -1): 
     }
     return transpose(divNoNan(transpose(xCentered, perm), xStd), inversePerm);
   });
+};
+
+export const getQuantile = (xData: number[] | number[][] | Tensor1D | Tensor2D, quantile: number[] | number, axis = -1): Tensor => {
+  return dataImplementFunc2D(xData, (arr: number[]) => quickSelectQuantiles(arr, quantile), axis);
 };
 
 /**
