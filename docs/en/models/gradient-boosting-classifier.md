@@ -1,7 +1,7 @@
 ---
 layout: default
 
-title: GradientBoostingRegressor
+title: GradientBoostingClassifier
 
 parent: Models
 
@@ -9,21 +9,21 @@ lang: en
 
 nav_order: 8
 ---
-# GradientBoostingRegressor
+# GradientBoostingClassifier
 
-Gradient boosting is a machine learning method which provides predictions by training an ensemble of weak estimatorss. GradientBoostingRegressor is an implementation of gradient boosting for regression task.
+Gradient boosting is a machine learning method which provides predictions by training an ensemble of weak estimatorss. GradientBoostingClassifier is an implementation of gradient boosting for classification task.
 
 ## Import
 
 ```typescript
 import * as DataCook from '@pipcook/datacook';
-const { GradientBoostingRegressor } = DataCook.Model;
+const { GradientBoostingClassifier } = DataCook.Model;
 ```
 
 ## Constructor
 
 ```typescript
-const gb = newGradientBoostingRegressor({ nEstimators: 10 });
+const gb = newGradientBoostingClassifier({ nEstimators: 10 });
 ```
 
 ### Option parameters
@@ -47,20 +47,20 @@ const gb = newGradientBoostingRegressor({ nEstimators: 10 });
 
 ### fit
 
-Fit gradient boosting regressor
+Fit gradient boosting classifier
 
 #### Syntax
 
 ```typescript
-async fit(xData: number[][] | Tensor2D, yData: number[] | Tensor1D): Promise<void>
+async fit(xData: number[][] | Tensor2D, yData: number[] | string[] | boolean[] | Tensor1D): Promise<void>
 ```
 
 #### Parameters
 
-| Parameter | type                                 | description                                                         |
-| --------- | ------------------------------------ | ------------------------------------------------------------------- |
-| xData     | Tensor\| RecursiveArray `<number>` | input data of shape (nSamples,nFeatures) in type of array or tensor |
-| yData     | Tensor\| RecursiveArray `<number>` | Tensor like of shape (n_sample, ), input target values              |
+| Parameter | type                                              | description                                                         |
+| --------- | ------------------------------------------------- | ------------------------------------------------------------------- |
+| xData     | Tensor2D\| number[][]                            | input data of shape (nSamples,nFeatures) in type of array or tensor |
+| yData     | Tensor1D\| number[] \| string[] \| boolean[]  | input target                                                        |
 
 ### predict
 
