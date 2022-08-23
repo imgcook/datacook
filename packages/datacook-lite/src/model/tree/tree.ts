@@ -1,4 +1,4 @@
-// import { checkJSArray } from "../../utils/validation";
+import { checkJsArray2D } from "../../utils/validation";
 
 export const SIZE_MAX = Number.MAX_SAFE_INTEGER;
 export interface Node {
@@ -236,4 +236,36 @@ export class Tree {
     return nodeId;
 
   }
+  /**
+   * Finds the terminal region (=leaf node) for each sample in X.
+   * @param xData input sample
+   */
+   public applyNode = (xData: number[][]): number[] => {
+     checkJsArray2D(xData);
+     const xArray = xData;
+     const nSamples = xArray.length;
+     const leaves = [];
+     for (let i = 0; i < nSamples; i++) {
+       const sample = xArray[i];
+       let node = this.nodes[0];
+       let curNode = 0;
+       while (node.leftChild != -1 && node.rightChild != -1) {
+         const xFeatureVal = sample[node.feature];
+         if (xFeatureVal <= node.threshold) {
+           node = this.nodes[node.leftChild];
+           if (node.leftChild !== -1) {
+             curNode = node.leftChild;
+           }
+         } else {
+           node = this.nodes[node.rightChild];
+           if (node.rightChild !== -1) {
+             curNode = node.rightChild;
+           }
+         }
+       }
+       leaves.push(curNode);
+     }
+     return leaves;
+   };
 }
+
