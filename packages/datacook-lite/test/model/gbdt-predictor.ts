@@ -169,7 +169,6 @@ describe('GradientBoostingDecisionTree', () => {
     const gbdt2 = new GradientBoostingRegressorPredictor({});
     await gbdt2.fromJson(modelJson);
     const predictions = await gbdt2.predict(irisData);
-    console.log(predictions);
     const r2 = getRSquare(target, predictions as number[]);
     console.log('r2', r2);
   });

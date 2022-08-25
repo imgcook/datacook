@@ -7,7 +7,8 @@ import {
   add1d as add1dCpu,
   sub1d as sub1dCpu,
   mul1d as mul1dCpu,
-  div1d as div1dCpu
+  div1d as div1dCpu,
+  equal1d as equal1dCpu
 } from '../../backend-cpu/op/binary-op';
 import { IS_CPU_BACKEND } from "../../env";
 import { getMethodErrorStr } from "./utils";
@@ -75,3 +76,12 @@ export const div1d = (x: Vector, y: Vector | number | Scalar): Vector => {
     throw new TypeError(getMethodErrorStr('div1d'));
   }
 };
+
+export const equal1d = (x: Vector, y: Vector | number | Scalar): Vector => {
+  if (IS_CPU_BACKEND) {
+    return equal1dCpu(x, y);
+  } else {
+    throw new TypeError(getMethodErrorStr('equal1d'));
+  }
+};
+

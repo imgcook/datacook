@@ -2,7 +2,7 @@ import { OneHotEncoder } from "../../preprocess/encoder";
 import { checkJsArray2D } from "../../utils/validation";
 import { BaseEstimator } from "../base";
 import { Tree } from "../tree/tree";
-import { LossFunction, ClassificationLossFunction } from "./gbdt-loss";
+import { LossFunction, ClassificationLossFunction, LeastSquaredError, MultinomialDeviance, BinomialDeviance } from "./gbdt-loss";
 import { predictStages } from "./utils";
 import {
   DecisionTreeCriterion,
@@ -206,7 +206,16 @@ export class GradientBoostingDecisionTreePredictor extends BaseEstimator {
       this.oneHotEncoder = new OneHotEncoder();
       await this.oneHotEncoder.init(classes);
     }
-
+    if (this.loss == 'ls') {
+      this.lossFunction = new LeastSquaredError();
+    }
+    if (this.loss == 'deviance') {
+      if (this.nClass > 2) {
+        this.lossFunction = new MultinomialDeviance(this.nClass);
+      } else {
+        this.lossFunction = new BinomialDeviance();
+      }
+    }
     if (trees) {
       this.estimators = [];
       for (let i = 0; i < trees.length; i++) {
