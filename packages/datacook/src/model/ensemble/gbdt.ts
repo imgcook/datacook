@@ -178,7 +178,6 @@ export class GradientBoostingDecisionTree extends BaseEstimator {
     let inverseSampleMask: number[] | undefined;
     const nInbag = Math.max(1, this.subSample * nSamples);
     const lossFunc = this.lossFunction;
-    let lossHistory: number[];
     let oldOOBScore;
     let i: number;
     let yValPred: number[][] | undefined;
@@ -186,7 +185,7 @@ export class GradientBoostingDecisionTree extends BaseEstimator {
      * TODO: verbose
      */
     if (this.nIterNoChange && xVal) {
-      lossHistory = new Array(this.nIterNoChange).fill(Number.MAX_SAFE_INTEGER);
+      this.lossHistory = new Array(this.nIterNoChange).fill(Number.MAX_SAFE_INTEGER);
       yValPred = this.stagedPredict(xVal);
     }
     for (i = beginAtStage; i < this.nEstimators; i++) {
@@ -469,7 +468,7 @@ export class GradientBoostingClassifier extends GradientBoostingDecisionTree {
    *
    * `tol` : number, default=1e-4
    *     Tolerance for the early stopping. When the loss is not improving
-   *     by at least tol for ``n_iter_no_change`` iterations (if set to a
+   *     by at least tol for ``nIterNoChange`` iterations (if set to a
    *     number), the training stops.
    *
    * `validation_fraction` : float, default=0.1
@@ -491,7 +490,7 @@ export class GradientBoostingClassifier extends GradientBoostingDecisionTree {
    *     Minimum number of samples required to split an internal node
    *
    * `minSamplesLeaf`: number, default = 1
-   *     The minimum number of samples required to be at leaf node,
+   *     The minimum number of samples required to be at leaf node
    *
    * `minWeightFractionLeaf`: number, default = 0
    *     The minimum weighted fraction of the sum total of weights required
@@ -504,17 +503,17 @@ export class GradientBoostingClassifier extends GradientBoostingDecisionTree {
    *     A node will be split if this split induces a decrease of the impurity
    *     greater than or equal to this value.
    *
-   * `max_features` : number, or {"auto", "sqrt", "log2"}, default = None
+   * `maxFeatures` : number, or {"auto", "sqrt", "log2"}, default = None
    *     The number of features to consider when looking for the best split:
    *
    *     - If integer value, then consider `max_features` features at each split.
    *     - If float value, then `max_features` is a fraction and
-   *        `int(max_features * n_features)` features are considered at each
+   *        `int(maxFeatures * n_features)` features are considered at each
    *         split.
-   *     - If "auto", then `max_features=sqrt(n_features)`.
-   *     - If "sqrt", then `max_features=sqrt(n_features)`.
-   *     - If "log2", then `max_features=log2(n_features)`.
-   *     - If None, then `max_features=n_features`.
+   *     - If "auto", then `maxFeatures=sqrt(nFeatures)`.
+   *     - If "sqrt", then `maxFeatures=sqrt(nFeatures)`.
+   *     - If "log2", then `maxFeatures=log2(nFeatures)`.
+   *     - If none, then `maxFeatures=nFatures`.
    *
    * `ccpAlpha`: number, default=0
    *     Complexity parameter used for Minimal Cost-complexity Pruning.
