@@ -1,12 +1,12 @@
 {
   "name": "@pipcook/datacook-lite",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "A JavaScript library for feature engineering on datasets",
   "main": "dist/index.js",
   "sideEffects": false,
   "scripts": {
     "preinstall": "rm -rf ./node_modules/@pipcook && mkdir -p ./node_modules/@pipcook && ln -s `pwd`/../datacook `pwd`/node_modules/@pipcook",
-    "test": "npm run test:node",
+    "test": "npm run preinstall && npm run test:node",
     "test:node": "env TS_NODE_PROJECT=\"tsconfig.test.json\" nyc mocha --timeout 60000 -r ts-node/register ./test/**/*.ts --require test/setup.ts",
     "test:simple": "env TS_NODE_PROJECT=\"tsconfig.test.json\" mocha --timeout 60000 -r ts-node/register --require test/setup.ts",
     "test:browser": "karma start",
@@ -25,7 +25,7 @@
     "url": "git+https://github.com/imgcook/datacook"
   },
   "publishConfig": {
-    "registry": "https://registry.npm.alibaba-inc.com"
+    "access": "public"
   },
   "keywords": [
     "data-processing",

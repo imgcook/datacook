@@ -135,6 +135,10 @@ export const basicImplement1dBinary = (func: ImplementFuncBinary, x: Vector, y: 
     }
     return vector(out);
   }
+  if (y instanceof Scalar) {
+    const out = x.data.map((d: number) => func(d, y.values()));
+    return vector(out);
+  }
   if (typeof y === 'number') {
     const out = x.data.map((d: number) => func(d, y));
     return vector(out);

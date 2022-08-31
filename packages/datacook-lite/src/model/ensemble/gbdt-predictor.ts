@@ -1,11 +1,14 @@
-import { Tensor1D, Tensor2D } from "@tensorflow/tfjs-core";
 import { OneHotEncoder } from "../../preprocess/encoder";
-import { checkJSArray } from "../../utils/validation";
+import { checkJsArray2D } from "../../utils/validation";
 import { BaseEstimator } from "../base";
-import { Tree } from "../tree";
-import { DecisionTreeCriterion, DecisionTreeRegressor } from "../tree/classes";
-import { LeastSquaredError, LossFunction, BinomialDeviance, ClassificationLossFunction, MultinomialDeviance } from "./gbdt-loss";
-import { getInverseMask, predictStages, randomSampleMask, trainTestSplit } from "./utils";
+import { Tree } from "../tree/tree";
+import { LossFunction, ClassificationLossFunction, LeastSquaredError, MultinomialDeviance, BinomialDeviance } from "./gbdt-loss";
+import { predictStages } from "./utils";
+import {
+  DecisionTreeCriterion,
+  DecisionTreeRegressorPredictor
+} from "../tree/decision-tree-predictor";
+// import { getInverseMask, predictStages, randomSampleMask, trainTestSplit } from "./utils";
 
 export type GBLoss = 'deviance' | 'ls' | 'lad';
 
@@ -31,7 +34,7 @@ export interface GradientBoostingDecisionTreeParams {
   nIterNoChange?: number;
 }
 
-export class GradientBoostingDecisionTree extends BaseEstimator {
+export class GradientBoostingDecisionTreePredictor extends BaseEstimator {
   protected loss: GBLoss;
   protected learningRate: number;
   protected nEstimators: number;
@@ -51,8 +54,8 @@ export class GradientBoostingDecisionTree extends BaseEstimator {
   protected validationFraction: number;
   protected tol: number;
   protected lossFunction: LossFunction;
-  protected estimators: DecisionTreeRegressor[][];
-  protected oneHotEncoder: OneHotEncoder;
+  protected estimators: DecisionTreeRegressorPredictor[][];
+  protected oneHotEncoder: OneHotEncoder<number | string>;
   public trainScore: number[];
   public oobImprovement: number[];
 
@@ -114,116 +117,6 @@ export class GradientBoostingDecisionTree extends BaseEstimator {
   }
 
   /**
-   * Fit estimators for given stage
-   */
-  private async fitStage(
-    i: number,
-    xData: number[][],
-    yData: number[][],
-    predictions: number[][],
-    sampleWeight?: number[],
-    sampleMask?: number[],
-  ): Promise<number[][]> {
-    const lossFunc = this.lossFunction;
-    const trees: DecisionTreeRegressor[] = [];
-    for (let k = 0; k < lossFunc.k; k++) {
-      const residuals = lossFunc.negativeGradient(yData, predictions, k, sampleWeight);
-      const tree = new DecisionTreeRegressor({
-        criterion: this.criterion,
-        splitter: 'best',
-        maxDepth: this.maxDepth,
-        minSamplesSplit: this.minSamplesSplit,
-        minSamplesLeaf: this.minSamplesLeaf,
-        minWeightFractionLeaf: this.minWeightFractionLeaf,
-        minImpurityDecrease: this.minImpurityDecrease,
-        maxFeatures: this.maxFeatures,
-        maxLeafNodes: this.maxLeafNodes,
-        ccpAlpha: this.ccpAlpha
-      });
-      await tree.fit(xData, residuals, sampleWeight);
-      lossFunc.updateTerminalRegions(
-        tree.tree,
-        xData,
-        yData,
-        residuals,
-        predictions,
-        sampleWeight,
-        sampleMask,
-        this.learningRate,
-        k
-      );
-      trees.push(tree);
-    }
-    this.estimators.push(trees);
-    return predictions;
-  }
-
-
-  /**
-   * Fit estimators for stages
-   */
-  private async fitStages(
-    x: number[][],
-    y: number[][],
-    predictions: number[][],
-    sampleWeight?: number[],
-    beginAtStage = 0,
-    xVal?: number[][],
-    yVal?: number[][],
-    sampleWeightVal?: number[]
-  ): Promise<number> {
-    const nSamples = x.length;
-    const doOOB = this.subSample && this.subSample < 1;
-    let sampleMask: number[] | undefined;
-    let inverseSampleMask: number[] | undefined;
-    const nInbag = Math.max(1, this.subSample * nSamples);
-    const lossFunc = this.lossFunction;
-    let oldOOBScore;
-    let i: number;
-    let yValPred: number[][] | undefined;
-    /**
-     * TODO: verbose
-     */
-    if (this.nIterNoChange && xVal) {
-      this.lossHistory = new Array(this.nIterNoChange).fill(Number.MAX_SAFE_INTEGER);
-      yValPred = this.stagedPredict(xVal);
-    }
-    for (i = beginAtStage; i < this.nEstimators; i++) {
-      if (doOOB) {
-        sampleMask = randomSampleMask(nSamples, nInbag);
-        inverseSampleMask = getInverseMask(sampleMask);
-        oldOOBScore = lossFunc.computeLoss(y, predictions, sampleWeight, inverseSampleMask);
-      }
-      predictions = await this.fitStage(
-        i,
-        x,
-        y,
-        predictions,
-        sampleWeight,
-        sampleMask
-      );
-      if (doOOB) {
-        this.trainScore[i] = lossFunc.computeLoss(y, predictions, sampleWeight, sampleMask);
-        this.oobImprovement[i] = oldOOBScore - lossFunc.computeLoss(y, predictions, sampleWeight, inverseSampleMask);
-      } else {
-        this.trainScore[i] = lossFunc.computeLoss(y, predictions, sampleWeight);
-      }
-      if (this.nIterNoChange && xVal && yVal && yValPred) {
-        const validationLoss = lossFunc.computeLoss(yVal, yValPred, sampleWeightVal);
-        let canBreak = true;
-        for (let j = 0; j < this.lossHistory.length; j++) {
-          if (validationLoss + this.tol < this.lossHistory[j]) {
-            canBreak = false;
-            this.lossHistory[ i % this.lossHistory.length ] = validationLoss;
-          }
-        }
-        if (canBreak) break;
-      }
-    }
-    return i + 1;
-  }
-
-  /**
    * Get predictions for current estimators
    */
   private stagedPredict(x: number[][]): number[][] {
@@ -233,6 +126,16 @@ export class GradientBoostingDecisionTree extends BaseEstimator {
     }
     return predictions;
   }
+  public async predict(x: number[][]): Promise<(number | string | boolean)[]> {
+    const predictions = this.stagedPredict(x);
+    if (this.isClassifier()) {
+      const idx = (this.lossFunction as ClassificationLossFunction).predictionToDecision(predictions);
+      const categories = this.oneHotEncoder.categories;
+      return idx.map((d) => categories[d]);
+    } else {
+      return predictions.map((d) => d[0]);
+    }
+  }
 
   private predictionInit(x: number[][]): number[][] {
     /**
@@ -240,79 +143,10 @@ export class GradientBoostingDecisionTree extends BaseEstimator {
      */
     const predictions: number[][] = [];
     for (let i = 0; i < x.length; i++) {
-      predictions.push(new Array(this.lossFunction.k).fill(0));
+      predictions.push(new Array(this.nClass ? this.nClass > 2 ? this.nClass : 1 : 1).fill(0));
     }
     // this.lossFunction.getInitPredictions(x)
     return predictions;
-  }
-
-  public async predict(x: number[][]): Promise<number[] | string[] | boolean[]> {
-    const predictions = this.stagedPredict(x);
-    if (this.isClassifier()) {
-      const idx = (this.lossFunction as ClassificationLossFunction).predictionToDecision(predictions);
-      const categories = this.oneHotEncoder.categories.dataSync();
-      return idx.map((d) => categories[d]);
-    } else {
-      return predictions.map((d) => d[0]);
-    }
-  }
-
-  /**
-   * Fit gradient boosting model
-   * @param xData input features
-   * @param yData target
-   * @param sampleWeight sample weight
-   */
-  public async fit(
-    xData: number[][] | Tensor2D,
-    yData: number[] | string[] | boolean[] | Tensor1D,
-    sampleWeight?: number[]
-  ): Promise<void> {
-
-    let y: number[][];
-    let x: number[][], xVal: number[][] | undefined, yVal: number[][] | undefined, sampleWeightVal: number[] | undefined;
-
-    x = checkJSArray(xData, 'float32', 2) as number[][];
-
-    this.checkAndSetNFeatures(xData, true);
-    const isClassification = this.isClassifier();
-    if (isClassification) {
-      const yArray = checkJSArray(yData, 'any', 1) as string [] | number[] | boolean[];
-      this.oneHotEncoder = new OneHotEncoder({ drop: 'binary-only' });
-      await this.oneHotEncoder.init(yArray);
-      this.nClass = this.oneHotEncoder.categories.shape[0];
-      if (this.nClass == 2) {
-        this.lossFunction = new BinomialDeviance();
-        y = (await (await this.oneHotEncoder.encode(yArray)).array() as number[]).map((d) => [ d ]);
-      } else {
-        this.lossFunction = new MultinomialDeviance(this.nClass);
-        y = await (await this.oneHotEncoder.encode(yArray)).array() as number[][];
-      }
-    } else {
-      const yArray = checkJSArray(yData, 'float32', 1) as number[];
-      this.lossFunction = new LeastSquaredError();
-      y = yArray.map((d: number) => [ d ]);
-    }
-
-
-    if (this.nIterNoChange) {
-      [ x, xVal, y, yVal, sampleWeight, sampleWeightVal ] = trainTestSplit(this.validationFraction, x, y, sampleWeight);
-
-    }
-
-    this.initState();
-    const predictions = this.predictionInit(x);
-    await this.fitStages(
-      x,
-      y,
-      predictions,
-      sampleWeight,
-      0,
-      xVal,
-      yVal,
-      sampleWeightVal
-    );
-    return;
   }
 
   /**
@@ -385,9 +219,9 @@ export class GradientBoostingDecisionTree extends BaseEstimator {
     if (trees) {
       this.estimators = [];
       for (let i = 0; i < trees.length; i++) {
-        const stagedEstimators: DecisionTreeRegressor[] = [];
+        const stagedEstimators: DecisionTreeRegressorPredictor[] = [];
         for (let j = 0; j < trees[i].length; j++) {
-          const tree = new DecisionTreeRegressor({
+          const tree = new DecisionTreeRegressorPredictor({
             criterion: this.criterion,
             splitter: 'best',
             maxDepth: this.maxDepth,
@@ -442,7 +276,7 @@ export class GradientBoostingDecisionTree extends BaseEstimator {
       nFeature: this.nFeature,
       k: this.lossFunction.k,
       trees,
-      classes: this?.oneHotEncoder?.categories?.arraySync()
+      classes: this?.oneHotEncoder?.categories
     };
     return JSON.stringify(modelParams);
   }
@@ -451,7 +285,7 @@ export class GradientBoostingDecisionTree extends BaseEstimator {
 /**
  * Gradient boosting model for classification task
  */
-export class GradientBoostingClassifier extends GradientBoostingDecisionTree {
+export class GradientBoostingClassifierPredictor extends GradientBoostingDecisionTreePredictor {
   /**
    * @param params model parameters
    * Option in params
@@ -528,17 +362,17 @@ export class GradientBoostingClassifier extends GradientBoostingDecisionTree {
       this.loss = 'deviance';
     }
   }
-  async predictProba(xData: number[][] | Tensor2D): Promise<number[][]> {
-    const x = checkJSArray(xData, 'float32', 2) as number[][];
-    this.checkAndSetNFeatures(x, false);
-    return (this.lossFunction as ClassificationLossFunction).predictionToProba(x);
+  async predictProba(xData: number[][]): Promise<number[][]> {
+    checkJsArray2D(xData);
+    this.checkAndSetNFeatures(xData, false);
+    return (this.lossFunction as ClassificationLossFunction).predictionToProba(xData);
   }
 }
 
 /**
  * Gradient boosting model for regression task
  */
-export class GradientBoostingRegressor extends GradientBoostingDecisionTree {
+export class GradientBoostingRegressorPredictor extends GradientBoostingDecisionTreePredictor {
   /**
    * @param params model parameters
    * Option in params

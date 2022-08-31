@@ -1,8 +1,14 @@
-export const accuracyScore = (yTrue: Array<any>, yPred: Array<any>): number => {
+import { sum1d } from "../backend-cpu/op";
+import { equal1d } from "../backend-cpu/op/binary-op";
+import { vector, Vector } from "../core/classes";
+
+export const accuracyScore = (yTrue: Array<any> | Vector, yPred: Array<any> | Vector): number => {
   const yTrueCount = yTrue.length;
   const yPredCount = yPred.length;
+  const yTrueVector = yTrue instanceof Array ? vector(yTrue) : yTrue;
+  const yPredVector = yPred instanceof Array ? vector(yPred) : yPred;
   if (yTrueCount != yPredCount) {
     throw new Error('Shape of yTrue should match shape of yPred');
   }
-  return yTrue.reduce((s, y, i: number): number => i === 0 ? Number(y === yPred[i]) : (Number(y === yPred[i]) + s)) * 1.0 / yTrueCount;
+  return sum1d(equal1d(yTrueVector, yPredVector)).values() / yTrueCount;
 };

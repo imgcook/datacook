@@ -20,6 +20,9 @@ const divFunc = (a: number, b: number): number => {
   return a / b;
 };
 
+const equalFunc = (a: number, b: number): number => {
+  return a === b ? 1 : 0;
+};
 
 export const add2dForward = (x: Matrix, y: Matrix | Vector | Scalar | number, by: ByAxis = 0): Matrix => {
   return basicImplement2dBinary(addFunc, x, y, by);
@@ -151,6 +154,8 @@ export const div1d = (x: Vector, y: Vector | Scalar | number): Vector => {
   return trackedImplement1dBinary(div1dForward, div1dBackwardX, div1dBackwardY, x, y);
 };
 
-// export const add0d = (x: Scalar, y: Scalar | number): Scalar => {
-//   return tracked
-// };
+export const equal1dForward = (x: Vector, y: Vector | Scalar | number): Vector => {
+  return basicImplement1dBinary(equalFunc, x, y);
+};
+
+export const equal1d = equal1dForward;

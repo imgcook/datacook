@@ -28,7 +28,9 @@ export const predictRegressionTreeFast = (x: number[][], nodes: Node[], k: numbe
         node = nodes[node.rightChild];
       }
     }
-    out[i][k] += scale * node.value[0];
+    if (node.value) {
+      out[i][k] += scale * node.value[0];
+    }
   }
 };
 

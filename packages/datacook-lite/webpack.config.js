@@ -12,7 +12,8 @@ const createConfig = (target) => {
       kmeansPredictor: './src/model/clustering/kmeans-predictor.ts',
       logisticRegressionPredictor: './src/model/linear-model/logistic-regression-predictor.ts',
       naiveBayesPredictor: './src/model/naive-bayes/naive-bayes-predictor.ts',
-      pcaPredictor: './src/model/pca-predictor.ts'
+      pcaPredictor: './src/model/pca-predictor.ts',
+      gbdtPredictor: './src/model/ensemble/gbdt-predictor.ts'
     },
     target: target,
     output: {
