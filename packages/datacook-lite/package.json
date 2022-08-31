@@ -1,6 +1,6 @@
 {
   "name": "@pipcook/datacook-lite",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "description": "A JavaScript library for feature engineering on datasets",
   "main": "dist/index.js",
   "sideEffects": false,
@@ -25,7 +25,7 @@
     "url": "git+https://github.com/imgcook/datacook"
   },
   "publishConfig": {
-    "registry": "https://registry.npm.alibaba-inc.com"
+    "access": "public"
   },
   "keywords": [
     "data-processing",
