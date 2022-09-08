@@ -1,6 +1,8 @@
 import { accuracyScore, getRSquare } from '../../src/metrics';
 import { GradientBoostingRegressor, GradientBoostingClassifier } from '@pipcook/datacook/dist/model';
 import { GradientBoostingClassifierPredictor, GradientBoostingRegressorPredictor } from '../../src/model/ensemble/gbdt-predictor'; 
+import { assert } from 'chai';
+import { numEqual } from '../../src/utils/validation';
 const irisData = [
   [ 5.1, 3.5, 1.4, 0.2 ],
   [ 4.9, 3., 1.4, 0.2 ],
@@ -172,6 +174,19 @@ describe('GradientBoostingDecisionTree', () => {
     const r2 = getRSquare(target, predictions as number[]);
     console.log('r2', r2);
   });
+  it('get probability (binary classification)', async () => {
+    const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
+    const gbdt = new GradientBoostingClassifier({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
+    gbdt.estimatorType = 'classifier';
+    await gbdt.fit(features, binomialIds);
+    const modelJson = await gbdt.toJson();
+    const gbdt2 = new GradientBoostingClassifierPredictor({});
+    await gbdt2.fromJson(modelJson);
+    const probas = await gbdt2.predictProba(features);
+    for (let i = 0; i < probas.length; i++) {
+      assert.isTrue(numEqual(probas[i][0] + probas[i][1], 1, 1e-4));
+    }
+  })
   it('save and load model (binary classification)', async () => {
     const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
     const gbdt = new GradientBoostingClassifier({ nEstimators: 10, maxDepth: 3, learningRate: 0.4 });
@@ -192,7 +207,7 @@ describe('GradientBoostingDecisionTree', () => {
     const modelJson = await gbdt.toJson();
     const gbdt2 = new GradientBoostingClassifierPredictor({});
     await gbdt2.fromJson(modelJson);
-    const predictions = await gbdt2.predict(irisData);
+    const predictions = await gbdt2.predict(features);
     const acc = accuracyScore(label_ids, predictions);
     console.log("acc", acc);
   });

@@ -119,7 +119,7 @@ export class GradientBoostingDecisionTreePredictor extends BaseEstimator {
   /**
    * Get predictions for current estimators
    */
-  private stagedPredict(x: number[][]): number[][] {
+  protected stagedPredict(x: number[][]): number[][] {
     const predictions = this.predictionInit(x);
     for (let i = 0; i < this.estimators.length; i++) {
       predictStages(x, this.estimators[i], this.learningRate, predictions);
@@ -365,7 +365,8 @@ export class GradientBoostingClassifierPredictor extends GradientBoostingDecisio
   async predictProba(xData: number[][]): Promise<number[][]> {
     checkJsArray2D(xData);
     this.checkAndSetNFeatures(xData, false);
-    return (this.lossFunction as ClassificationLossFunction).predictionToProba(xData);
+    const predictions = this.stagedPredict(xData);
+    return (this.lossFunction as ClassificationLossFunction).predictionToProba(predictions);
   }
 }
 

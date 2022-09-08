@@ -1,4 +1,4 @@
-import { Tensor, RecursiveArray, norm, div, max, sub, abs, lessEqual, slice, tensor, isNaN, where, tidy } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, norm, div, max, sub, abs, lessEqual, slice, tensor, isNaN, where, tidy, stack, squeeze } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
 
 /**
@@ -112,5 +112,23 @@ export const fillNaN = (xData: Tensor | RecursiveArray<number>, fillV = 0): Tens
     const xTensor = checkArray(xData, 'float32', 2);
     const cond = isNaN(xTensor);
     return where(cond, fillV, xTensor);
+  });
+};
+
+/**
+ * Get the digonal elements in a matrix
+ * @param matrix target matrix
+ * @returns tensor of diagnal elements
+ */
+export const getDiagElements = (matrix: Tensor | number[]): Tensor => {
+  return tidy(() => {
+    const matrixTensor = checkArray(matrix, 'any', 2);
+    const [ m, n ] = matrixTensor.shape;
+    const rank = m > n ? n : m;
+    const diagElements = [];
+    for (let i = 0; i < rank; i++) {
+      diagElements.push(slice(matrixTensor, [ i, i ], [ 1, 1 ]));
+    }
+    return squeeze(stack(diagElements));
   });
 };

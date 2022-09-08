@@ -48,3 +48,10 @@ export function scalarEqual(x: Scalar, y: Scalar, tol = 0): boolean {
   }
   return true;
 }
+
+export function numEqual(x: number, y: number, tol: number): boolean {
+  if (Math.abs(x - y) > tol) {
+    return false;
+  }
+  return true;
+}
