@@ -206,7 +206,7 @@ export class BinomialDeviance extends DevianceLossFunction {
   predictionToProba(predictions: number[][]): number[][] {
     const proba = [];
     for (let i = 0; i < predictions.length; i++) {
-      const p = 1 / (1 + Math.exp(-predictions[0]));
+      const p = 1 / (1 + Math.exp(-predictions[i][0]));
       proba.push([ 1 - p, p ]);
     }
     return proba;

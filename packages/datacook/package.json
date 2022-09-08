@@ -1,6 +1,6 @@
 {
   "name": "@pipcook/datacook",
-  "version": "0.1.4-beta.3",
+  "version": "0.1.5",
   "description": "A JavaScript library for feature engineering on datasets",
   "main": "dist/index.js",
   "dependencies": {

@@ -1,4 +1,4 @@
-import { Tensor, unique, oneHot, cast, tensor, argMax, reshape, slice, stack, sub, squeeze, greaterEqual, topk, Tensor1D, tidy, RecursiveArray } from '@tensorflow/tfjs-core';
+import { Tensor, unique, oneHot, cast, tensor, argMax, reshape, slice, stack, sub, squeeze, greaterEqual, topk, Tensor1D, tidy } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
 import { checkShape } from '../linalg/utils';
 
@@ -19,7 +19,7 @@ export abstract class EncoderBase {
    * @param x data input used to init encoder
    * @param categories user input categories
    */
-  public async init(x: Tensor | number[] | string[] | boolean[]): Promise<void> {
+  public async init(x: Tensor | number[] | string[]): Promise<void> {
     const { values } = unique(x);
     if (values.dtype === 'int32' || values.dtype === 'float32') {
       this.categories = topk(values, values.shape[0], false).values;
@@ -36,8 +36,8 @@ export abstract class EncoderBase {
     }
     this.cateMap = cateMap;
   }
-  // abstract encode(x: Tensor | number[] | string[]): Promise<Tensor>;
-  // abstract decode(x: Tensor | RecursiveArray<number>): Promise<Tensor>;
+  abstract encode(x: Tensor | number[] | string[]): Promise<Tensor>;
+  abstract decode(x: Tensor): Promise<Tensor>;
 }
 
 /**
@@ -76,7 +76,7 @@ export class OneHotEncoder extends EncoderBase {
    * @param x feature array need to encode
    * @returns transformed one-hot feature
    */
-  public async encode(x: Tensor | number[] | string[] | boolean[]): Promise<Tensor> {
+  public async encode(x: Tensor | number[] | string[]): Promise<Tensor> {
     if (!this.categories) {
       throw TypeError('Please init encoder using init()');
     }
@@ -97,18 +97,17 @@ export class OneHotEncoder extends EncoderBase {
    * @param x one-hot format data need to transform
    * @returns transformed category data
    */
-  public async decode(x: Tensor | RecursiveArray<number>): Promise<Tensor> {
+  public async decode(x: Tensor): Promise<Tensor> {
     if (!this.categories) {
       throw TypeError('Please init encoder using init()');
     }
-    const xTensor = checkArray(x, 'float32');
     const nCate = this.categories.shape[0];
     const codeSize = this.drop === 'first' ? nCate - 1 : this.drop === 'binary-only' && nCate === 2 ? 1 : nCate;
-    const shapeCorrect = codeSize > 1 ? checkShape(xTensor, [ -1, codeSize ]) : (checkShape(xTensor, [ -1 ]) || checkShape(xTensor, [ -1, 1 ]));
+    const shapeCorrect = codeSize > 1 ? checkShape(x, [ -1, codeSize ]) : (checkShape(x, [ -1 ]) || checkShape(x, [ -1, 1 ]));
     if (!shapeCorrect) {
       throw new TypeError('Input shape does not match');
     }
-    const cateInd = (this.drop === 'binary-only' && nCate === 2) ? await greaterEqual(squeeze(xTensor), 0.5).data() : await argMax(xTensor, 1).data();
+    const cateInd = (this.drop === 'binary-only' && nCate === 2) ? await greaterEqual(squeeze(x), 0.5).data() : await argMax(x, 1).data();
     const cateTensors: Tensor[] = [];
     if (this.drop === 'binary-only' && nCate === 2) {
       cateInd.forEach((ind: number) => {
@@ -119,7 +118,7 @@ export class OneHotEncoder extends EncoderBase {
       });
     } else if (this.drop === 'first') {
       cateInd.forEach((ind: number, i: number) => {
-        if (Number(slice(xTensor, [ i, ind ], [ 1, 1 ]).dataSync()) === 0) {
+        if (Number(slice(x, [ i, ind ], [ 1, 1 ]).dataSync()) === 0) {
           cateTensors.push(slice(this.categories, 0, 1));
         } else {
           cateTensors.push(slice(this.categories, ind + 1, 1));
@@ -140,7 +139,7 @@ export class LabelEncoder extends EncoderBase {
    * @param x feature array need to encode
    * @returns transformed one-hot feature
    */
-  public async encode(x: Tensor | number[] | string[] | boolean[]): Promise<Tensor> {
+  public async encode(x: Tensor | number[] | string[]): Promise<Tensor> {
     if (!this.categories) {
       throw TypeError('Please init encoder using init()');
     }
