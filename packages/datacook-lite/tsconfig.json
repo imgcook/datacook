@@ -8,7 +8,7 @@
       "noImplicitAny": true,
       "esModuleInterop": true,
       "incremental": true,
-      "module": "es6",
+      "module": "CommonJS",
       "target": "es6",
       "moduleResolution": "node",
       "lib": [ "es6" ],
