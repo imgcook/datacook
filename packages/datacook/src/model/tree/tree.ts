@@ -56,8 +56,6 @@ export class Tree {
   public maxDepth: number;
   // Feature count
   public nFeature: number;
-  // output count
-  public nOutput: number;
   // class count
   public nClass: number;
   // nodes
@@ -65,7 +63,6 @@ export class Tree {
 
   constructor (nFeature?: number, nClass?: number) {
     this.nFeature = nFeature;
-    // this.nOutput = nOutput;
     this.nClass = nClass;
     this.nodes = [];
     this.nodeCount = 0;

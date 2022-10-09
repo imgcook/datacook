@@ -220,10 +220,12 @@ describe('DecisionTreeClassifier', () => {
 describe('DecisionTreeRegressor', () => {
   it('fit iris', async () => {
     const dt = new DecisionTreeRegressor();
-    const features = irisData.map((d) => [ d[0], d[1], d[2] ]);
-    const target = irisData.map((d) => d[3]);
+    const features = irisData.map((d) => [ d[1], d[2], d[3] ]);
+    const target = irisData.map((d) => d[0]);
     await dt.fit(features, target);
-    const predY = await dt.predict(features);
+    const predY = await dt.predict(features) as number[];
+    const r = getRSquare(target, predY);
+    console.log('r square', r);
   });
   it('save and load model (regressor)', async () => {
     const dt = new DecisionTreeRegressor();
