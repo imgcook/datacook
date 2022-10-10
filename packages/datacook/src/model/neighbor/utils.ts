@@ -11,6 +11,10 @@ export const quickPartitionNode = (data: number[][], idxArr: number[], startIdx:
   if (n === 1) {
     return;
   }
+  const pivotIdx = startIdx + Math.floor(Math.random() * n);
+  const startIdxOrigin = idxArr[startIdx];
+  idxArr[startIdx] = idxArr[pivotIdx];
+  idxArr[pivotIdx] = startIdxOrigin;
   const pivot = data[idxArr[startIdx]][iMax];
   let i = startIdx + 1;
   let highCount = 0;
@@ -25,6 +29,7 @@ export const quickPartitionNode = (data: number[][], idxArr: number[], startIdx:
     }
   }
   let equalCount = 0;
+  i = 0;
   while (i < endIdx - highCount - equalCount) {
     if (data[idxArr[i]][iMax] === pivot) {
       const tmp = idxArr[endIdx - highCount - equalCount - 1];
@@ -35,6 +40,8 @@ export const quickPartitionNode = (data: number[][], idxArr: number[], startIdx:
       i++;
     }
   }
+
+  const curData = new Array(n).fill(0).map((d, i) => data[idxArr[startIdx + i]][iMax]);
 
   const lowCount = n - equalCount - highCount;
 
@@ -68,7 +75,7 @@ export const randomChoice = (arr: number[]): number => {
    */
 export const partitionNodeIndices = (data: number[][], idxArr: number[], startIdx: number, endIdx: number, iMax: number): void => {
   const k = Math.floor((endIdx - startIdx) / 2);
-  return quickSelectNode(data, idxArr, startIdx, endIdx, iMax, k);
+  return quickPartitionNode(data, idxArr, startIdx, endIdx, iMax, k);
 };
 
 

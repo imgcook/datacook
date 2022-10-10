@@ -53,7 +53,7 @@ export class NeighborHeap {
     }
     distArr[i] = val;
     indArr[i] = iVal;
-    this.distances[i] = distArr;
-    this.indices[i] = indArr;
+    this.distances[row] = distArr;
+    this.indices[row] = indArr;
   }
 }

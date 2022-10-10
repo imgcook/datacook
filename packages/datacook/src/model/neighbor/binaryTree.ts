@@ -1,3 +1,4 @@
+import { Tensor2D } from "@tensorflow/tfjs-core";
 import { NodeIndex } from "@tensorflow/tfjs-layers/dist/keras_format/node_config";
 import { checkJSArray } from "../../utils/validation";
 import { NeighborHeap } from "./heap";
@@ -33,7 +34,8 @@ export abstract class BianryTree {
   public nNodes: number;
   public nLevels: number;
 
-  constructor(data: number[][], params: BinaryTreeParams = {}) {
+
+  public async fit(data: number[][], params: BinaryTreeParams = {}): Promise<void> {
     const { leafSize = 40, metrics = "minkowski" } = params;
     this.dataArr = checkJSArray(data, 'float32', 2) as number[][];
     if (this.dataArr.length === 0) {
@@ -45,10 +47,16 @@ export abstract class BianryTree {
     // Determine leaf size and level size
     this.leafSize = leafSize;
     this.nLevels = Math.ceil(Math.log2(Math.max(1, (nSamples - 1) / this.leafSize)));
-    this.nNodes = Math.pow(2, leafSize) - 1;
+    this.nNodes = Math.pow(2, this.nLevels) - 1;
     this.idxArr = new Array(nSamples).fill(0).map((d, i) => i);
-    this.nodeDataArr = new Array(this.nNodes).fill({});
-
+    this.nodeDataArr = new Array(this.nNodes);
+    this.nodeBounds = new Array(this.nNodes);
+    for (let i = 0; i < this.nNodes; i++) {
+      this.nodeDataArr[i] = { startIdx: -1, endIdx: -1 };
+      this.nodeBounds[i] = new Array(nFeatures).fill(0);
+    }
+    this.recursiveBuild(0, 0, this.dataArr.length);
+    // this.recursiveBuild();
   }
 
   /**
@@ -112,7 +120,7 @@ export abstract class BianryTree {
         const iMax = this.findNodeSplitDim(this.dataArr, this.idxArr, nFeatures, nPoints);
         quickPartitionNode(this.dataArr, this.idxArr, startIdx, endIdx, iMax, nMid);
         this.recursiveBuild(2 * iNode + 1, startIdx, startIdx + nMid);
-        this.recursiveBuild(2 * iNode + 1, startIdx + nMid, endIdx);
+        this.recursiveBuild(2 * iNode + 2, startIdx + nMid, endIdx);
       }
     }
   }
@@ -128,6 +136,17 @@ export abstract class BianryTree {
     */
     return x1.map((d, i) => Math.pow(d - x2[i], 2)).reduce((a, b) => a + b);
   }
+
+  // public async fit(xData: number[][]): Promise<void> {
+  //   const xArray = checkJSArray(xData, 'float32', 2) as number[][];
+  //   const nFeature = xArray[0].length;
+  //   this.dataArr = xArray;
+  //   this.idxArr = this.dataArr.map((_, i) => i);
+  //   this.nodeBounds = this.dataArr.map(() => new Array(nFeature).fill(0));
+  //   this.nodeDataArr = new Array(xArray.length);
+  //   this.recursiveBuild(0, 0, this.dataArr.length);
+  // }
+
   /**
    * Query the tree for n nearest neighbors
    * @param xData input data
@@ -157,7 +176,7 @@ export abstract class BianryTree {
     }
   }
   /**
-   * Query signle data point
+   * Query single data point
    */
   public querySingleDepthFirst(iNode: number, data: number[], iPt: number, heap: NeighborHeap, dist: number): void {
     const nodeInfo = this.nodeDataArr[iNode];
