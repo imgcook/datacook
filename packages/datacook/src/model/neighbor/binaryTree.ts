@@ -2,6 +2,7 @@ import { Tensor2D } from "@tensorflow/tfjs-core";
 import { NodeIndex } from "@tensorflow/tfjs-layers/dist/keras_format/node_config";
 import { checkJSArray } from "../../utils/validation";
 import { NeighborHeap } from "./heap";
+import { NeighborhoodMethod } from "./neighborhood";
 import { quickPartitionNode } from './utils';
 
 export type BinaryTreeMetrics = "minkowski" | "";
@@ -19,7 +20,7 @@ export interface BinaryTreeNode {
   radius?: number;
 }
 
-export abstract class BianryTree {
+export abstract class BianryTree implements NeighborhoodMethod {
   // data samples
   public dataArr: number[][];
   // sample weights

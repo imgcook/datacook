@@ -1,4 +1,6 @@
-import { BallTree } from '../../../../src/model/neighbor';
+import { KNeighborClassifier } from '../../../../src/model/neighbor/kNeighborClassifier';
+import { accuracyScore } from '../../../../src/metrics';
+import { assert } from 'chai';
 const irisData = [
   [ 5.1, 3.5, 1.4, 0.2 ],
   [ 4.9, 3., 1.4, 0.2 ],
@@ -152,18 +154,24 @@ const irisData = [
   [ 5.9, 3., 5.1, 1.8 ]
 ];
 
+const labels = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ];
+
 describe('Ball tree', () => {
   it('fit model ', async () => {
-    const ballTree = new BallTree();
-    await ballTree.fit(irisData);
-    const out = ballTree.query([[ 6.6, 3, 5, 2 ], [ 5.9, 3.1, 5.0, 1.7 ]], 2);
-    for(let i = 0; i < out.indices.length; i++) {
-      console.log(i);
-      for (let j = 0; j < out.indices[i].length; j++) {
-        console.log(irisData[out.indices[i][j]]);
-      }
-    }
-    console.log(out);
+    const knn = new KNeighborClassifier({ nNeighbors: 10 });
+    await knn.fit(irisData, labels);
+    const predLabels = await knn.predict(irisData);
+    const acc = accuracyScore(predLabels, labels);
+    console.log('accuracy score', acc);
+    assert.isTrue(acc > 0.8);
+  });
+  it('fit model (distance weight)', async () => {
+    const knn = new KNeighborClassifier({ nNeighbors: 1, weight: 'distance' });
+    await knn.fit(irisData, labels);
+    const predLabels = await knn.predict(irisData);
+    const acc = accuracyScore(predLabels, labels);
+    console.log('accuracy score', acc);
+    assert.isTrue(acc > 0.8);
   });
 });
     

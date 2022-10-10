@@ -1,4 +1,4 @@
-import { add, any, divNoNan, equal, fill, lessEqual, mul, neg, sum, Tensor1D, Tensor2D, tidy, transpose } from "@tensorflow/tfjs-core";
+import { add, any, divNoNan, equal, fill, mul, neg, reshape, sum, Tensor1D, Tensor2D, tidy, transpose } from "@tensorflow/tfjs-core";
 import { checkArray, checkJSArray } from "../../utils/validation";
 import { BallTree } from "./ballTree";
 import { NeighborhoodMethod } from "./neighborhood";
@@ -17,8 +17,9 @@ export const WEIGHT_FUNCTIONS = {
       const hasZero = any(isZero, 1);
       const inverseDist = divNoNan(1, distances);
       const invSum = sum(inverseDist, 1);
-      const weights = divNoNan(inverseDist, invSum);
-      return transpose(add(mul(transpose(weights), neg(hasZero)), isZero)) as Tensor2D;
+      const weights = divNoNan(inverseDist, reshape(invSum, [ -1, 1 ]));
+      const zeroWeights = divNoNan(isZero, reshape(sum(isZero, 1), [ -1, 1 ]));
+      return add(mul(weights, reshape(neg(hasZero), [ -1, 1 ])), zeroWeights) as Tensor2D;
     });
   }
 };
@@ -52,7 +53,7 @@ export class KNeighborBase implements KNeighborParams {
     this.nNeighbors = nNeighbors;
     this.weightFunction = WEIGHT_FUNCTIONS[this.weight];
   }
-  public async fit(xData: number[][] | Tensor2D, yData: Tensor1D): Promise<void> {
+  public async fit(xData: number[][] | Tensor2D, yData: string[] | boolean[] | number[] | Tensor1D): Promise<void> {
     const xArray = checkJSArray(xData, 'float32', 2) as number[][];
     const yTensor = checkArray(yData, 'any', 1) as Tensor1D;
     this.neighborMethod.fit(xArray, { leafSize: this.leafSize });

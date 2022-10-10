@@ -1,4 +1,4 @@
-import { gather, mul, RecursiveArray, reshape, sum, Tensor, tensor2d, Tensor2D } from "@tensorflow/tfjs-core";
+import { gather, mul, RecursiveArray, reshape, sum, Tensor, Tensor1D, tensor2d, Tensor2D } from "@tensorflow/tfjs-core";
 import { OneHotDropTypes, OneHotEncoder } from "../../preprocess/encoder";
 import { checkArray, checkJSArray } from "../../utils/validation";
 import { BaseClassifier, ClassMap } from "../base";
@@ -14,7 +14,7 @@ export class KNeighborClassifier extends KNeighborBase implements BaseClassifier
     return await this.classOneHotEncoder.encode(y);
   }
 
-  public async initClasses(y: Tensor | number[] | string[], drop: OneHotDropTypes = 'none'): Promise<void> {
+  public async initClasses(y: Tensor | number[] | string[] | boolean[], drop: OneHotDropTypes = 'none'): Promise<void> {
     this.classOneHotEncoder = new OneHotEncoder({ drop });
     await this.classOneHotEncoder.init(y);
   }
@@ -53,11 +53,16 @@ export class KNeighborClassifier extends KNeighborBase implements BaseClassifier
     const { distances, indices } = await this.query(xArray);
     const distTensor = tensor2d(distances);
     const [ nSamples, nNeighbors ] = distTensor.shape;
-    const nnLabels = gather(this.y, indices);
+    const nnLabels = reshape(gather(this.y, indices), [ nSamples * nNeighbors ]);
     const weights = this.weightFunction(distTensor);
     const labelOneHot = await this.classOneHotEncoder.encode(nnLabels);
     const proba = sum(mul(reshape(labelOneHot, [ nSamples, nNeighbors, -1 ]), reshape(weights, [ nSamples, nNeighbors, 1 ])), 1) as Tensor2D;
     return proba;
+  }
+
+  public async fit(xData: number[][] | Tensor2D, yData: number[] | string[] | boolean[] | Tensor1D): Promise<void> {
+    await this.initClasses(yData);
+    await super.fit(xData, yData);
   }
   public async predict(xData: number[][] | Tensor2D): Promise<Tensor> {
     const proba = await this.predictProba(xData);
