@@ -137,16 +137,6 @@ export abstract class BianryTree {
     return x1.map((d, i) => Math.pow(d - x2[i], 2)).reduce((a, b) => a + b);
   }
 
-  // public async fit(xData: number[][]): Promise<void> {
-  //   const xArray = checkJSArray(xData, 'float32', 2) as number[][];
-  //   const nFeature = xArray[0].length;
-  //   this.dataArr = xArray;
-  //   this.idxArr = this.dataArr.map((_, i) => i);
-  //   this.nodeBounds = this.dataArr.map(() => new Array(nFeature).fill(0));
-  //   this.nodeDataArr = new Array(xArray.length);
-  //   this.recursiveBuild(0, 0, this.dataArr.length);
-  // }
-
   /**
    * Query the tree for n nearest neighbors
    * @param xData input data

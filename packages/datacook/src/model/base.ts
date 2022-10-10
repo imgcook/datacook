@@ -105,16 +105,6 @@ export class BaseClassifier {
   public classOneHotEncoder: OneHotEncoder;
   public classMap: ClassMap;
 
-  public score( x: Tensor, y: Tensor ): Tensor {
-    const xCount = x.shape[0];
-    const yCount = y.shape[0];
-    if (xCount == 0 || yCount == 0) {
-      throw new Error('Inputs should not have length of zero');
-    }
-    // TODO(sugarspectre): Accuaracy score computation
-    const score = tensor([ 0 ]);
-    return score;
-  }
   // get label one-hot expression
   public async getLabelOneHot(y: Tensor): Promise<Tensor> {
     return await this.classOneHotEncoder.encode(y);
