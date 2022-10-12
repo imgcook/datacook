@@ -1,4 +1,3 @@
-import { Tensor2D } from "@tensorflow/tfjs-core";
 import { NodeIndex } from "@tensorflow/tfjs-layers/dist/keras_format/node_config";
 import { checkJSArray } from "../../utils/validation";
 import { NeighborHeap } from "./heap";
@@ -28,12 +27,15 @@ export abstract class BianryTree implements NeighborhoodMethod {
   // node data
   public nodeDataArr: BinaryTreeNode[];
   public idxArr: number[];
-  public nodeBounds: number[][];
+  // public nodeBounds: number[][];
   // maximum number of leaves
   public leafSize: number;
+  protected nFeatures: number;
   // number of nodes
-  public nNodes: number;
-  public nLevels: number;
+  protected nNodes: number;
+  protected nLevels: number;
+
+  protected abstract initNodeBounds(): void;
 
 
   public async fit(data: number[][], params: BinaryTreeParams = {}): Promise<void> {
@@ -51,11 +53,11 @@ export abstract class BianryTree implements NeighborhoodMethod {
     this.nNodes = Math.pow(2, this.nLevels) - 1;
     this.idxArr = new Array(nSamples).fill(0).map((d, i) => i);
     this.nodeDataArr = new Array(this.nNodes);
-    this.nodeBounds = new Array(this.nNodes);
+    this.nFeatures = nFeatures;
     for (let i = 0; i < this.nNodes; i++) {
       this.nodeDataArr[i] = { startIdx: -1, endIdx: -1 };
-      this.nodeBounds[i] = new Array(nFeatures).fill(0);
     }
+    this.initNodeBounds();
     this.recursiveBuild(0, 0, this.dataArr.length);
     // this.recursiveBuild();
   }
@@ -158,6 +160,7 @@ export abstract class BianryTree implements NeighborhoodMethod {
     const heap = new NeighborHeap(xArray.length, k);
     for (let i = 0; i < xArray.length; i++) {
       const reducedDist = this.minRDist(0, xArray[i]);
+      // console.log('iter', i);
       this.querySingleDepthFirst(0, xArray[i], i, heap, reducedDist);
     }
     if (returnDistance) {
@@ -186,7 +189,7 @@ export abstract class BianryTree implements NeighborhoodMethod {
         const i1 = 2 * iNode + 1;
         const i2 = i1 + 1;
         const reducedDistL = this.minRDist(i1, data);
-        const reducedDistR = this.minDist(i2, data);
+        const reducedDistR = this.minRDist(i2, data);
 
         if (reducedDistL <= reducedDistR) {
           this.querySingleDepthFirst(i1, data, iPt, heap, reducedDistL);

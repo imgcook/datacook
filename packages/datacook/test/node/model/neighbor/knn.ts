@@ -154,7 +154,35 @@ const irisData = [
   [ 5.9, 3., 5.1, 1.8 ]
 ];
 
-const labels = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ];
+const labels = [ 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 ].map((d) => {
+    if (d == 1) {
+        return 'label1';
+    }
+    if (d == 2) {
+        return 'label2';
+    } else {
+        return 'label3';
+    }
+});
+
+describe('Ball tree', () => {
+  it('fit model ', async () => {
+    const knn = new KNeighborClassifier({ nNeighbors: 10 });
+    await knn.fit(irisData, labels);
+    const predLabels = await knn.predict(irisData);
+    const acc = accuracyScore(predLabels, labels);
+    console.log('accuracy score', acc);
+    assert.isTrue(acc > 0.8);
+  });
+  it('fit model (distance weight)', async () => {
+    const knn = new KNeighborClassifier({ nNeighbors: 1, weight: 'distance' });
+    await knn.fit(irisData, labels);
+    const predLabels = await knn.predict(irisData);
+    const acc = accuracyScore(predLabels, labels);
+    console.log('accuracy score', acc);
+    assert.isTrue(acc > 0.8);
+  });
+});
 
 describe('Ball tree', () => {
   it('fit model ', async () => {

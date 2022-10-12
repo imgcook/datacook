@@ -1,6 +1,7 @@
 import { add, any, divNoNan, equal, fill, mul, neg, reshape, sum, Tensor1D, Tensor2D, tidy, transpose } from "@tensorflow/tfjs-core";
 import { checkArray, checkJSArray } from "../../utils/validation";
 import { BallTree } from "./ballTree";
+import { KDTree } from "./kdTree";
 import { NeighborhoodMethod } from "./neighborhood";
 
 export type WeightFunction = (distances: Tensor2D) => Tensor2D;
@@ -25,7 +26,8 @@ export const WEIGHT_FUNCTIONS = {
 };
 
 export const NEIGHBOR_METHODS = {
-  ballTree: new BallTree()
+  ballTree: new BallTree(),
+  kdTree: new KDTree()
 };
 
 export interface KNeighborParams {
@@ -40,7 +42,7 @@ export class KNeighborBase implements KNeighborParams {
   nNeighbors?: number;
   weight?: "uniform" | "distance";
 
-  protected y?: Tensor1D;
+  protected y?: string[] | boolean[] | number[];
   protected neighborMethod?: NeighborhoodMethod;
   protected weightFunction?: WeightFunction;
 
@@ -55,9 +57,9 @@ export class KNeighborBase implements KNeighborParams {
   }
   public async fit(xData: number[][] | Tensor2D, yData: string[] | boolean[] | number[] | Tensor1D): Promise<void> {
     const xArray = checkJSArray(xData, 'float32', 2) as number[][];
-    const yTensor = checkArray(yData, 'any', 1) as Tensor1D;
+    const yArray = checkJSArray(yData, 'any', 1) as number[] | boolean[] | string[];
     this.neighborMethod.fit(xArray, { leafSize: this.leafSize });
-    this.y = yTensor;
+    this.y = yArray;
   }
   public async query(xData: number[][] | Tensor2D): Promise<{ indices: number[][], distances?: number[][] }> {
     const xArray = checkJSArray(xData, 'float32', 2) as number[][];

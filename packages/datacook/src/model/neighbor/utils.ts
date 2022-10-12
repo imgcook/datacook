@@ -29,7 +29,7 @@ export const quickPartitionNode = (data: number[][], idxArr: number[], startIdx:
     }
   }
   let equalCount = 0;
-  i = 0;
+  i = startIdx;
   while (i < endIdx - highCount - equalCount) {
     if (data[idxArr[i]][iMax] === pivot) {
       const tmp = idxArr[endIdx - highCount - equalCount - 1];
@@ -44,7 +44,7 @@ export const quickPartitionNode = (data: number[][], idxArr: number[], startIdx:
   const curData = new Array(n).fill(0).map((d, i) => data[idxArr[startIdx + i]][iMax]);
 
   const lowCount = n - equalCount - highCount;
-
+  // const curArr = n.map((d) => curData[iMax]);
   if (k < lowCount) {
     return quickPartitionNode(data, idxArr, startIdx, startIdx + lowCount, iMax, k);
   } else {

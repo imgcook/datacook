@@ -89,7 +89,7 @@ export class OneHotEncoder extends EncoderBase {
     } else if (this.drop === 'first') {
       return oneHot(cast(sub(tensor(xInd), 1), 'int32'), nCate - 1);
     } else {
-      return oneHot(cast(tensor(xInd), 'int32'), nCate);
+      return oneHot(xInd, nCate);
     }
   }
   /**

@@ -1,4 +1,4 @@
-import { gather, mul, RecursiveArray, reshape, sum, Tensor, Tensor1D, tensor2d, Tensor2D } from "@tensorflow/tfjs-core";
+import { gather, mul, RecursiveArray, reshape, slice, sum, Tensor, Tensor1D, tensor2d, Tensor2D } from "@tensorflow/tfjs-core";
 import { OneHotDropTypes, OneHotEncoder } from "../../preprocess/encoder";
 import { checkArray, checkJSArray } from "../../utils/validation";
 import { BaseClassifier, ClassMap } from "../base";
@@ -53,9 +53,16 @@ export class KNeighborClassifier extends KNeighborBase implements BaseClassifier
     const { distances, indices } = await this.query(xArray);
     const distTensor = tensor2d(distances);
     const [ nSamples, nNeighbors ] = distTensor.shape;
-    const nnLabels = reshape(gather(this.y, indices), [ nSamples * nNeighbors ]);
+    const ySlice: (string | boolean | number)[] = [];
+    for (let i = 0; i < indices.length; i++) {
+      for (let j = 0; j < indices[i].length; j++) {
+        ySlice.push(this.y[indices[i][j]]);
+      }
+    }
+    // const ySlice = indices.map((inds) => inds.map((d) => this.y[d]));
+    // const nnLabels = reshape(tensor2d(ySlice), [ nSamples * nNeighbors ]);
     const weights = this.weightFunction(distTensor);
-    const labelOneHot = await this.classOneHotEncoder.encode(nnLabels);
+    const labelOneHot = await this.classOneHotEncoder.encode(ySlice as string[] | boolean[] | number[]);
     const proba = sum(mul(reshape(labelOneHot, [ nSamples, nNeighbors, -1 ]), reshape(weights, [ nSamples, nNeighbors, 1 ])), 1) as Tensor2D;
     return proba;
   }

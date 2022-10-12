@@ -1,4 +1,5 @@
 import { BallTree } from '../../../../src/model/neighbor';
+import { KDTree } from '../../../../src/model/neighbor/kdTree';
 const irisData = [
   [ 5.1, 3.5, 1.4, 0.2 ],
   [ 4.9, 3., 1.4, 0.2 ],
@@ -152,11 +153,11 @@ const irisData = [
   [ 5.9, 3., 5.1, 1.8 ]
 ];
 
-describe('Ball tree', () => {
+describe('KD tree', () => {
   it('fit model ', async () => {
-    const ballTree = new BallTree();
-    await ballTree.fit(irisData);
-    const out = ballTree.query([[ 6.6, 3, 5, 2 ], [ 5.9, 3.1, 5.0, 1.7 ], [ 5.9, 3, 5.1, 1.8 ]], 1);
+    const kdTree = new KDTree();
+    await kdTree.fit(irisData, { leafSize: 5 });
+    const out = kdTree.query([[ 6.6, 3, 5, 2 ], [ 5.9, 3.1, 5.0, 1.7 ], [ 5.9, 3, 5.1, 1.8 ]], 1);
     for(let i = 0; i < out.indices.length; i++) {
       console.log(i);
       for (let j = 0; j < out.indices[i].length; j++) {

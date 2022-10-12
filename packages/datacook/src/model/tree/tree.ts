@@ -60,6 +60,7 @@ export class Tree {
   public nClass: number;
   // nodes
   public nodes: Node[];
+  public nOutput: number;
 
   constructor (nFeature?: number, nClass?: number) {
     this.nFeature = nFeature;
