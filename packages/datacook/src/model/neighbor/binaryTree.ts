@@ -201,4 +201,37 @@ export abstract class BianryTree implements NeighborhoodMethod {
       }
     }
   }
+
+  public async toObject(): Promise<Record<string, any>> {
+    const modelParams: Record<string, any> = {};
+    modelParams.dataArr = this.dataArr;
+    modelParams.sampleWeights = this.sampleWeights;
+    modelParams.nodeDataArr = this.nodeDataArr;
+    modelParams.idxArr = this.idxArr;
+    modelParams.leafSize = this.leafSize;
+    modelParams.nFeatures = this.nFeatures;
+    modelParams.nNodes = this.nNodes;
+    modelParams.nLevels = this.nLevels;
+    return modelParams;
+  }
+  public async fromObject(modelParams: Record<string, any>): Promise<void> {
+    const {
+      dataArr,
+      sampleWeights,
+      nodeDataArr,
+      idxArr,
+      leafSize,
+      nFeatures,
+      nNodes,
+      nLevels
+    } = modelParams;
+    this.dataArr = dataArr;
+    this.sampleWeights = sampleWeights;
+    this.nodeDataArr = nodeDataArr;
+    this.idxArr = idxArr;
+    this.leafSize = leafSize;
+    this.nFeatures = nFeatures;
+    this.nNodes = nNodes;
+    this.nLevels = nLevels;
+  }
 }

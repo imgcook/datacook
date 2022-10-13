@@ -1,4 +1,4 @@
-import { gather, mul, RecursiveArray, reshape, slice, sum, Tensor, Tensor1D, tensor2d, Tensor2D } from "@tensorflow/tfjs-core";
+import { mul, RecursiveArray, reshape, slice, sum, Tensor, Tensor1D, tensor2d, Tensor2D } from "@tensorflow/tfjs-core";
 import { OneHotDropTypes, OneHotEncoder } from "../../preprocess/encoder";
 import { checkArray, checkJSArray } from "../../utils/validation";
 import { BaseClassifier, ClassMap } from "../base";
@@ -74,5 +74,26 @@ export class KNeighborClassifier extends KNeighborBase implements BaseClassifier
   public async predict(xData: number[][] | Tensor2D): Promise<Tensor> {
     const proba = await this.predictProba(xData);
     return await this.classOneHotEncoder.decode(proba);
+  }
+  public async toObject(): Promise<Record<string, any>> {
+    const modelParams = await super.toObject();
+    const categories = this.classOneHotEncoder.categories.arraySync();
+    modelParams.categories = categories;
+    return modelParams;
+  }
+  public async fromObject(modelParams: Record<string, any>): Promise<void> {
+    const {
+      categories
+    } = modelParams;
+    await super.fromObject(modelParams);
+    await this.initClasses(categories);
+  }
+  public async toJson(): Promise<string> {
+    const modelParams = await this.toObject();
+    return JSON.stringify(modelParams);
+  }
+  public async fromJson(modelJson: string): Promise<void> {
+    const modelParams = JSON.parse(modelJson);
+    await this.fromObject(modelParams);
   }
 }

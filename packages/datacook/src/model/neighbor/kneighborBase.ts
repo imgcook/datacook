@@ -65,4 +65,30 @@ export class KNeighborBase implements KNeighborParams {
     const xArray = checkJSArray(xData, 'float32', 2) as number[][];
     return this.neighborMethod.query(xArray, this.nNeighbors, true);
   }
+  public async toObject(): Promise<Record<string, any>> {
+    // const xArray = checkArray
+    const modelParams: Record<string, any> = {};
+    modelParams.algorithm = this.algorithm;
+    modelParams.leafSize = this.leafSize;
+    modelParams.weight = this.weight;
+    modelParams.nNeighbors = this.nNeighbors;
+    modelParams.neighborMethodParams = await this.neighborMethod.toObject();
+    return modelParams;
+  }
+  public async fromObject(modelParams: Record<string, any>): Promise<void> {
+    const {
+      algorithm,
+      leafSize,
+      weight,
+      nNeighbors,
+      neighborMethodParams
+    } = modelParams;
+    this.algorithm = algorithm;
+    this.neighborMethod = NEIGHBOR_METHODS[this.algorithm];
+    this.leafSize = leafSize;
+    this.weight = weight;
+    this.nNeighbors = nNeighbors;
+    this.weightFunction = WEIGHT_FUNCTIONS[this.weight];
+    await this.neighborMethod.fromObject(neighborMethodParams);
+  }
 }

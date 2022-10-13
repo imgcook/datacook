@@ -29,6 +29,9 @@ export class KDTree extends BianryTree implements NeighborhoodMethod {
     this.nodeDataArr[iNode].endIdx = endIdx;
     this.nodeDataArr[iNode].radius = Math.pow(radius, 1 / 2);
   }
+  protected minDist(iNode: number, data: number[]): number {
+    return Math.pow(this.minRDist(iNode, data), 1 / 2);
+  }
   protected minRDist(iNode: number, data: number[]): number {
     let rDist = 0;
     for (let j = 0; j < this.nFeatures; j++) {
@@ -39,7 +42,17 @@ export class KDTree extends BianryTree implements NeighborhoodMethod {
     }
     return rDist;
   }
-  protected minDist(iNode: number, data: number[]): number {
-    return Math.pow(this.minRDist(iNode, data), 1 / 2);
+
+  public async fromObject(modelParams: Record<string, any>): Promise<void> {
+    super.fromObject(modelParams);
+    this.uppperBounds = modelParams.nodeBounds;
+    this.lowerBounds = modelParams.lowerBounds;
+  }
+
+  public async toObject(): Promise<Record<string, any>> {
+    const modelParams = await super.toObject();
+    modelParams.uppperBounds = this.uppperBounds;
+    modelParams.lowerBounds = this.lowerBounds;
+    return modelParams;
   }
 }

@@ -78,8 +78,3 @@ export const partitionNodeIndices = (data: number[][], idxArr: number[], startId
   return quickPartitionNode(data, idxArr, startIdx, endIdx, iMax, k);
 };
 
-
-// export const partitionNodeIndices = (data: number[][], idxArr: number[],
-//   startIdx: number, endIdx: number, iMax: number): void => {
-//   return quickSelectNodeMedian(data, idxArr, startIdx, endIdx, iMax);
-// };

@@ -52,4 +52,15 @@ export class BallTree extends BianryTree implements NeighborhoodMethod {
     // return Math.max(0, Math.pow(dist - this.nodeDataArr[iNode].radius, 2));
     return Math.pow(Math.max(0, dist - this.nodeDataArr[iNode].radius), 2);
   }
+
+  public async fromObject(modelParams: Record<string, any>): Promise<void> {
+    super.fromObject(modelParams);
+    this.nodeBounds = modelParams.nodeBounds;
+  }
+
+  public async toObject(): Promise<Record<string, any>> {
+    const modelParams = await super.toObject();
+    modelParams.nodeBounds = this.nodeBounds;
+    return modelParams;
+  }
 }
