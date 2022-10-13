@@ -201,5 +201,16 @@ describe('Ball tree', () => {
     console.log('accuracy score', acc);
     assert.isTrue(acc > 0.8);
   });
+  it('load and save model', async () => {
+    const knn = new KNeighborClassifier({ nNeighbors: 2, weight: 'distance' });
+    await knn.fit(irisData, labels);
+    const modelJson = await knn.toJson();
+    const knn2 = new KNeighborClassifier();
+    await knn2.fromJson(modelJson);
+    const predLabels1 = await knn.predict(irisData);
+    const predLabels2 = await knn2.predict(irisData);
+    const acc = accuracyScore(predLabels1, predLabels2);
+    assert.isTrue(acc === 1);
+  });
 });
     

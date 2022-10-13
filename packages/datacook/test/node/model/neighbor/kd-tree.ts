@@ -167,4 +167,3 @@ describe('KD tree', () => {
     console.log(out);
   });
 });
-    

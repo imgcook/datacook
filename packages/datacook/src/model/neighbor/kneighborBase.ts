@@ -73,6 +73,7 @@ export class KNeighborBase implements KNeighborParams {
     modelParams.weight = this.weight;
     modelParams.nNeighbors = this.nNeighbors;
     modelParams.neighborMethodParams = await this.neighborMethod.toObject();
+    modelParams.y = this.y;
     return modelParams;
   }
   public async fromObject(modelParams: Record<string, any>): Promise<void> {
@@ -81,7 +82,8 @@ export class KNeighborBase implements KNeighborParams {
       leafSize,
       weight,
       nNeighbors,
-      neighborMethodParams
+      neighborMethodParams,
+      y
     } = modelParams;
     this.algorithm = algorithm;
     this.neighborMethod = NEIGHBOR_METHODS[this.algorithm];
@@ -89,6 +91,7 @@ export class KNeighborBase implements KNeighborParams {
     this.weight = weight;
     this.nNeighbors = nNeighbors;
     this.weightFunction = WEIGHT_FUNCTIONS[this.weight];
+    this.y = y;
     await this.neighborMethod.fromObject(neighborMethodParams);
   }
 }
