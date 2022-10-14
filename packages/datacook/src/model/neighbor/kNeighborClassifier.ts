@@ -1,4 +1,4 @@
-import { mul, RecursiveArray, reshape, slice, sum, Tensor, Tensor1D, tensor2d, Tensor2D } from "@tensorflow/tfjs-core";
+import { mul, RecursiveArray, reshape, sum, Tensor, Tensor1D, tensor2d, Tensor2D } from "@tensorflow/tfjs-core";
 import { OneHotDropTypes, OneHotEncoder } from "../../preprocess/encoder";
 import { checkArray, checkJSArray } from "../../utils/validation";
 import { BaseClassifier, ClassMap } from "../base";

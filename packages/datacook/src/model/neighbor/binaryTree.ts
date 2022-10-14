@@ -39,7 +39,7 @@ export abstract class BianryTree implements NeighborhoodMethod {
 
 
   public async fit(data: number[][], params: BinaryTreeParams = {}): Promise<void> {
-    const { leafSize = 40, metrics = "minkowski" } = params;
+    const { leafSize = 40 } = params;
     this.dataArr = checkJSArray(data, 'float32', 2) as number[][];
     if (this.dataArr.length === 0) {
       throw new TypeError('Input is empry array');

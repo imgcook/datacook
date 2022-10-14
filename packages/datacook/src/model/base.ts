@@ -1,4 +1,4 @@
-import { Tensor, RecursiveArray, tensor, tidy, dispose, Tensor2D } from '@tensorflow/tfjs-core';
+import { Tensor, RecursiveArray, tidy, dispose, Tensor2D } from '@tensorflow/tfjs-core';
 import { checkArray } from '../utils/validation';
 import { OneHotEncoder } from '../preprocess/encoder';
 import { OneHotDropTypes } from '../preprocess/encoder';

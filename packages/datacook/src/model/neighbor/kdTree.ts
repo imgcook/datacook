@@ -45,7 +45,7 @@ export class KDTree extends BianryTree implements NeighborhoodMethod {
 
   public async fromObject(modelParams: Record<string, any>): Promise<void> {
     super.fromObject(modelParams);
-    this.uppperBounds = modelParams.nodeBounds;
+    this.uppperBounds = modelParams.uppperBounds;
     this.lowerBounds = modelParams.lowerBounds;
   }
 

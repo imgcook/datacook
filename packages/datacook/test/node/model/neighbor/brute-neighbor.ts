@@ -152,7 +152,7 @@ const irisData = [
   [ 5.9, 3., 5.1, 1.8 ]
 ];
 
-describe('Ball tree', () => {
+describe('Brute method', () => {
   it('fit model ', async () => {
     const bruteNeighbor = new BruteNeighbor();
     await bruteNeighbor.fit(irisData);

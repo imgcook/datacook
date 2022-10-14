@@ -1,4 +1,4 @@
-import { neg, pow, reshape, stack, sub, sum, Tensor, Tensor2D, topk, unstack } from "@tensorflow/tfjs-core";
+import { neg, pow, stack, sub, sum, Tensor, Tensor2D, topk, unstack } from "@tensorflow/tfjs-core";
 import { checkArray } from "../../utils/validation";
 import { NeighborhoodMethod } from "./neighborhood";
 

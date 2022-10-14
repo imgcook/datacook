@@ -41,8 +41,6 @@ export const quickPartitionNode = (data: number[][], idxArr: number[], startIdx:
     }
   }
 
-  const curData = new Array(n).fill(0).map((d, i) => data[idxArr[startIdx + i]][iMax]);
-
   const lowCount = n - equalCount - highCount;
   // const curArr = n.map((d) => curData[iMax]);
   if (k < lowCount) {
