@@ -1,6 +1,7 @@
-import { add, any, divNoNan, equal, fill, mul, neg, reshape, sum, Tensor1D, Tensor2D, tidy, transpose } from "@tensorflow/tfjs-core";
-import { checkArray, checkJSArray } from "../../utils/validation";
+import { add, any, divNoNan, equal, fill, mul, neg, reshape, sum, Tensor1D, Tensor2D, tidy } from "@tensorflow/tfjs-core";
+import { checkJSArray } from "../../utils/validation";
 import { BallTree } from "./ballTree";
+import { BruteNeighbor } from "./bruteNeighbor";
 import { KDTree } from "./kdTree";
 import { NeighborhoodMethod } from "./neighborhood";
 
@@ -27,7 +28,8 @@ export const WEIGHT_FUNCTIONS = {
 
 export const NEIGHBOR_METHODS = {
   ballTree: new BallTree(),
-  kdTree: new KDTree()
+  kdTree: new KDTree(),
+  brute: new BruteNeighbor()
 };
 
 export interface KNeighborParams {
