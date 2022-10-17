@@ -21,16 +21,13 @@ export class KDTree extends BianryTree implements NeighborhoodMethod {
         uppperBound[j] = Math.max(uppperBound[j], this.dataArr[this.idxArr[i]][j]);
       }
     }
-    let radius = 0;
-    for (let j = 0; j < this.nFeatures; j++) {
-      radius += Math.pow(Math.abs(uppperBound[j] - lowerBound[j]), 2);
-    }
+    const radius = this.dist(uppperBound, lowerBound);
     this.nodeDataArr[iNode].startIdx = startIdx;
     this.nodeDataArr[iNode].endIdx = endIdx;
-    this.nodeDataArr[iNode].radius = Math.pow(radius, 1 / 2);
+    this.nodeDataArr[iNode].radius = radius;
   }
   protected minDist(iNode: number, data: number[]): number {
-    return Math.pow(this.minRDist(iNode, data), 1 / 2);
+    return this.metric.rDistToDist(this.minRDist(iNode, data));
   }
   protected minRDist(iNode: number, data: number[]): number {
     let rDist = 0;
@@ -38,7 +35,7 @@ export class KDTree extends BianryTree implements NeighborhoodMethod {
       const dLow = this.lowerBounds[iNode][j] - data[j];
       const dHigh = data[j] - this.uppperBounds[iNode][j];
       const dist = Math.max(0, dLow) + Math.max(0, dHigh);
-      rDist += Math.pow(dist, 2);
+      rDist += this.metric.distToRDist(dist);
     }
     return rDist;
   }

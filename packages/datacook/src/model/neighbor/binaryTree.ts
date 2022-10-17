@@ -3,20 +3,27 @@ import { checkJSArray } from "../../utils/validation";
 import { NeighborHeap } from "./heap";
 import { NeighborhoodMethod } from "./neighborhood";
 import { quickPartitionNode } from './utils';
+import { MetricName, DistanceMetric, MetricFactory, MetricParams } from './metrics';
 
-export type BinaryTreeMetrics = "minkowski" | "";
+// export type BinaryTreeMetrics = "minkowski" | "";
 
-export interface BinaryTreeParams {
-  leafSize?: number;
-  metrics?: BinaryTreeMetrics;
-  sampleWeights?: number[];
-}
+// export interface BinaryTreeFitParams {
+//   leafSize?: number;
+//   sampleWeights?: number[];
+// }
 
 export interface BinaryTreeNode {
   isLeaf?: boolean;
   startIdx: number;
   endIdx: number;
   radius?: number;
+}
+
+export interface BinaryTreeParams {
+  metric?: MetricName;
+  metricParams?: MetricParams;
+  leafSize?: number;
+  sampleWeights?: number[];
 }
 
 export abstract class BianryTree implements NeighborhoodMethod {
@@ -27,6 +34,7 @@ export abstract class BianryTree implements NeighborhoodMethod {
   // node data
   public nodeDataArr: BinaryTreeNode[];
   public idxArr: number[];
+  public metric: DistanceMetric;
   // public nodeBounds: number[][];
   // maximum number of leaves
   public leafSize: number;
@@ -37,9 +45,13 @@ export abstract class BianryTree implements NeighborhoodMethod {
 
   protected abstract initNodeBounds(): void;
 
+  constructor(params: BinaryTreeParams = {}) {
+    const { metric = 'l2', metricParams = {}, leafSize = 40 } = params;
+    this.metric = MetricFactory.getMetric(metric, metricParams);
+    this.leafSize = leafSize;
+  }
 
-  public async fit(data: number[][], params: BinaryTreeParams = {}): Promise<void> {
-    const { leafSize = 40 } = params;
+  public async fit(data: number[][]): Promise<void> {
     this.dataArr = checkJSArray(data, 'float32', 2) as number[][];
     if (this.dataArr.length === 0) {
       throw new TypeError('Input is empry array');
@@ -48,7 +60,6 @@ export abstract class BianryTree implements NeighborhoodMethod {
     const nFeatures = this.dataArr[0].length;
 
     // Determine leaf size and level size
-    this.leafSize = leafSize;
     this.nLevels = Math.ceil(Math.log2(Math.max(1, (nSamples - 1) / this.leafSize)));
     this.nNodes = Math.pow(2, this.nLevels) - 1;
     this.idxArr = new Array(nSamples).fill(0).map((d, i) => i);
@@ -128,7 +139,8 @@ export abstract class BianryTree implements NeighborhoodMethod {
     }
   }
   protected dist(x1: number[], x2: number[]): number {
-    return Math.sqrt(x1.map((d, i) => Math.pow(d - x2[i], 2)).reduce((a, b) => a + b));
+    // return Math.sqrt(x1.map((d, i) => Math.pow(d - x2[i], 2)).reduce((a, b) => a + b));
+    return this.metric.dist(x1, x2);
   }
   /**
    * redueced distance between x1 and x2
@@ -137,7 +149,7 @@ export abstract class BianryTree implements NeighborhoodMethod {
     /**
     * reduced euclidean distance
     */
-    return x1.map((d, i) => Math.pow(d - x2[i], 2)).reduce((a, b) => a + b);
+    return this.metric.rDist(x1, x2);
   }
 
   /**
@@ -212,6 +224,8 @@ export abstract class BianryTree implements NeighborhoodMethod {
     modelParams.nFeatures = this.nFeatures;
     modelParams.nNodes = this.nNodes;
     modelParams.nLevels = this.nLevels;
+    modelParams.metric = this.metric.name;
+    modelParams.metricPrams = { p: this.metric.p };
     return modelParams;
   }
   public async fromObject(modelParams: Record<string, any>): Promise<void> {
@@ -223,7 +237,9 @@ export abstract class BianryTree implements NeighborhoodMethod {
       leafSize,
       nFeatures,
       nNodes,
-      nLevels
+      nLevels,
+      metric,
+      metricParams
     } = modelParams;
     this.dataArr = dataArr;
     this.sampleWeights = sampleWeights;
@@ -233,5 +249,6 @@ export abstract class BianryTree implements NeighborhoodMethod {
     this.nFeatures = nFeatures;
     this.nNodes = nNodes;
     this.nLevels = nLevels;
+    this.metric = MetricFactory.getMetric(metric, metricParams);
   }
 }

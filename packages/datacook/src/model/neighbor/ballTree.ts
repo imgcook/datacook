@@ -1,4 +1,4 @@
-import { BianryTree, BinaryTreeParams } from "./binaryTree";
+import { BianryTree } from "./binaryTree";
 import { NeighborhoodMethod } from "./neighborhood";
 
 export class BallTree extends BianryTree implements NeighborhoodMethod {
@@ -10,8 +10,8 @@ export class BallTree extends BianryTree implements NeighborhoodMethod {
       this.nodeBounds[i] = new Array(this.nFeatures).fill(0);
     }
   }
-  public async fit(data: number[][], params?: BinaryTreeParams): Promise<void> {
-    await super.fit(data, params);
+  public async fit(data: number[][]): Promise<void> {
+    await super.fit(data);
   }
   protected initNode(iNode: number, startIdx: number, endIdx: number): void {
     const nFeatures = this.dataArr[0].length;
@@ -49,8 +49,7 @@ export class BallTree extends BianryTree implements NeighborhoodMethod {
   // TODO: reduced distance
   protected minRDist(iNode: number, data: number[]): number {
     const dist = this.dist(data, this.nodeBounds[iNode]);
-    // return Math.max(0, Math.pow(dist - this.nodeDataArr[iNode].radius, 2));
-    return Math.pow(Math.max(0, dist - this.nodeDataArr[iNode].radius), 2);
+    return this.metric.distToRDist(Math.max(0, dist - this.nodeDataArr[iNode].radius));
   }
 
   public async fromObject(modelParams: Record<string, any>): Promise<void> {

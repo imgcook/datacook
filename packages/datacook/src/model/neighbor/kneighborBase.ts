@@ -1,8 +1,10 @@
 import { add, any, divNoNan, equal, fill, mul, neg, reshape, sum, Tensor1D, Tensor2D, tidy } from "@tensorflow/tfjs-core";
 import { checkJSArray } from "../../utils/validation";
 import { BallTree } from "./ballTree";
-import { BruteNeighbor } from "./bruteNeighbor";
+import { BinaryTreeParams } from "./binaryTree";
+import { BruteNeighbor, BruteNeighborParams } from "./bruteNeighbor";
 import { KDTree } from "./kdTree";
+import { MetricName, MetricParams } from "./metrics";
 import { NeighborhoodMethod } from "./neighborhood";
 
 export type WeightFunction = (distances: Tensor2D) => Tensor2D;
@@ -26,20 +28,40 @@ export const WEIGHT_FUNCTIONS = {
   }
 };
 
-export const NEIGHBOR_METHODS = {
-  ballTree: new BallTree(),
-  kdTree: new KDTree(),
-  brute: new BruteNeighbor()
-};
+// export const NEIGHBOR_METHODS = {
+//   ballTree: new BallTree(),
+//   kdTree: new KDTree(),
+//   brute: new BruteNeighbor()
+// };
+
+export type NeighborMethodType = 'ballTree' | 'kdTree' | 'brute';
+export type NeighborParams = BinaryTreeParams | BruteNeighborParams;
+
+export class NeighborFactory {
+  public static getNeighborMethod(name: NeighborMethodType, params: NeighborParams = {}): NeighborhoodMethod {
+    switch (name) {
+    case 'ballTree':
+      return new BallTree(params as BinaryTreeParams);
+    case 'kdTree':
+      return new KDTree(params as BinaryTreeParams);
+    case 'brute':
+      return new BruteNeighbor(params as BruteNeighborParams);
+    default:
+      return new KDTree(params as BinaryTreeParams);
+    }
+  }
+}
 
 export interface KNeighborParams {
-  algorithm?: keyof typeof NEIGHBOR_METHODS;
+  algorithm?: NeighborMethodType;
   leafSize?: number;
   nNeighbors?: number;
   weight?: keyof typeof WEIGHT_FUNCTIONS;
+  metric?: MetricName;
+  metricParams?: MetricParams;
 }
 export class KNeighborBase implements KNeighborParams {
-  algorithm?: keyof typeof NEIGHBOR_METHODS;
+  algorithm?: NeighborMethodType;
   leafSize?: number;
   nNeighbors?: number;
   weight?: "uniform" | "distance";
@@ -49,9 +71,9 @@ export class KNeighborBase implements KNeighborParams {
   protected weightFunction?: WeightFunction;
 
   constructor(parmas: KNeighborParams = {}) {
-    const { algorithm = "ballTree", leafSize = 40, nNeighbors = 10, weight = "uniform" } = parmas;
+    const { algorithm = "ballTree", leafSize = 40, nNeighbors = 10, weight = "uniform", metric = 'l2', metricParams = {} } = parmas;
     this.algorithm = algorithm;
-    this.neighborMethod = NEIGHBOR_METHODS[this.algorithm];
+    this.neighborMethod = NeighborFactory.getNeighborMethod(algorithm, { leafSize, metric, metricParams });
     this.leafSize = leafSize;
     this.weight = weight;
     this.nNeighbors = nNeighbors;
@@ -60,7 +82,7 @@ export class KNeighborBase implements KNeighborParams {
   public async fit(xData: number[][] | Tensor2D, yData: string[] | boolean[] | number[] | Tensor1D): Promise<void> {
     const xArray = checkJSArray(xData, 'float32', 2) as number[][];
     const yArray = checkJSArray(yData, 'any', 1) as number[] | boolean[] | string[];
-    this.neighborMethod.fit(xArray, { leafSize: this.leafSize });
+    this.neighborMethod.fit(xArray);
     this.y = yArray;
   }
   public async query(xData: number[][] | Tensor2D): Promise<{ indices: number[][], distances?: number[][] }> {
@@ -88,7 +110,7 @@ export class KNeighborBase implements KNeighborParams {
       y
     } = modelParams;
     this.algorithm = algorithm;
-    this.neighborMethod = NEIGHBOR_METHODS[this.algorithm];
+    this.neighborMethod = NeighborFactory.getNeighborMethod(algorithm);
     this.leafSize = leafSize;
     this.weight = weight;
     this.nNeighbors = nNeighbors;

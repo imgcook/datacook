@@ -155,8 +155,8 @@ const irisData = [
 
 describe('KD tree', () => {
   it('fit model ', async () => {
-    const kdTree = new KDTree();
-    await kdTree.fit(irisData, { leafSize: 5 });
+    const kdTree = new KDTree({ leafSize: 5 });
+    await kdTree.fit(irisData);
     const out = kdTree.query([[ 6.6, 3, 5, 2 ], [ 5.9, 3.1, 5.0, 1.7 ], [ 5.9, 3, 5.1, 1.8 ]], 1);
     for(let i = 0; i < out.indices.length; i++) {
       console.log(i);
