@@ -70,13 +70,6 @@ export class ManhattanDistance extends DistanceMetric {
   }
 }
 
-// export const METRIC_MAPPING: Record<string, typeof DistanceMetric> = {
-//   'euclidean': EuclideanDistance,
-//   'l2': EuclideanDistance,
-//   'l1': ManhattanDistance,
-//   'minkowski': MinkowskiDistance
-// };
-
 export type MetricName = 'euclidean' | 'l2' | 'l1' | 'manhattan' | 'minkowski'
 
 export class MetricFactory {

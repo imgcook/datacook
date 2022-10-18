@@ -5,13 +5,6 @@ import { NeighborhoodMethod } from "./neighborhood";
 import { quickPartitionNode } from './utils';
 import { MetricName, DistanceMetric, MetricFactory, MetricParams } from './metrics';
 
-// export type BinaryTreeMetrics = "minkowski" | "";
-
-// export interface BinaryTreeFitParams {
-//   leafSize?: number;
-//   sampleWeights?: number[];
-// }
-
 export interface BinaryTreeNode {
   isLeaf?: boolean;
   startIdx: number;
