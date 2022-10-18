@@ -31,7 +31,7 @@ where $$N_{yi}$$ is the number of $$x_i$$ appeared in class $$y$$, $$n$$ is numb
 ## Import 
 
 ```typescript
-import * as Datacook from 'datacook';
+import * as Datacook from '@pipcook/datacook';
 const { MultimonialNB } = DataCook.Model;
 ```
 

@@ -34,6 +34,10 @@ getVariance(xData: Tensor | RecursiveArray<number>, axis = 0): Tensor
 
 ## Usage
 
+<<<<<<< HEAD
+=======
+Variance calculation for one-dimensinoal data:
+>>>>>>> 829aa619a4d47da4f9345de21739fbe5230f0e0e
 ```javascript
 const x = [ 1, 2, 3, 4, 5 ];
 const y = getVariance(x);
@@ -44,8 +48,31 @@ Tensor
 **/
 ```
 
+<<<<<<< HEAD
 
 
 
 
 ## Usage
+=======
+Variance calculation for two-dimensinoal data:
+```javascript
+const x =  [ [ 1, 2, 3, 4, 5 ], [ 6, 7, 8, 9, 10 ] ];
+const v1 = getVariance(x, 0);
+v1.print();
+/**
+ * Tensor
+ * [12.5, 12.5, 12.5, 12.5, 12.5]
+ ** /
+```
+
+```javascript
+const x =  [ [ 1, 2, 3, 4, 5 ], [ 6, 7, 8, 9, 10 ] ];
+const v2 = getVariance(x, 1);
+v2.print();
+/**
+ * Tensor
+ * [2.5, 2.5]
+ ** /
+```
+>>>>>>> 829aa619a4d47da4f9345de21739fbe5230f0e0e
