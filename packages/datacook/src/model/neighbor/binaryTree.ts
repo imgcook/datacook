@@ -4,6 +4,7 @@ import { NeighborHeap } from "./heap";
 import { NeighborhoodMethod } from "./neighborhood";
 import { quickPartitionNode } from './utils';
 import { MetricName, DistanceMetric, MetricFactory, MetricParams } from './metrics';
+import { convertMat2Csr, convertCsr2Mat } from '../../utils/csr';
 
 export interface BinaryTreeNode {
   isLeaf?: boolean;
@@ -209,7 +210,7 @@ export abstract class BianryTree implements NeighborhoodMethod {
 
   public async toObject(): Promise<Record<string, any>> {
     const modelParams: Record<string, any> = {};
-    modelParams.dataArr = this.dataArr;
+    modelParams.dataArr = convertMat2Csr(this.dataArr);
     modelParams.sampleWeights = this.sampleWeights;
     modelParams.nodeDataArr = this.nodeDataArr;
     modelParams.idxArr = this.idxArr;
@@ -221,6 +222,7 @@ export abstract class BianryTree implements NeighborhoodMethod {
     modelParams.metricPrams = { p: this.metric.p };
     return modelParams;
   }
+
   public async fromObject(modelParams: Record<string, any>): Promise<void> {
     const {
       dataArr,
@@ -234,7 +236,7 @@ export abstract class BianryTree implements NeighborhoodMethod {
       metric,
       metricParams
     } = modelParams;
-    this.dataArr = dataArr;
+    this.dataArr = convertCsr2Mat(dataArr);
     this.sampleWeights = sampleWeights;
     this.nodeDataArr = nodeDataArr;
     this.idxArr = idxArr;
