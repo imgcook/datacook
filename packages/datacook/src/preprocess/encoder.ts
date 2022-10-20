@@ -80,17 +80,19 @@ export class OneHotEncoder extends EncoderBase {
     if (!this.categories) {
       throw TypeError('Please init encoder using init()');
     }
-    const xTensor = checkArray(x, 'any', 1);
-    const xData = await xTensor.data();
-    const nCate = this.categories.shape[0];
-    const xInd = xData.map((d: number|string) => this.cateMap[d]);
-    if (this.drop === 'binary-only' && nCate === 2) {
-      return tensor(xInd);
-    } else if (this.drop === 'first') {
-      return oneHot(cast(sub(tensor(xInd), 1), 'int32'), nCate - 1);
-    } else {
-      return oneHot(xInd, nCate);
-    }
+    return tidy(() => {
+      const xTensor = checkArray(x, 'any', 1);
+      const xData = xTensor.dataSync();
+      const nCate = this.categories.shape[0];
+      const xInd = xData.map((d: number|string) => this.cateMap[d]);
+      if (this.drop === 'binary-only' && nCate === 2) {
+        return tensor(xInd);
+      } else if (this.drop === 'first') {
+        return oneHot(cast(sub(tensor(xInd), 1), 'int32'), nCate - 1);
+      } else {
+        return oneHot(xInd, nCate);
+      }
+    });
   }
   /**
    * Decode one-hot array to original category array
@@ -101,35 +103,37 @@ export class OneHotEncoder extends EncoderBase {
     if (!this.categories) {
       throw TypeError('Please init encoder using init()');
     }
-    const nCate = this.categories.shape[0];
-    const codeSize = this.drop === 'first' ? nCate - 1 : this.drop === 'binary-only' && nCate === 2 ? 1 : nCate;
-    const shapeCorrect = codeSize > 1 ? checkShape(x, [ -1, codeSize ]) : (checkShape(x, [ -1 ]) || checkShape(x, [ -1, 1 ]));
-    if (!shapeCorrect) {
-      throw new TypeError('Input shape does not match');
-    }
-    const cateInd = (this.drop === 'binary-only' && nCate === 2) ? await greaterEqual(squeeze(x), 0.5).data() : await argMax(x, 1).data();
-    const cateTensors: Tensor[] = [];
-    if (this.drop === 'binary-only' && nCate === 2) {
-      cateInd.forEach((ind: number) => {
-        if (ind != 0 && ind != 1) {
-          throw RangeError('Index out of range');
-        }
-        cateTensors.push(slice(this.categories, ind, 1));
-      });
-    } else if (this.drop === 'first') {
-      cateInd.forEach((ind: number, i: number) => {
-        if (Number(slice(x, [ i, ind ], [ 1, 1 ]).dataSync()) === 0) {
-          cateTensors.push(slice(this.categories, 0, 1));
-        } else {
-          cateTensors.push(slice(this.categories, ind + 1, 1));
-        }
-      });
-    } else {
-      cateInd.forEach((ind: number) => {
-        cateTensors.push(slice(this.categories, ind, 1));
-      });
-    }
-    return reshape(stack(cateTensors), [ -1 ]);
+    return tidy(() => {
+      const nCate = this.categories.shape[0];
+      const codeSize = this.drop === 'first' ? nCate - 1 : this.drop === 'binary-only' && nCate === 2 ? 1 : nCate;
+      const shapeCorrect = codeSize > 1 ? checkShape(x, [ -1, codeSize ]) : (checkShape(x, [ -1 ]) || checkShape(x, [ -1, 1 ]));
+      if (!shapeCorrect) {
+        throw new TypeError('Input shape does not match');
+      }
+      const cateInd = (this.drop === 'binary-only' && nCate === 2) ? greaterEqual(squeeze(x), 0.5).dataSync() : argMax(x, 1).dataSync();
+      const cateTensors: Tensor[] = [];
+      if (this.drop === 'binary-only' && nCate === 2) {
+        cateInd.forEach((ind: number) => {
+          if (ind != 0 && ind != 1) {
+            throw RangeError('Index out of range');
+          }
+          cateTensors.push(slice(this.categories, ind, 1));
+        });
+      } else if (this.drop === 'first') {
+        cateInd.forEach((ind: number, i: number) => {
+          if (Number(slice(x, [ i, ind ], [ 1, 1 ]).dataSync()) === 0) {
+            cateTensors.push(slice(this.categories, 0, 1));
+          } else {
+            cateTensors.push(slice(this.categories, ind + 1, 1));
+          }
+        });
+      } else {
+        cateInd.forEach((ind: number) => {
+          cateTensors.push(slice(this.categories, ind, 1));
+        });
+      }
+      return reshape(stack(cateTensors), [ -1 ]);
+    });
   }
 }
 

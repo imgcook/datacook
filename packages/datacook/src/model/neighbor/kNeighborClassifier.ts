@@ -1,4 +1,4 @@
-import { mul, RecursiveArray, reshape, sum, Tensor, Tensor1D, tensor2d, Tensor2D } from "@tensorflow/tfjs-core";
+import { dispose, memory, mul, RecursiveArray, reshape, sum, Tensor, Tensor1D, tensor2d, Tensor2D, tidy } from "@tensorflow/tfjs-core";
 import { OneHotDropTypes, OneHotEncoder } from "../../preprocess/encoder";
 import { checkArray, checkJSArray } from "../../utils/validation";
 import { BaseClassifier, ClassMap } from "../base";
@@ -63,7 +63,8 @@ export class KNeighborClassifier extends KNeighborBase implements BaseClassifier
     // const nnLabels = reshape(tensor2d(ySlice), [ nSamples * nNeighbors ]);
     const weights = this.weightFunction(distTensor);
     const labelOneHot = await this.classOneHotEncoder.encode(ySlice as string[] | boolean[] | number[]);
-    const proba = sum(mul(reshape(labelOneHot, [ nSamples, nNeighbors, -1 ]), reshape(weights, [ nSamples, nNeighbors, 1 ])), 1) as Tensor2D;
+    const proba = tidy(() => sum(mul(reshape(labelOneHot, [ nSamples, nNeighbors, -1 ]), reshape(weights, [ nSamples, nNeighbors, 1 ])), 1) as Tensor2D);
+    dispose([ weights, labelOneHot, distTensor ]);
     return proba;
   }
 
@@ -73,7 +74,9 @@ export class KNeighborClassifier extends KNeighborBase implements BaseClassifier
   }
   public async predict(xData: number[][] | Tensor2D): Promise<Tensor> {
     const proba = await this.predictProba(xData);
-    return await this.classOneHotEncoder.decode(proba);
+    const predClass = await this.classOneHotEncoder.decode(proba);
+    dispose(proba);
+    return predClass;
   }
   public async toObject(): Promise<Record<string, any>> {
     const modelParams = await super.toObject();

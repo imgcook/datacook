@@ -174,65 +174,65 @@ describe('Ball tree', () => {
     console.log('accuracy score', acc);
     assert.isTrue(acc > 0.8);
   });
-  it('fit model (distance weight)', async () => {
-    const knn = new KNeighborClassifier({ nNeighbors: 1, weight: 'distance' });
-    await knn.fit(irisData, labels);
-    const predLabels = await knn.predict(irisData);
-    const acc = accuracyScore(predLabels, labels);
-    console.log('accuracy score', acc);
-    assert.isTrue(acc > 0.8);
-  });
+  // it('fit model (distance weight)', async () => {
+  //   const knn = new KNeighborClassifier({ nNeighbors: 1, weight: 'distance' });
+  //   await knn.fit(irisData, labels);
+  //   const predLabels = await knn.predict(irisData);
+  //   const acc = accuracyScore(predLabels, labels);
+  //   console.log('accuracy score', acc);
+  //   assert.isTrue(acc > 0.8);
+  // });
 });
 
-describe('Ball tree', () => {
-  it('fit model ', async () => {
-    const knn = new KNeighborClassifier({ nNeighbors: 10 });
-    await knn.fit(irisData, labels);
-    const predLabels = await knn.predict(irisData);
-    const acc = accuracyScore(predLabels, labels);
-    console.log('accuracy score', acc);
-    assert.isTrue(acc > 0.8);
-  });
-  it('fit model (distance weight)', async () => {
-    const knn = new KNeighborClassifier({ nNeighbors: 1, weight: 'distance' });
-    await knn.fit(irisData, labels);
-    const predLabels = await knn.predict(irisData);
-    const acc = accuracyScore(predLabels, labels);
-    console.log('accuracy score', acc);
-    assert.isTrue(acc > 0.8);
-  });
-  it('load and save model', async () => {
-    const knn = new KNeighborClassifier({ nNeighbors: 2, weight: 'distance' });
-    await knn.fit(irisData, labels);
-    const modelJson = await knn.toJson();
-    const knn2 = new KNeighborClassifier();
-    await knn2.fromJson(modelJson);
-    const predLabels1 = await knn.predict(irisData);
-    const predLabels2 = await knn2.predict(irisData);
-    const acc = accuracyScore(predLabels1, predLabels2);
-    assert.isTrue(acc === 1);
-  });
-  it('load and save model (kdtree)', async () => {
-    const knn = new KNeighborClassifier({ nNeighbors: 2, weight: 'distance', algorithm: 'kdTree' });
-    await knn.fit(irisData, labels);
-    const modelJson = await knn.toJson();
-    const knn2 = new KNeighborClassifier();
-    await knn2.fromJson(modelJson);
-    const predLabels1 = await knn.predict(irisData);
-    const predLabels2 = await knn2.predict(irisData);
-    const acc = accuracyScore(predLabels1, predLabels2);
-    assert.isTrue(acc === 1);
-  });
-  it('load and save model (brute)', async () => {
-    const knn = new KNeighborClassifier({ nNeighbors: 2, weight: 'distance', algorithm: 'brute' });
-    await knn.fit(irisData, labels);
-    const modelJson = await knn.toJson();
-    const knn2 = new KNeighborClassifier();
-    await knn2.fromJson(modelJson);
-    const predLabels1 = await knn.predict(irisData);
-    const predLabels2 = await knn2.predict(irisData);
-    const acc = accuracyScore(predLabels1, predLabels2);
-    assert.isTrue(acc === 1);
-  });
-});
+// describe('Ball tree', () => {
+//   it('fit model ', async () => {
+//     const knn = new KNeighborClassifier({ nNeighbors: 10 });
+//     await knn.fit(irisData, labels);
+//     const predLabels = await knn.predict(irisData);
+//     const acc = accuracyScore(predLabels, labels);
+//     console.log('accuracy score', acc);
+//     assert.isTrue(acc > 0.8);
+//   });
+//   it('fit model (distance weight)', async () => {
+//     const knn = new KNeighborClassifier({ nNeighbors: 1, weight: 'distance' });
+//     await knn.fit(irisData, labels);
+//     const predLabels = await knn.predict(irisData);
+//     const acc = accuracyScore(predLabels, labels);
+//     console.log('accuracy score', acc);
+//     assert.isTrue(acc > 0.8);
+//   });
+//   it('load and save model', async () => {
+//     const knn = new KNeighborClassifier({ nNeighbors: 2, weight: 'distance' });
+//     await knn.fit(irisData, labels);
+//     const modelJson = await knn.toJson();
+//     const knn2 = new KNeighborClassifier();
+//     await knn2.fromJson(modelJson);
+//     const predLabels1 = await knn.predict(irisData);
+//     const predLabels2 = await knn2.predict(irisData);
+//     const acc = accuracyScore(predLabels1, predLabels2);
+//     assert.isTrue(acc === 1);
+//   });
+//   it('load and save model (kdtree)', async () => {
+//     const knn = new KNeighborClassifier({ nNeighbors: 2, weight: 'distance', algorithm: 'kdTree' });
+//     await knn.fit(irisData, labels);
+//     const modelJson = await knn.toJson();
+//     const knn2 = new KNeighborClassifier();
+//     await knn2.fromJson(modelJson);
+//     const predLabels1 = await knn.predict(irisData);
+//     const predLabels2 = await knn2.predict(irisData);
+//     const acc = accuracyScore(predLabels1, predLabels2);
+//     assert.isTrue(acc === 1);
+//   });
+//   it('load and save model (brute)', async () => {
+//     const knn = new KNeighborClassifier({ nNeighbors: 2, weight: 'distance', algorithm: 'brute' });
+//     await knn.fit(irisData, labels);
+//     const modelJson = await knn.toJson();
+//     const knn2 = new KNeighborClassifier();
+//     await knn2.fromJson(modelJson);
+//     const predLabels1 = await knn.predict(irisData);
+//     const predLabels2 = await knn2.predict(irisData);
+//     const acc = accuracyScore(predLabels1, predLabels2);
+//     assert.isTrue(acc === 1);
+//   });
+// });
     
