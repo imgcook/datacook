@@ -1,4 +1,3 @@
-
 import { MultinomialNB } from '../../../src/model/naive-bayes';
 import * as tf from '@tensorflow/tfjs-core';
 import { assert } from 'chai';
@@ -25,15 +24,15 @@ describe('Naive bayes', () => {
   it('predict train case', async () => {
     const mnb = new MultinomialNB();
     // train twice
-    await mnb.train(cases, labels);
-    await mnb.train(cases, labels);
+    await mnb.fit(cases, labels);
+    await mnb.fit(cases, labels);
     const prediction = await mnb.predict(cases);
     assert.deepEqual(prediction.arraySync() as any, labels);
   });
 
   it('predict class probabilities', async () => {
     const mnb = new MultinomialNB();
-    await mnb.train(cases, labels);
+    await mnb.fit(cases, labels);
     const probs = await mnb.predictProba(cases);
     const nCases = cases.shape[0];
     const class_prob_sum = tf.sum(probs, 1);
@@ -43,14 +42,14 @@ describe('Naive bayes', () => {
 
   it('predict test case', async () => {
     const mnb = new MultinomialNB();
-    await mnb.train(cases, labels);
+    await mnb.fit(cases, labels);
     const yPred = await mnb.predict(testCases);
     assert.deepEqual(yPred.arraySync() as any, testLabels);
   });
 
   it('save and load model', async () => {
     const mnb = new MultinomialNB();
-    await mnb.train(cases, labels);
+    await mnb.fit(cases, labels);
     const modelJson = mnb.toJson();
     const mnb2 = new MultinomialNB();
     await mnb2.load(modelJson);

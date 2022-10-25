@@ -1,6 +1,7 @@
 import { BaseClassifier } from '../base';
 import { Tensor, add, sub, log, cast, squeeze, exp, reshape, matMul, transpose,
   sum, booleanMaskAsync, gather, stack, Tensor2D, tensor, divNoNan } from '@tensorflow/tfjs-core';
+import { checkArray } from '../../utils/validation';
 
 export type ClassMap = {
   [ key: string ]: number
@@ -80,7 +81,7 @@ export class MultinomialNB extends BaseClassifier {
    * @param yData label array, one dimension numeric array or 1D Tensor of size n_samples, use different integer values to represent different labels
    * @returns classifier itself
    */
-  public async train(xData: Array<any> | Tensor, yData: Array<any> | Tensor): Promise<MultinomialNB> {
+  public async fit(xData: Array<any> | Tensor, yData: Array<any> | Tensor): Promise<MultinomialNB> {
     const { x, y } = this.validateData(xData, yData);
     const firstCall = this.firstCall();
     let yOneHot;
@@ -124,11 +125,12 @@ export class MultinomialNB extends BaseClassifier {
 
   /**
    * Perform classification on an array of test vector X.
-   * @param x input feature array, two dimension numeric array or 2D Tensor of shape (n_samples, n_features).
+   * @param xData input feature array, two dimension numeric array or 2D Tensor of shape (n_samples, n_features).
    * @returns 1D Tensor of shape n_samples, Predicted target value of X.
    */
-  public async predict(X: Tensor2D): Promise<Tensor> {
-    const logLikelihood = this.getLogLikelihood(X);
+  public async predict(xData: Tensor2D | number[][]): Promise<Tensor> {
+    const xTensor = checkArray(xData, 'float32', 2) as Tensor2D;
+    const logLikelihood = this.getLogLikelihood(xTensor);
     const classVal = await this.classOneHotEncoder.decode(logLikelihood);
     return classVal;
   }
