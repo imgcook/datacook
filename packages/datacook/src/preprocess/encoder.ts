@@ -77,10 +77,10 @@ export class OneHotEncoder extends EncoderBase {
    * @returns transformed one-hot feature
    */
   public async encode(x: Tensor | number[] | string[] | boolean[]): Promise<Tensor> {
-    if (!this.categories) {
-      throw TypeError('Please init encoder using init()');
-    }
     return tidy(() => {
+      if (!this.categories) {
+        throw TypeError('Please init encoder using init()');
+      }
       const xTensor = checkArray(x, 'any', 1);
       const xData = xTensor.dataSync();
       const nCate = this.categories.shape[0];
@@ -90,7 +90,7 @@ export class OneHotEncoder extends EncoderBase {
       } else if (this.drop === 'first') {
         return oneHot(cast(sub(tensor(xInd), 1), 'int32'), nCate - 1);
       } else {
-        return oneHot(xInd, nCate);
+        return oneHot(cast(tensor(xInd), 'int32'), nCate);
       }
     });
   }
@@ -100,10 +100,10 @@ export class OneHotEncoder extends EncoderBase {
    * @returns transformed category data
    */
   public async decode(x: Tensor): Promise<Tensor> {
-    if (!this.categories) {
-      throw TypeError('Please init encoder using init()');
-    }
     return tidy(() => {
+      if (!this.categories) {
+        throw TypeError('Please init encoder using init()');
+      }
       const nCate = this.categories.shape[0];
       const codeSize = this.drop === 'first' ? nCate - 1 : this.drop === 'binary-only' && nCate === 2 ? 1 : nCate;
       const shapeCorrect = codeSize > 1 ? checkShape(x, [ -1, codeSize ]) : (checkShape(x, [ -1 ]) || checkShape(x, [ -1, 1 ]));

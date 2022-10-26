@@ -1,6 +1,7 @@
 import { BaseClassifier } from '../base';
 import { Tensor, add, sub, log, cast, squeeze, exp, reshape, matMul, transpose,
-  sum, booleanMaskAsync, gather, stack, Tensor2D, tensor, divNoNan } from '@tensorflow/tfjs-core';
+  sum, booleanMaskAsync, gather, stack, Tensor2D, tensor, divNoNan, tidy, dispose } from '@tensorflow/tfjs-core';
+import { checkArray } from '../../utils/validation';
 
 export type ClassMap = {
   [ key: string ]: number
@@ -28,42 +29,52 @@ export class MultinomialNB extends BaseClassifier {
 
   private updateClassLogPrior() {
     if (this.classCount) {
-      const nData = cast(sum(this.classCount), 'float32');
-      this.priorProb = sub(log(this.classCount), log(nData));
+      this.priorProb = tidy(() => {
+        const nData = cast(sum(this.classCount), 'float32');
+        return sub(log(this.classCount), log(nData));
+      });
     }
   }
 
   private updateFeatureLogProb() {
     if (this.featureCount){
-      const axisH = 1;
-      const featureCountFixed = add(this.featureCount, this.alpha);
-      const classCountFixed = reshape(sum(featureCountFixed, axisH), [ -1, 1 ]);
-      this.conditionProb = sub(log(featureCountFixed), log(classCountFixed));
+      this.conditionProb = tidy(() => {
+        const axisH = 1;
+        const featureCountFixed = add(this.featureCount, this.alpha);
+        const classCountFixed = reshape(sum(featureCountFixed, axisH), [ -1, 1 ]);
+        return sub(log(featureCountFixed), log(classCountFixed));
+      });
     }
   }
 
   private updateFeautrCount(featureCount: Tensor) {
-    featureCount = cast(featureCount, 'float32');
-    if (this.featureCount) {
-      this.featureCount = add(this.featureCount, featureCount);
-    } else {
-      this.featureCount = featureCount;
-    }
+    this.featureCount = tidy(() => {
+      featureCount = cast(featureCount, 'float32');
+      if (this.featureCount) {
+        return add(this.featureCount, featureCount);
+      } else {
+        return featureCount;
+      }
+    });
   }
 
   private updateClassCount(classCount: Tensor) {
-    classCount = cast(classCount, 'float32');
-    if (this.classCount) {
-      this.classCount = add(this.classCount, classCount);
-    } else {
-      this.classCount = classCount;
-    }
+    this.classCount = tidy(() => {
+      classCount = cast(classCount, 'float32');
+      if (this.classCount) {
+        return add(this.classCount, classCount);
+      } else {
+        return classCount;
+      }
+    });
   }
 
   private getLogLikelihood(X: Tensor2D): Tensor {
-    const v = matMul(X, transpose(this.conditionProb));
-    const predictions = add(v, this.priorProb);
-    return predictions;
+    return tidy(() => {
+      const v = matMul(X, transpose(this.conditionProb));
+      const predictions = add(v, this.priorProb);
+      return predictions;
+    });
   }
 
   // check if first call to train
@@ -80,10 +91,10 @@ export class MultinomialNB extends BaseClassifier {
    * @param yData label array, one dimension numeric array or 1D Tensor of size n_samples, use different integer values to represent different labels
    * @returns classifier itself
    */
-  public async train(xData: Array<any> | Tensor, yData: Array<any> | Tensor): Promise<MultinomialNB> {
+  public async fit(xData: Array<any> | Tensor, yData: Array<any> | Tensor): Promise<MultinomialNB> {
     const { x, y } = this.validateData(xData, yData);
     const firstCall = this.firstCall();
-    let yOneHot;
+    let yOneHot: Tensor;
 
     if (firstCall){
       await this.initClasses(y);
@@ -100,20 +111,24 @@ export class MultinomialNB extends BaseClassifier {
     const axisH = 0;
     const nClass = this.classes().shape[0];
     // update class count
-    const classCount = sum(yOneHot, axisH);
+    const classCount = tidy(() => sum(yOneHot, axisH));
     this.updateClassCount(classCount);
 
     // update feature count
     const featureCounts = [];
-    for (let i = 0; i < nClass ; i++) {
+    for (let i = 0; i < nClass; i++) {
       const axisH = 1;
       const axisV = 0;
-      const classMask = squeeze(cast(gather(yOneHot, [ i ], axisH), 'bool'));
+      const classMask = tidy(() => squeeze(cast(gather(yOneHot, [ i ], axisH), 'bool')));
       const dataI = await booleanMaskAsync(x, classMask);
       const featureCount = sum(dataI, axisV);
+      dispose([ classMask, dataI ]);
       featureCounts.push(featureCount);
     }
     const featureCountTensor = stack(featureCounts);
+    for (let i = 0; i < featureCounts.length; i++) {
+      dispose(featureCounts[i]);
+    }
     this.updateFeautrCount(featureCountTensor);
     // update prior prob
     this.updateClassLogPrior();
@@ -124,12 +139,14 @@ export class MultinomialNB extends BaseClassifier {
 
   /**
    * Perform classification on an array of test vector X.
-   * @param x input feature array, two dimension numeric array or 2D Tensor of shape (n_samples, n_features).
+   * @param xData input feature array, two dimension numeric array or 2D Tensor of shape (n_samples, n_features).
    * @returns 1D Tensor of shape n_samples, Predicted target value of X.
    */
-  public async predict(X: Tensor2D): Promise<Tensor> {
-    const logLikelihood = this.getLogLikelihood(X);
+  public async predict(xData: Tensor2D | number[][]): Promise<Tensor> {
+    const xTensor = checkArray(xData, 'float32', 2) as Tensor2D;
+    const logLikelihood = this.getLogLikelihood(xTensor);
     const classVal = await this.classOneHotEncoder.decode(logLikelihood);
+    dispose(logLikelihood);
     return classVal;
   }
 
@@ -141,12 +158,14 @@ export class MultinomialNB extends BaseClassifier {
             order
    */
   public async predictProba(x: Tensor2D): Promise<Tensor> {
-    const axisH = 1;
-    const logLikelihood = this.getLogLikelihood(x);
-    const likeliHood = exp(logLikelihood);
-    const sumLikelihood = reshape(sum(likeliHood, axisH), [ -1, 1 ]);
-    const proba = divNoNan(likeliHood, sumLikelihood);
-    return proba;
+    return tidy(() => {
+      const axisH = 1;
+      const logLikelihood = this.getLogLikelihood(x);
+      const likeliHood = exp(logLikelihood);
+      const sumLikelihood = reshape(sum(likeliHood, axisH), [ -1, 1 ]);
+      const proba = divNoNan(likeliHood, sumLikelihood);
+      return proba;
+    });
   }
 
   /**
@@ -154,7 +173,7 @@ export class MultinomialNB extends BaseClassifier {
    * @param modelJson: JSON string, contains model parameters
    * @returns classifier itself
    */
-  public async load(modelJson:string): Promise<void> {
+  public async fromJson(modelJson:string): Promise<void> {
     const modelParams = JSON.parse(modelJson);
     if (modelParams.name !== 'MultinomialNB'){
       throw new TypeError(`${modelParams.name} is not a Multinomial Naive Bayes`);
