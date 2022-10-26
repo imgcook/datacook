@@ -54,4 +54,12 @@ describe('OneHot Encoder', () => {
     const bxCate = await encoder.decode(bxEncodeDrop);
     assert.deepEqual(bxCate.dataSync() as any, bx);
   });
+
+  it('encode missing input', async () => {
+    const encoder = new OneHotEncoder();
+    await encoder.init(x);
+    const xOneHot = await encoder.encode([ 'banana', 'dog' ]);
+    xOneHot.print();
+    // assert.deepEqual(xOneHot.dataSync(), xEncode.dataSync());
+  });
 });

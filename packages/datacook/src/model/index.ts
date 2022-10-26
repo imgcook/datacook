@@ -7,4 +7,4 @@ export { stepwiseLinearRegression } from './stat/stepwise';
 export { NonLinearRegression, NonLinearRegressionTrainParams } from './non-linear-model/NonLinearRegression';
 export { MLPRegressor, MLPRegressorParams, MLPRegressorTrainParams } from './neural-network/MLPRegressor';
 export { GradientBoostingClassifier, GradientBoostingRegressor } from './ensemble/gbdt';
-
+export { KNeighborClassifier, KDTree, BruteNeighbor, BallTree } from './neighbor';
