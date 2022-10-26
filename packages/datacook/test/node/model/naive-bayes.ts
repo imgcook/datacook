@@ -26,7 +26,9 @@ describe('Naive bayes', () => {
     // train twice
     await mnb.fit(cases, labels);
     await mnb.fit(cases, labels);
+    console.log(tf.memory());
     const prediction = await mnb.predict(cases);
+    console.log(tf.memory());
     assert.deepEqual(prediction.arraySync() as any, labels);
   });
 
