@@ -173,7 +173,7 @@ export class MultinomialNB extends BaseClassifier {
    * @param modelJson: JSON string, contains model parameters
    * @returns classifier itself
    */
-  public async load(modelJson:string): Promise<void> {
+  public async fromJson(modelJson:string): Promise<void> {
     const modelParams = JSON.parse(modelJson);
     if (modelParams.name !== 'MultinomialNB'){
       throw new TypeError(`${modelParams.name} is not a Multinomial Naive Bayes`);

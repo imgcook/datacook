@@ -54,7 +54,7 @@ describe('Naive bayes', () => {
     await mnb.fit(cases, labels);
     const modelJson = mnb.toJson();
     const mnb2 = new MultinomialNB();
-    await mnb2.load(modelJson);
+    await mnb2.fromJson(modelJson);
     const yPred = await mnb2.predict(testCases);
     assert.deepEqual(yPred.arraySync() as any, testLabels);
   });
